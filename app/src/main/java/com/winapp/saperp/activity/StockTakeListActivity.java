@@ -591,7 +591,7 @@ public class StockTakeListActivity extends NavigationActivity implements View.On
         if (item.getItemId() == android.R.id.home) {//finish();
             onBackPressed();
         } else if (item.getItemId() == R.id.action_add) {
-            Intent intent = new Intent(getApplicationContext(), TransferInActivity.class);
+            Intent intent = new Intent(getApplicationContext(), StockTakeAddActivity.class);
             startActivity(intent);
         }
         else if (item.getItemId()==R.id.action_filter){

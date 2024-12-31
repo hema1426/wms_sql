@@ -70,6 +70,7 @@ public class RoReceiptSettlePreviewActivity extends AppCompatActivity {
 
     private ArrayList<SettlementReceiptModel.CurrencyDenomination> denominationArrayList ;
     private ArrayList<SettlementReceiptModel.Expense> expenseArrayList ;
+    private ArrayList<SettlementReceiptDetailModel.invoiceDetailSettlement> invoiceDetailSettlementList ;
     private TextView setle_fromdatel;
     private TextView setle_todatel;
     private TextView setle_usernamel;
@@ -188,6 +189,7 @@ public class RoReceiptSettlePreviewActivity extends AppCompatActivity {
         settlementReceiptDetailModelList = new ArrayList<>();
         denominationArrayList = new ArrayList<>();
         expenseArrayList = new ArrayList<>();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject, response -> {
             try{
 
@@ -237,6 +239,23 @@ public class RoReceiptSettlePreviewActivity extends AppCompatActivity {
                                    model.setBankCode(receiptObject.optString("bankCode"));
                                    model.setChequeNo(receiptObject.optString("chequeNo"));
 
+                                JSONArray invoiceArray = receiptObject.optJSONArray("receiptInvoiceDetails");
+                                invoiceDetailSettlementList =new ArrayList<>();
+                                
+                                if(invoiceArray.length() > 0) {
+                                    for (int k = 0; k < invoiceArray.length(); k++) {
+                                        JSONObject obj = invoiceArray.optJSONObject(k);
+                                        SettlementReceiptDetailModel.invoiceDetailSettlement modela =
+                                                new SettlementReceiptDetailModel.invoiceDetailSettlement();
+                                        modela.setInvoiceNo(obj.optString("invoiceNo"));
+                                        modela.setInvoiceDate(obj.optString("invoiceDate"));
+                                        modela.setPaidAmt(obj.optString("paidAmount"));
+                                        modela.setTotal(obj.optString("invoiceTotal"));
+
+                                        invoiceDetailSettlementList.add(modela);
+                                    }
+                                    model.setInvoiceDetailSettlementList(invoiceDetailSettlementList);
+                                }
                                 settlementReceiptDetailModelList.add(model);
                             }
                         }

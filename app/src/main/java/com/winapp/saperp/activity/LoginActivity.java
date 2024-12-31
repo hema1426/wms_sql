@@ -296,7 +296,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 String userMiddlename =object.optString("userMiddleName");
                                 String adminPermission =object.optString("adminPermission");
 
-
                                 String invUOM =object.optString("invoiceDefaultUOM");
                                 String salesUOM =object.optString("salesOrderDefaultUOM");
                                 String returnUOM =object.optString("salesRetunDefaultUOM");

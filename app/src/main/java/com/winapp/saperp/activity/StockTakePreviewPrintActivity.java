@@ -276,9 +276,9 @@ public class StockTakePreviewPrintActivity extends AppCompatActivity {
     }
 
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 //        if (id == R.id.action_print) {
 //            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 //            if (mBluetoothAdapter == null) {
@@ -296,13 +296,12 @@ public class StockTakePreviewPrintActivity extends AppCompatActivity {
 //                }
 //            }
 //            return true;
-//        } else if (id == android.R.id.home) {
-//            finish();
-//        } else if (id == R.id.action_pdf) {
-//
 //        }
-//        return super.onOptionsItemSelected(item);
-//    }
+        if (id == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 //    public void showPrintAlert(){
 //        AlertDialog.Builder builder1 = new AlertDialog.Builder(StockTakePreviewPrintActivity.this);

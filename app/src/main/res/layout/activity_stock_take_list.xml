@@ -14,10 +14,7 @@
         android:orientation="vertical"
         android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/search_filtertake"
-        android:visibility="gone"
-        layout="@layout/stockadjust_filter_layout"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,10 +55,11 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stockTakeList"
-        tools:listitem="@layout/transfer_list_item"
+        tools:listitem="@layout/stock_take_list_item"
         android:layout_width="match_parent"
         android:paddingBottom="40dp"
         android:visibility="gone"
+        android:background="@color/lit_grey_new"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +75,10 @@
         android:text="No Record Found....!"
         android:layout_gravity="center"
         android:layout_height="match_parent"/>
-
+        <include
+            android:id="@+id/search_filtertake"
+            android:visibility="gone"
+            layout="@layout/stockadjust_filter_layout"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:background="#8000"

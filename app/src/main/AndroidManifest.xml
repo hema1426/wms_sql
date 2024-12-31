@@ -128,7 +128,11 @@
             android:name=".activity.StockTakePreviewPrintActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".activity.StockTakeAddActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ReportPreview.SapStockSummaryPreviewActivity"
             android:exported="false"

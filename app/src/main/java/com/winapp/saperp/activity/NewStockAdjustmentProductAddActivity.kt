@@ -142,7 +142,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     var pcsPerCarton: EditText? = null
     var stockCount: EditText? = null
     var qtyValue: EditText? = null
-    var returnQtyText: EditText? = null
     var customerNameText: EditText? = null
     var priceText: EditText? = null
     var subTotalValue: TextView? = null
@@ -164,6 +163,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     var productId: String? = null
     var editTimeStamp: String? = null
     var productName: String? = null
+    var batch_btnl: Button? = null
     var uomChangel: TextView? = null
     var ed_uomTxtl: TextView? = null
     var uomTxtTitl: TextView? = null
@@ -181,13 +181,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     var lqtyTextWatcher: TextWatcher? = null
     var cartonPriceTextWatcher: TextWatcher? = null
     var loosePriceTextWatcher: TextWatcher? = null
-    var focSwitch: Switch? = null
-    var exchangeSwitch: Switch? = null
-    var returnSwitch: Switch? = null
-    var focEditText: EditText? = null
-    var exchangeEditext: EditText? = null
-    var discountEditext: EditText? = null
-    var returnEditext: EditText? = null
     var scanProduct: ImageView? = null
     var RESULT_CODE = 12
     var scannedBarcode: String? = ""
@@ -214,7 +207,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     var isPriceEdit = true
     var salesReturn: CheckBox? = null
     var salesReturnText: TextView? = null
-    var minimumSellingPriceText: TextView? = null
     private val cancelSheet: ImageView? = null
     private var cancelButton: Button? = null
     private var okButton: Button? = null
@@ -282,6 +274,8 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         uomSpinner = findViewById(R.id.uom_spinner)
         uomChangel = findViewById(R.id.uomChange)
         ed_uomTxtl = findViewById(R.id.ed_uomTxt)
+        batch_btnl = findViewById(R.id.batch_btn)
+
         uomTxtTitl = findViewById(R.id.uomTxtTitle)
         location_adjustl = findViewById(R.id.location_adjust)
 
@@ -311,7 +305,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         pcsPerCarton = findViewById(R.id.pcs_per_ctn)
         uomText = findViewById(R.id.uom)
         stockCount = findViewById(R.id.stock_count)
-        qtyValue = findViewById(R.id.qty)
+        qtyValue = findViewById(R.id.qty_adjust)
         subTotalValue = findViewById(R.id.balance_value)
 //        taxValueText = findViewById(R.id.tax)
 //        netTotalValue = findViewById(R.id.net_total)
@@ -319,13 +313,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         addProduct = findViewById(R.id.add_product)
         itemCount = findViewById(R.id.item_count)
         noproductText = findViewById(R.id.no_product_text)
-        focSwitch = findViewById(R.id.foc_switch)
-        exchangeSwitch = findViewById(R.id.exchange_switch)
-        returnSwitch = findViewById(R.id.return_switch)
-        focEditText = findViewById(R.id.foc)
-        exchangeEditext = findViewById(R.id.exchange_text)
-        returnEditext = findViewById(R.id.return_text)
-        discountEditext = findViewById(R.id.discount_text)
         scanProduct = findViewById(R.id.scan_product)
         stockQtyValue = findViewById(R.id.stock_qty)
         stockLayout = findViewById(R.id.stock_layout)
@@ -335,9 +322,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         productLayout = findViewById(R.id.product_layout)
         salesReturn = findViewById(R.id.sales_return)
         salesReturnText = findViewById(R.id.sales_return_text)
-        minimumSellingPriceText = findViewById(R.id.minimum_selling_price)
         barcodeText = findViewById(R.id.barcode_text)
-        returnQtyText = findViewById(R.id.return_qty)
         customerNameText = findViewById(R.id.customer_name_text)
         remarkText = findViewById(R.id.remarks)
         returnAdj = findViewById(R.id.return_adj)
@@ -358,10 +343,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 
         //  PrinterUtils printerUtils=new PrinterUtils(this,printerMacId);
         //  printerUtils.connectPrinter();
-        focEditText!!.setEnabled(false)
-        exchangeEditext!!.setEnabled(false)
-        discountEditext!!.setEnabled(false)
-        returnEditext!!.setEnabled(false)
+        qtyValue!!.setEnabled(false)
         val c = Calendar.getInstance().time
         println("Current time => $c")
         val df1 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
@@ -619,8 +601,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             .isEmpty()
                     ) {
                         if (priceText!!.getText().toString().toDouble() > 0) {
-                            val minimumsellingprice =
-                                minimumSellingPriceText!!.getText().toString().toDouble()
+                           // val minimumsellingprice = minimumSellingPriceText!!.getText().toString().toDouble()
                             addProduct("Add")
 
 //                            if (minimumsellingprice <= priceText!!.getText().toString().toDouble()) {
@@ -632,20 +613,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //                                )
 //                            }
                         } else {
-                            if (focEditText!!.getText() != null && !focEditText!!.getText().toString()
-                                    .isEmpty() && focEditText!!.getText()
-                                    .toString() != "0" || returnQtyText!!.getText() != null && !returnQtyText!!.getText()
-                                    .toString().isEmpty() && returnQtyText!!.getText()
-                                    .toString() != "0"
-                            ) {
-                                addProduct("Add")
-                            } else {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Price should not be zero",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+
                         }
                     } else {
                         Toast.makeText(applicationContext, "Enter the price", Toast.LENGTH_SHORT)
@@ -653,19 +621,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                if (focEditText!!.getText() != null && !focEditText!!.getText().toString()
-                        .isEmpty() && focEditText!!.getText()
-                        .toString() != "0" || returnQtyText!!.getText() != null && !returnQtyText!!.getText()
-                        .toString().isEmpty() && returnQtyText!!.getText().toString() != "0"
-                ) {
-                    addProduct("Add")
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        "Price should not be zero",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+
             }
         })
 //        returnAdj!!.setOnClickListener(View.OnClickListener { returnLayoutView!!.setVisibility(View.VISIBLE) })
@@ -807,10 +763,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             qtyValue!!.requestFocus()
                             openKeyborard(qtyValue)
                             qtyValue!!.setSelection(qtyValue!!.text.length)
-                            focEditText!!.isEnabled = true
-                            exchangeEditext!!.isEnabled = true
-                            discountEditext!!.isEnabled = true
-                            returnEditext!!.isEnabled = true
                         } else {
                             Toast.makeText(
                                 applicationContext,
@@ -835,10 +787,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                         qtyValue!!.requestFocus()
                         openKeyborard(qtyValue)
                         qtyValue!!.setSelection(qtyValue!!.text.length)
-                        focEditText!!.isEnabled = true
-                        exchangeEditext!!.isEnabled = true
-                        discountEditext!!.isEnabled = true
-                        returnEditext!!.isEnabled = true
                     }
                 } else {
                     Log.w("Not_found", "Product")
@@ -925,31 +873,14 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             var foc = "0"
             var uom = "PCS"
             var price_value = "0"
-            if (focSwitch!!.isChecked) {
-                focType = "ctn"
-            }
-            if (exchangeSwitch!!.isChecked) {
-                exchangeType = "ctn"
-            }
-            if (returnSwitch!!.isChecked) {
-                returnType = "ctn"
-            }
+
             val ctn_qty = "0"
             var qty_value = "0"
             if (!qtyValue!!.text.toString().isEmpty()) {
                 qty_value = qtyValue!!.text.toString()
             }
-            if (!discountEditext!!.text.toString().isEmpty()) {
-                discount = discountEditext!!.text.toString()
-            }
-            if (!returnQtyText!!.text.toString().isEmpty()) {
-                return_qty = returnQtyText!!.text.toString()
-            }
             if (!priceText!!.text.toString().isEmpty()) {
                 price_value = priceText!!.text.toString()
-            }
-            if (!focEditText!!.text.toString().isEmpty()) {
-                foc = focEditText!!.text.toString()
             }
             val priceValue = 0.0
 //            val net_qty = qty_value.toDouble() - return_qty.toDouble()
@@ -1017,24 +948,15 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 stockQtyValue!!.text = ""
                 qtyValue!!.clearFocus()
                 productAutoComplete!!.clearFocus()
-                focEditText!!.setText("")
-                exchangeEditext!!.setText("")
-                discountEditext!!.setText("")
-                returnQtyText!!.setText("")
                 editTimeStamp = ""
                 uomChangel!!.visibility = View.GONE
                 ed_uomTxtl!!.visibility = View.GONE
                 uomSpinnerLayl!!.visibility = View.VISIBLE
                 ischangeUOM = false
-                focSwitch!!.isChecked = false
-                exchangeSwitch!!.isChecked = false
-                returnSwitch!!.isChecked = false
                 stockLayout!!.visibility = View.GONE
                 priceText!!.isEnabled = false
                // qtyValue!!.isEnabled = false
-                focEditText!!.isEnabled = false
-                exchangeEditext!!.isEnabled = false
-                discountEditext!!.isEnabled = false
+                qtyValue!!.isEnabled = false
                 addProduct!!.text = "Add"
                 hideKeyboard()
                 getProducts()
@@ -1097,19 +1019,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                         jsonObject.put("ItemCode",productEditId)
                         getUOMEdit(jsonObject,model.uomCode,model.stockProductQty)
 
-
-                        if (model.focQty != null && !model.focQty.isEmpty() && model.focQty != "null") {
-                            focEditText!!.setText(model.focQty)
-                        } else {
-                            focEditText!!.setText("0")
-                        }
-                        if (model.returnQty != null && !model.returnQty.isEmpty() && model.returnQty != "null") {
-                            returnQtyText!!.setText(model.returnQty)
-                        } else {
-                            returnQtyText!!.setText("0")
-                        }
-                        focEditText!!.isEnabled = true
-                        returnQtyText!!.isEnabled = true
+                        qtyValue!!.isEnabled = true
                        // stockLayout!!.visibility = View.VISIBLE
                         stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
                         stockQtyValue!!.text = model.stockQty
@@ -1231,8 +1141,6 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         stockQtyValue!!.text = ""
         qtyValue!!.clearFocus()
         productAutoComplete!!.clearFocus()
-        focEditText!!.setText("")
-        returnQtyText!!.setText("")
         stockLayout!!.visibility = View.GONE
         uomChangel!!.visibility = View.GONE
         ed_uomTxtl!!.visibility = View.GONE
@@ -1432,28 +1340,13 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 qty = "0"
             }
             val cPriceCalc = price.toDouble()
-            if (!returnQtyText!!.text.toString()
-                    .isEmpty() && returnQtyText!!.text.toString() != "null"
-            ) {
-                return_qty = returnQtyText!!.text.toString().toDouble()
-                netReturnQty!!.text = return_qty.toString()
-            } else {
-                netReturnQty!!.text = "0"
-                expiryReturnQty!!.setText("")
-                damageReturnQty!!.setText("")
-            }
             net_qty = qty.toDouble() - return_qty
             var tt = net_qty * cPriceCalc
             Log.w("TOTALVALUES:", tt.toString())
             val Prodtotal = Utils.twoDecimalPoint(tt)
             var subTotal = 0.0
-            val itemDisc = discountEditext!!.text.toString()
-            subTotal = if (!itemDisc.matches("".toRegex())) {
-                val itmDisc = itemDisc.toDouble()
-                tt - itmDisc
-            } else {
-                tt
-            }
+            subTotal = tt
+
 
           subTotalValue!!.text = Utils.twoDecimalPoint(subTotal)
 
@@ -1525,16 +1418,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             addProduct!!.alpha = 0.9f
             addProduct!!.isEnabled = true
         } else {
-            if (!focEditText!!.text.toString()
-                    .isEmpty() && focEditText!!.text.toString() != "0" || !returnQtyText!!.text.toString()
-                    .isEmpty() && returnQtyText!!.text.toString() != "0"
-            ) {
-                addProduct!!.alpha = 0.9f
-                addProduct!!.isEnabled = true
-            } else {
-                addProduct!!.alpha = 0.4f
-                addProduct!!.isEnabled = false
-            }
+
         }
     }
 
@@ -1748,15 +1632,13 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             // looseQtyValue.setEnabled(true);
             qtyValue!!.setText("")
             priceText!!.isEnabled = true
-            focEditText!!.isEnabled = true
-            exchangeEditext!!.isEnabled = true
-            discountEditext!!.isEnabled = true
-            returnQtyText!!.isEnabled = true
-            if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
-                minimumSellingPriceText!!.text = model.minimumSellingPrice
-            } else {
-                minimumSellingPriceText!!.text = "0.00"
-            }
+            qtyValue!!.isEnabled = true
+
+//            if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
+//                minimumSellingPriceText!!.text = model.minimumSellingPrice
+//            } else {
+//                minimumSellingPriceText!!.text = "0.00"
+//            }
 
             // stockLayout.setVisibility(View.VISIBLE);
             if (model.stockQty != null && model.stockQty != "null") {
@@ -1865,11 +1747,12 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                         getProductPrice(productId);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    }*/if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
-            minimumSellingPriceText!!.text = model.minimumSellingPrice
-        } else {
-            minimumSellingPriceText!!.text = "0.00"
-        }
+                    }*/
+//            if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
+//            minimumSellingPriceText!!.text = model.minimumSellingPrice
+//        } else {
+//            minimumSellingPriceText!!.text = "0.00"
+//        }
             productName = productsModel!!.productName
             productAutoComplete!!.setText(model.productName + " - " + model.productCode)
             //  cartonPrice.setText(model.getUnitCost()+"");
@@ -1894,10 +1777,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             }
                 // looseQtyValue.setEnabled(true);
             cartonPrice!!.isEnabled = true
-            focEditText!!.isEnabled = true
-            exchangeEditext!!.isEnabled = true
-            discountEditext!!.isEnabled = true
-            returnEditext!!.isEnabled = true
+            qtyValue!!.isEnabled = true
 
             //stockLayout.setVisibility(View.VISIBLE);
             if (model.stockQty != null && model.stockQty != "null") {
@@ -2014,6 +1894,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             val signature_layoutl = customLayout.findViewById<LinearLayout>(R.id.signature_layout)
             selectImagel = customLayout.findViewById(R.id.select_imageInv)
 
+            invoicePrintCheck!!.visibility = View.GONE
             signature_layoutl!!.visibility = View.GONE
             attachement_layoutInvl!!.visibility = View.GONE
             printLayout!!.visibility = View.GONE
@@ -3584,11 +3465,12 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                     getProductPrice(productId);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }*/if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
-            minimumSellingPriceText!!.text = model.minimumSellingPrice
-        } else {
-            minimumSellingPriceText!!.text = "0.00"
-        }
+                }*/
+//        if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
+//            minimumSellingPriceText!!.text = model.minimumSellingPrice
+//        } else {
+//            minimumSellingPriceText!!.text = "0.00"
+//        }
         productName = productsModel!!.productName
         productAutoComplete!!.setText(model.productName + " - " + model.productCode)
         //  cartonPrice.setText(model.getUnitCost()+"");
@@ -3629,11 +3511,9 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //            focEditText!!.isEnabled = true
 //        }
 //        else{
-            focEditText!!.isEnabled = false
         //}
-        exchangeEditext!!.isEnabled = true
-        discountEditext!!.isEnabled = true
-        returnEditext!!.isEnabled = true
+        qtyValue!!.isEnabled = true
+
         stockLayout!!.visibility = View.VISIBLE
         if (model.stockQty != null && model.stockQty != "null") {
             pdtStockVal = model.stockQty

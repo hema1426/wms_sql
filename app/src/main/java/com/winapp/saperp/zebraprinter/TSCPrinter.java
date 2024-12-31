@@ -2144,6 +2144,8 @@ public class TSCPrinter {
                     }
                 }
                 settleHeight = receiptDetailsModels1.size() * 20;
+
+
                 Log.w("settlheig",""+settleHeight);
 
                 finalHeight = height + (receiptModelDetailList.size() * 11) + (currencyListl * list_height)
