@@ -239,23 +239,24 @@ public class RoReceiptSettlePreviewActivity extends AppCompatActivity {
                                    model.setBankCode(receiptObject.optString("bankCode"));
                                    model.setChequeNo(receiptObject.optString("chequeNo"));
 
-                                JSONArray invoiceArray = receiptObject.optJSONArray("receiptInvoiceDetails");
+                             //   JSONArray invoiceArray = receiptObject.optJSONArray("receiptInvoiceDetails");
                                 invoiceDetailSettlementList =new ArrayList<>();
-                                
-                                if(invoiceArray.length() > 0) {
-                                    for (int k = 0; k < invoiceArray.length(); k++) {
-                                        JSONObject obj = invoiceArray.optJSONObject(k);
-                                        SettlementReceiptDetailModel.invoiceDetailSettlement modela =
-                                                new SettlementReceiptDetailModel.invoiceDetailSettlement();
-                                        modela.setInvoiceNo(obj.optString("invoiceNo"));
-                                        modela.setInvoiceDate(obj.optString("invoiceDate"));
-                                        modela.setPaidAmt(obj.optString("paidAmount"));
-                                        modela.setTotal(obj.optString("invoiceTotal"));
-
-                                        invoiceDetailSettlementList.add(modela);
-                                    }
+//
+//                                if(invoiceArray.length() > 0) {
+//                                    for (int k = 0; k < invoiceArray.length(); k++) {
+//                                        JSONObject obj = invoiceArray.optJSONObject(k);
+//                                        SettlementReceiptDetailModel.invoiceDetailSettlement modela =
+//                                                new SettlementReceiptDetailModel.invoiceDetailSettlement();
+//                                        modela.setInvoiceNo(obj.optString("invoiceNo"));
+//                                        modela.setInvoiceDate(obj.optString("invoiceDate"));
+//                                        modela.setPaidAmt(obj.optString("paidAmount"));
+//                                        modela.setTotal(obj.optString("paidAmount"));
+//                                        modela.setType(obj.optString("invType"));
+//
+//                                        invoiceDetailSettlementList.add(modela);
+//                                    }
                                     model.setInvoiceDetailSettlementList(invoiceDetailSettlementList);
-                                }
+                            //    }
                                 settlementReceiptDetailModelList.add(model);
                             }
                         }

@@ -120,6 +120,15 @@ public class SettlementReceiptDetailModel {
         private String invoiceDate;
         private String total;
         private String paidAmt;
+        private String type;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
 
         public String getInvoiceNo() {
             return invoiceNo;

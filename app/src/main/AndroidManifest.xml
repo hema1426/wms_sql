@@ -162,12 +162,12 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.StockAdjustmentListActivity"
+            android:name=".activity.GoodReceiptListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.NewStockAdjustmentProductAddActivity"
+            android:name=".activity.GoodReceiptProductAddActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             />

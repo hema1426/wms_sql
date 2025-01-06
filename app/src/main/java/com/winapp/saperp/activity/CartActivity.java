@@ -71,6 +71,7 @@ import com.winapp.saperp.db.DBHelper;
 import com.winapp.saperp.model.CartModel;
 import com.winapp.saperp.model.CustomerDetails;
 import com.winapp.saperp.model.InvoicePrintPreviewModel;
+import com.winapp.saperp.model.ReturnProductsModel;
 import com.winapp.saperp.model.SalesOrderPrintPreviewModel;
 import com.winapp.saperp.model.SettingsModel;
 import com.winapp.saperp.utils.CaptureSignatureView;
@@ -1940,7 +1941,8 @@ public class CartActivity extends AppCompatActivity {
                 invoiceObject.put("qty", String.valueOf(net_qty));
                 // convert into int
                 int value = (int) data;
-                invoiceObject.put("pcsPerCarton", String.valueOf(value));
+              //  invoiceObject.put("pcsPerCarton", String.valueOf(value));
+
                 //    double priceValue=Double.parseDouble(model.getCART_UNIT_PRICE()) / net_qty;
 //                if (object.optString("taxType").equals("I")){
 //                    invoiceObject.put("price",Utils.twoDecimalPoint(priceValue));
@@ -1985,9 +1987,9 @@ public class CartActivity extends AppCompatActivity {
                 }
 
                 if (!model.getExchange_qty().isEmpty() && !model.getExchange_qty().equals("null")) {
-                    invoiceObject.put("exchangeQty", model.getExchange_qty());
+                    invoiceObject.put("ExcQty", model.getExchange_qty());
                 } else {
-                    invoiceObject.put("exchangeQty", "0");
+                    invoiceObject.put("ExcQty", "0");
 
                 }
 
@@ -2001,6 +2003,21 @@ public class CartActivity extends AppCompatActivity {
                 invoiceObject.put("locationCode", locationCode);
                 invoiceObject.put("createUser", userName);
                 invoiceObject.put("modifyUser", userName);
+                invoiceObject.put("invoiceNumber", "");
+
+                JSONObject returnProductObject = new JSONObject();
+
+//                ArrayList<ReturnProductsModel> returnProducts=dbHelper.getReturnProducts(model.getCART_COLUMN_PID());
+//                Log.w("returnlistcart",""+returnProducts+".."+model.getCART_COLUMN_PID());
+
+                returnProductArray=new JSONArray();
+                if (!model.getReturn_qty().isEmpty() && !model.getReturn_qty().toString().equals("null")) {
+                            returnProductObject=new JSONObject();
+                            returnProductObject.put("ReturnReason","Saleable Return");
+                            returnProductObject.put("ReturnQty",model.getReturn_qty());
+                            returnProductArray.put(returnProductObject);
+                        }
+                invoiceObject.put("ReturnDetails", returnProductArray);
                 invoiceDetailsArray.put(invoiceObject);
                 index++;
             }
@@ -2033,7 +2050,7 @@ public class CartActivity extends AppCompatActivity {
 
             // rootJsonObject.put("IsSaveSO",false);
             //  rootJsonObject.put("InvoiceHeader", invoiceHeader);
-            rootJsonObject.put("ReturnDetails", returnProductArray);
+
             rootJsonObject.put("PostingInvoiceDetails", invoiceDetailsArray);
             //  rootJsonObject.put("InvoiceSignature",signatureObject);
             // rootJsonObject.put("InvoicePhoto",invoiceImageObject);

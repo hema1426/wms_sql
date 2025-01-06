@@ -26,10 +26,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.winapp.saperp.R;
-import com.winapp.saperp.model.SalesOrderModel;
-import com.winapp.saperp.model.StockAdjustmentModuleModel;
-import com.winapp.saperp.model.SalesOrderPrintPreviewModel;
-import com.winapp.saperp.model.StockAdjustmentPreviewModel;
+import com.winapp.saperp.model.GoodReceiptModuleModel;
+import com.winapp.saperp.model.GoodReceiptPreviewModel;
 import com.winapp.saperp.utils.Constants;
 import com.winapp.saperp.utils.SessionManager;
 import com.winapp.saperp.utils.Utils;
@@ -44,7 +42,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class GoodReceiptAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
@@ -52,19 +50,19 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private boolean isLoading;
     private int visibleThreshold = 5;
     private int lastVisibleItem, totalItemCount;
-    public static ArrayList<StockAdjustmentModuleModel> stockAdjustOrderList;
-    public static ArrayList<StockAdjustmentModuleModel> salesOrderFilterList;
+    public static ArrayList<GoodReceiptModuleModel> stockAdjustOrderList;
+    public static ArrayList<GoodReceiptModuleModel> salesOrderFilterList;
     Context mContext;
     CallBack callBack;
 
     private String companyId;
     private SessionManager session;
     private HashMap<String, String> user;
-    private ArrayList<StockAdjustmentPreviewModel.StockAdjustList> adjustnewList;
+    private ArrayList<GoodReceiptPreviewModel.StockAdjustList> adjustnewList;
     private String locationCode;
 
-    public StockAdjustmentAdapter(Context context, RecyclerView mRecyclerView,
-                                  ArrayList<StockAdjustmentModuleModel> salesOrderList, CallBack callBack) {
+    public GoodReceiptAdapter(Context context, RecyclerView mRecyclerView,
+                              ArrayList<GoodReceiptModuleModel> salesOrderList, CallBack callBack) {
 
         this.stockAdjustOrderList = salesOrderList;
         this.salesOrderFilterList=salesOrderList;
@@ -121,12 +119,12 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             companyId = user.get(SessionManager.KEY_COMPANY_CODE);
             locationCode=user.get(SessionManager.KEY_LOCATION_CODE);
 
-            StockAdjustmentModuleModel stockAdjustmentModuleModel = stockAdjustOrderList.get(position);
-            ((adjustViewHolder) viewHolder).date.setText(stockAdjustmentModuleModel.getDate());
-            ((adjustViewHolder) viewHolder).number.setText(stockAdjustmentModuleModel.getNumber());
+            GoodReceiptModuleModel GoodReceiptModuleModel = stockAdjustOrderList.get(position);
+            ((adjustViewHolder) viewHolder).date.setText(GoodReceiptModuleModel.getDate());
+            ((adjustViewHolder) viewHolder).number.setText(GoodReceiptModuleModel.getNumber());
 
-            if (stockAdjustmentModuleModel.getNetTotal()!=null && !stockAdjustmentModuleModel.getNetTotal().equals("null")){
-                ((adjustViewHolder) viewHolder).netTotal.setText("$ "+Utils.twoDecimalPoint(Double.parseDouble(stockAdjustmentModuleModel.getNetTotal())));
+            if (GoodReceiptModuleModel.getNetTotal()!=null && !GoodReceiptModuleModel.getNetTotal().equals("null")){
+                ((adjustViewHolder) viewHolder).netTotal.setText("$ "+Utils.twoDecimalPoint(Double.parseDouble(GoodReceiptModuleModel.getNetTotal())));
             }else {
                 ((adjustViewHolder) viewHolder).netTotal.setText("$ "+"0.00");
             }
@@ -138,7 +136,7 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             }*/
 
 
-            switch (stockAdjustmentModuleModel.getDoStatus()) {
+            switch (GoodReceiptModuleModel.getDoStatus()) {
                 case "C":
                     ((adjustViewHolder) viewHolder).status.setText("Closed");
                     ((adjustViewHolder) viewHolder).statusLayout.setBackgroundResource(R.drawable.invoice_closed);
@@ -164,23 +162,23 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                         ((adjustViewHolder) viewHolder).showHideBottomLayout.setTag("show");
                         ((adjustViewHolder) viewHolder).showHideBottomLayout.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_keyboard_arrow_up_24));
                         try {
-                            if (stockAdjustmentModuleModel.getStockAdjustList() != null &&
-                                    stockAdjustmentModuleModel.getStockAdjustList().size() > 0) {
+                            if (GoodReceiptModuleModel.getStockAdjustList() != null &&
+                                    GoodReceiptModuleModel.getStockAdjustList().size() > 0) {
 
-                                    setAdjustAdapter(viewHolder, position, stockAdjustmentModuleModel.getStockAdjustList());
+                                    setAdjustAdapter(viewHolder, position, GoodReceiptModuleModel.getStockAdjustList());
                                     ((adjustViewHolder) viewHolder).progressLayout.setVisibility(View.GONE);
                                     ((adjustViewHolder) viewHolder).mainLayout.setVisibility(View.VISIBLE);
                                 } else {
-                                    getStockAdjustDetails(stockAdjustmentModuleModel.getCode(),
-                                            viewHolder, position, stockAdjustmentModuleModel);
-                                    stockAdjustmentModuleModel.setShow(true);
+                                    getStockAdjustDetails(GoodReceiptModuleModel.getCode(),
+                                            viewHolder, position, GoodReceiptModuleModel);
+                                    GoodReceiptModuleModel.setShow(true);
                                 }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }else {
-                        stockAdjustmentModuleModel.setShow(false);
+                        GoodReceiptModuleModel.setShow(false);
                         ((adjustViewHolder) viewHolder).bottomLayout.setVisibility(View.GONE);
                         ((adjustViewHolder) viewHolder).showHideBottomLayout.setTag("hide");
                         ((adjustViewHolder) viewHolder).showHideBottomLayout.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_keyboard_arrow_down_24));
@@ -188,12 +186,12 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
             });
 
-            if (stockAdjustmentModuleModel.isShow()){
+            if (GoodReceiptModuleModel.isShow()){
                 ((adjustViewHolder) viewHolder).bottomLayout.setVisibility(View.VISIBLE);
                 ((adjustViewHolder) viewHolder).showHideBottomLayout.setTag("show");
                 ((adjustViewHolder) viewHolder).showHideBottomLayout.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_keyboard_arrow_up_24));
                 try {
-                    setAdjustAdapter(viewHolder,position,stockAdjustmentModuleModel.getStockAdjustList());
+                    setAdjustAdapter(viewHolder,position,GoodReceiptModuleModel.getStockAdjustList());
                     ((adjustViewHolder) viewHolder).progressLayout.setVisibility(View.GONE);
                     ((adjustViewHolder) viewHolder).mainLayout.setVisibility(View.VISIBLE);
                 } catch (Exception e) {
@@ -209,7 +207,7 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             ((adjustViewHolder) viewHolder).moreOption.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    callBack.showMoreOption(stockAdjustmentModuleModel.getCode(),((adjustViewHolder) viewHolder).status.getText().toString());
+                    callBack.showMoreOption(GoodReceiptModuleModel.getCode(),((adjustViewHolder) viewHolder).status.getText().toString());
                 }
             });
 
@@ -264,7 +262,7 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
     private void getStockAdjustDetails(String number, RecyclerView.ViewHolder  viewHolder,
-                                       int position, StockAdjustmentModuleModel stockAdjustmentModuleModel)
+                                       int position, GoodReceiptModuleModel GoodReceiptModuleModel)
             throws JSONException {
         // Initialize a new RequestQueue instance
         JSONObject jsonObject=new JSONObject();
@@ -288,7 +286,7 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                             JSONArray responseData = response.getJSONArray("responseData");
                             JSONObject object = responseData.optJSONObject(0);
 
-                            StockAdjustmentPreviewModel model = new StockAdjustmentPreviewModel();
+                            GoodReceiptPreviewModel model = new GoodReceiptPreviewModel();
                             model.setSoNumber(object.optString("goodsReceiptNo"));
                             model.setSoDate(object.optString("docDate"));
 //                            model.setAddress(object.optString("address1") + object.optString("address2") + object.optString("address3"));
@@ -322,8 +320,8 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                             for (int i=0;i<detailsArray.length();i++){
                                 JSONObject detailObject=detailsArray.optJSONObject(i);
 
-                                    StockAdjustmentPreviewModel.StockAdjustList salesListModel =
-                                            new StockAdjustmentPreviewModel.StockAdjustList();
+                                    GoodReceiptPreviewModel.StockAdjustList salesListModel =
+                                            new GoodReceiptPreviewModel.StockAdjustList();
 
                                     salesListModel.setProductCode(detailObject.optString("productCode"));
                                     salesListModel.setDescription( detailObject.optString("productName"));
@@ -352,7 +350,7 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                         if (adjustnewList.size()>0){
                             ((adjustViewHolder) viewHolder).progressLayout.setVisibility(View.GONE);
                             ((adjustViewHolder) viewHolder).mainLayout.setVisibility(View.VISIBLE);
-                            stockAdjustmentModuleModel.setStockAdjustList(adjustnewList);
+                            GoodReceiptModuleModel.setStockAdjustList(adjustnewList);
                             setAdjustAdapter(viewHolder,position,adjustnewList);
                         }
                     }catch (Exception e){
@@ -389,10 +387,10 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         requestQueue.add(jsonObjectRequest);
     }
     public void setAdjustAdapter(@NonNull RecyclerView.ViewHolder  viewHolder, 
-                                 int position, ArrayList<StockAdjustmentPreviewModel.StockAdjustList> adjustList){
+                                 int position, ArrayList<GoodReceiptPreviewModel.StockAdjustList> adjustList){
         ((adjustViewHolder) viewHolder).productListView.setHasFixedSize(true);
         ((adjustViewHolder) viewHolder).productListView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
-        StockAdjustPrintPreviewAdapter adapter=new StockAdjustPrintPreviewAdapter(mContext, adjustList);
+        goodReceiptPrintPreviewAdapter adapter=new goodReceiptPrintPreviewAdapter(mContext, adjustList);
         ((adjustViewHolder) viewHolder).productListView.setAdapter(adapter);
         // notifyDataSetChanged();
     }
@@ -422,16 +420,16 @@ public class StockAdjustmentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         void showMoreOption(String deliveryorderId, String status);
     }
 
-    public void filterList(ArrayList<StockAdjustmentModuleModel> filterdNames) {
+    public void filterList(ArrayList<GoodReceiptModuleModel> filterdNames) {
         stockAdjustOrderList = filterdNames;
         notifyDataSetChanged();
     }
 
-    public static ArrayList<StockAdjustmentModuleModel> getNotalInvoiceList(){
+    public static ArrayList<GoodReceiptModuleModel> getNotalInvoiceList(){
         return stockAdjustOrderList;
     }
 
-    public static ArrayList<StockAdjustmentModuleModel> getStockAdjustOrderList(){
+    public static ArrayList<GoodReceiptModuleModel> getStockAdjustOrderList(){
         return salesOrderFilterList;
     }
 

@@ -1211,12 +1211,14 @@ public class NewInvoiceListActivity extends NavigationActivity
             //   editInvoiceLayout.setVisibility(View.GONE);
             cashCollectionLayout.setVisibility(View.GONE);
             deleteInvoiceLayout.setVisibility(View.GONE);
+            duplicateInvoiceLayout.setVisibility(View.GONE);
             invoiceStatusValue = "P";
 
         } else if (invoiceStatus.equals("Partial")) {
             //   editInvoiceLayout.setVisibility(View.GONE);
             cashCollectionLayout.setVisibility(View.VISIBLE);
             deleteInvoiceLayout.setVisibility(View.GONE);
+            duplicateInvoiceLayout.setVisibility(View.GONE);
             invoiceStatusValue = "PR";
         } else if (invoiceStatus.equals("Open") || invoiceStatus.equals("O")) {
             // editInvoiceLayout.setVisibility(View.VISIBLE);

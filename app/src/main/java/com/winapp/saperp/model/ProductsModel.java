@@ -31,6 +31,16 @@ public class ProductsModel {
     private String defaultUom;
     private String barcode;
     private String isItemFOC;
+    private String isBatch;
+
+
+    public String getIsBatch() {
+        return isBatch;
+    }
+
+    public void setIsBatch(String isBatch) {
+        this.isBatch = isBatch;
+    }
 
     public String getIsItemFOC() {
         return isItemFOC;

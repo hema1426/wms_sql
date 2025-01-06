@@ -1,7 +1,5 @@
 package com.winapp.saperp.printpreview;
 
-import static com.winapp.saperp.activity.SalesOrderListActivity.shortCodeStr;
-
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -54,9 +52,8 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.winapp.saperp.R;
-import com.winapp.saperp.adapter.SalesOrderPrintPreviewAdapter;
-import com.winapp.saperp.adapter.StockAdjustPrintPreviewAdapter;
-import com.winapp.saperp.model.StockAdjustmentPreviewModel;
+import com.winapp.saperp.adapter.goodReceiptPrintPreviewAdapter;
+import com.winapp.saperp.model.GoodReceiptPreviewModel;
 import com.winapp.saperp.utils.Constants;
 import com.winapp.saperp.utils.ImageUtil;
 import com.winapp.saperp.utils.SessionManager;
@@ -83,10 +80,10 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
     private String adjustNumber;
     private SessionManager session;
     private HashMap<String ,String> user;
-    private ArrayList<StockAdjustmentPreviewModel> stockadjustHeaderDetails;
-    private ArrayList<StockAdjustmentPreviewModel.StockAdjustList> stockadjustList;
+    private ArrayList<GoodReceiptPreviewModel> stockadjustHeaderDetails;
+    private ArrayList<GoodReceiptPreviewModel.StockAdjustList> stockadjustList;
     private RecyclerView salesListView;
-    private StockAdjustPrintPreviewAdapter adapter;
+    private goodReceiptPrintPreviewAdapter adapter;
     private TextView soNumberText;
     private TextView soDateText;
     private TextView addressText;
@@ -320,7 +317,7 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
                             JSONArray responseData = response.getJSONArray("responseData");
                             JSONObject object = responseData.optJSONObject(0);
 
-                            StockAdjustmentPreviewModel model = new StockAdjustmentPreviewModel();
+                            GoodReceiptPreviewModel model = new GoodReceiptPreviewModel();
                             model.setSoNumber(object.optString("goodsReceiptNo"));
                             model.setSoDate(object.optString("docDate"));
                             model.setNetTotal(object.optString("docTotal"));
@@ -330,8 +327,8 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
                             for (int i=0;i<detailsArray.length();i++){
                                 JSONObject detailObject=detailsArray.optJSONObject(i);
 
-                                StockAdjustmentPreviewModel.StockAdjustList salesListModel =
-                                        new StockAdjustmentPreviewModel.StockAdjustList();
+                                GoodReceiptPreviewModel.StockAdjustList salesListModel =
+                                        new GoodReceiptPreviewModel.StockAdjustList();
 
                                 salesListModel.setProductCode(detailObject.optString("productCode"));
                                 salesListModel.setDescription( detailObject.optString("productName"));
@@ -406,7 +403,7 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
     }
 
     public void setStockAdjustAdapter(){
-        for (StockAdjustmentPreviewModel model: stockadjustHeaderDetails){
+        for (GoodReceiptPreviewModel model: stockadjustHeaderDetails){
             soNumberText.setText(model.getSoNumber());
             soDateText.setText(model.getSoDate());
             netTotalText.setText(Utils.twoDecimalPoint(Double.parseDouble(model.getNetTotal())));
@@ -415,7 +412,7 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
             // RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
             salesListView.setLayoutManager(new LinearLayoutManager(StockAdjustPrintPreview.this,
                     LinearLayoutManager.VERTICAL, false));
-            adapter = new StockAdjustPrintPreviewAdapter(StockAdjustPrintPreview.this, stockadjustList);
+            adapter = new goodReceiptPrintPreviewAdapter(StockAdjustPrintPreview.this, stockadjustList);
             salesListView.setAdapter(adapter);
             rootLayout.setVisibility(View.VISIBLE);
         }
@@ -594,7 +591,7 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
                 ActionBar.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER);
         TextView textviewTitle = viewActionBar.findViewById(R.id.actionbar_textview);
-        textviewTitle.setText("Stock Adjustment");
+        textviewTitle.setText("Good Receipt");
         Objects.requireNonNull(abar).setCustomView(viewActionBar, params);
         abar.setDisplayShowCustomEnabled(true);
         abar.setDisplayShowTitleEnabled(false);

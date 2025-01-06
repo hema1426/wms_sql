@@ -2,7 +2,7 @@ package com.winapp.saperp.model;
 
 import java.util.ArrayList;
 
-public class StockAdjustmentModuleModel {
+public class GoodReceiptModuleModel {
 
     private String number;
     private String code;
@@ -10,7 +10,7 @@ public class StockAdjustmentModuleModel {
     private String netTotal;
     private String doStatus;
     private boolean isShow=false;
-    private ArrayList<StockAdjustmentPreviewModel.StockAdjustList> stockAdjustList;
+    private ArrayList<GoodReceiptPreviewModel.StockAdjustList> stockAdjustList;
 
 
 
@@ -23,11 +23,11 @@ public class StockAdjustmentModuleModel {
     }
 
 
-    public ArrayList<StockAdjustmentPreviewModel.StockAdjustList> getStockAdjustList() {
+    public ArrayList<GoodReceiptPreviewModel.StockAdjustList> getStockAdjustList() {
         return stockAdjustList;
     }
 
-    public void setStockAdjustList(ArrayList<StockAdjustmentPreviewModel.StockAdjustList> stockAdjustList) {
+    public void setStockAdjustList(ArrayList<GoodReceiptPreviewModel.StockAdjustList> stockAdjustList) {
         this.stockAdjustList = stockAdjustList;
     }
     public String getNumber() {

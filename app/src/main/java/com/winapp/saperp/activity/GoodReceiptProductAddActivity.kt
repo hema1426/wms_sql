@@ -3,6 +3,7 @@ package com.winapp.saperp.activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -23,10 +24,12 @@ import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
@@ -39,7 +42,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -72,12 +74,16 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.winapp.saperp.BuildConfig
 import com.winapp.saperp.R
-import com.winapp.saperp.adapter.NewStockAdjustmentProductAdapter
+import com.winapp.saperp.adapter.BatchListAdapter
+import com.winapp.saperp.adapter.NewGoodReceiptProductAdapter
 import com.winapp.saperp.adapter.SelectProductAdapter
 import com.winapp.saperp.db.DBHelper
 import com.winapp.saperp.model.AppUtils
+import com.winapp.saperp.model.BatchDetailModule
 import com.winapp.saperp.model.CreateInvoiceModel
 import com.winapp.saperp.model.CustomerModel
+import com.winapp.saperp.model.GoodReceiptSaveDetail
+import com.winapp.saperp.model.GoodReceiptSaveModel
 import com.winapp.saperp.model.HomePageModel
 import com.winapp.saperp.model.InvoicePrintPreviewModel
 import com.winapp.saperp.model.ItemGroupList
@@ -86,8 +92,6 @@ import com.winapp.saperp.model.ProductSummaryModel
 import com.winapp.saperp.model.ProductsModel
 import com.winapp.saperp.model.SalesOrderPrintPreviewModel
 import com.winapp.saperp.model.SalesOrderPrintPreviewModel.SalesList
-import com.winapp.saperp.model.StockAdjustSaveDetail
-import com.winapp.saperp.model.StockAdjustSaveModel
 import com.winapp.saperp.model.UomModel
 import com.winapp.saperp.thermalprinter.PrinterUtils
 import com.winapp.saperp.utils.BarCodeScanner
@@ -101,7 +105,6 @@ import com.winapp.saperp.utils.SharedPreferenceUtil
 import com.winapp.saperp.utils.Utils
 import com.winapp.saperp.zebraprinter.TSCPrinter
 import com.winapp.saperp.zebraprinter.ZebraPrinterActivity
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -114,10 +117,12 @@ import java.util.Date
 import java.util.Locale
 import java.util.Objects
 
-class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
+class GoodReceiptProductAddActivity : AppCompatActivity(),
+    BatchListAdapter.RemoveBatchClickListener,
+    BatchListAdapter.BatchQtyClickListener {
     var returnLayout: LinearLayout? = null
     var showHideButton: ImageView? = null
-    private var productSummaryAdapter: NewStockAdjustmentProductAdapter? = null
+    private var productSummaryAdapter: NewGoodReceiptProductAdapter? = null
     private val productSummaryList: ArrayList<ProductSummaryModel>? = null
     var productSummaryView: RecyclerView? = null
     var companyCode: String? = null
@@ -139,13 +144,21 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     var loosePrice: EditText? = null
     var uomText: EditText? = null
     private var uomName = ""
+    var isItemBatchApi = "No"
     var pcsPerCarton: EditText? = null
     var stockCount: EditText? = null
     var qtyValue: EditText? = null
+    var addbatch: Button? = null
     var customerNameText: EditText? = null
     var priceText: EditText? = null
     var subTotalValue: TextView? = null
-//    var taxValueText: TextView? = null
+    var batch_rv: RecyclerView? = null
+    var total_batchQty: TextView? = null
+    var batchList: ArrayList<BatchDetailModule>? = ArrayList()
+    var batchListSave: ArrayList<BatchDetailModule>? = ArrayList()
+    var batchListAdapter: BatchListAdapter? = null
+
+    //    var taxValueText: TextView? = null
 //    var netTotalValue: TextView? = null
 //    var customerDetails: ArrayList<CustomerDetails>? = null
     private var dbHelper: DBHelper? = null
@@ -175,7 +188,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     var isUomSetting = true
     private var uomList: ArrayList<UomModel>? = null
     private var uomListEdit: ArrayList<UomModel>? = null
-    var stockAdjustDetailList: ArrayList<StockAdjustSaveDetail>? = null
+    var stockAdjustDetailList: ArrayList<GoodReceiptSaveDetail>? = null
     var qtyTextWatcher: TextWatcher? = null
     var cartonTextWatcher: TextWatcher? = null
     var lqtyTextWatcher: TextWatcher? = null
@@ -258,7 +271,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_stock_adjust_product_add)
-        supportActionBar!!.title = "Stock Adjustment"
+        supportActionBar!!.title = "Good Receipt"
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         signatureString = ""
         Log.w("activity_cg", javaClass.simpleName.toString())
@@ -296,7 +309,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         productNameEditext = findViewById(R.id.product_search)
         transLayout = findViewById(R.id.trans_layout)
         totalProducts = findViewById(R.id.total_products)
-        productAutoComplete = findViewById(R.id.product_name)
+        productAutoComplete = findViewById(R.id.product_name_receipt)
         groupspinner = findViewById(R.id.spinner_group)
         cartonPrice = findViewById(R.id.carton_price)
         priceText = findViewById(R.id.price)
@@ -306,6 +319,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         uomText = findViewById(R.id.uom)
         stockCount = findViewById(R.id.stock_count)
         qtyValue = findViewById(R.id.qty_adjust)
+        addbatch = findViewById(R.id.batch_btn)
         subTotalValue = findViewById(R.id.balance_value)
 //        taxValueText = findViewById(R.id.tax)
 //        netTotalValue = findViewById(R.id.net_total)
@@ -336,6 +350,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         products = ArrayList()
         productAutoComplete!!.clearFocus()
         barcodeText!!.requestFocus()
+
         sharedPreferences = getSharedPreferences("PrinterPref", MODE_PRIVATE)
         printerType = sharedPreferences!!.getString("printer_type", "")
         printerMacId = sharedPreferences!!.getString("mac_address", "")
@@ -353,13 +368,13 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 
         invoiceDate!!.setText(formattedDate)
         if (intent != null) {
-         //   customerNameText!!.setText(intent.getStringExtra("customerName"))
-        //    customerCode = intent.getStringExtra("customerCode")
+            //   customerNameText!!.setText(intent.getStringExtra("customerName"))
+            //    customerCode = intent.getStringExtra("customerCode")
             activityFrom = intent.getStringExtra("from")
-          //  editSoNumber = intent.getStringExtra("editSoNumber")
+            //  editSoNumber = intent.getStringExtra("editSoNumber")
             currentSaveDateTime = intent.getStringExtra("currentDateTime")
             Log.w("GivenActivityFrom::", activityFrom.toString())
-            supportActionBar!!.setTitle("Stock Adjustment")
+            supportActionBar!!.setTitle("Good Receipt")
         }
         val jsonObject = JSONObject()
         try {
@@ -456,36 +471,40 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 }
             }
         })
+        addbatch!!.setOnClickListener() {
+            if (productAutoComplete!!.text.toString().isNotEmpty()) {
+                showBatchDialog()
+            }
+        }
+        uomChangel!!.setOnClickListener {
+            ischangeUOM = true
+            uomChangel!!.visibility = View.VISIBLE
+            ed_uomTxtl!!.visibility = View.GONE
+            uomSpinnerLayl!!.visibility = View.VISIBLE
 
-        uomChangel!!.setOnClickListener(){
-                ischangeUOM = true
-                uomChangel!!.visibility = View.VISIBLE
-                ed_uomTxtl!!.visibility = View.GONE
-                uomSpinnerLayl!!.visibility = View.VISIBLE
+            val jsonObject = JSONObject()
+            if (isEditItem) {
+                try {
+                    Log.w("pdtediyyy", "" + productEditId);
+                    jsonObject.put("CustomerCode", selectCustomerId)
+                    jsonObject.put("ItemCode", productEditId)
+                    getUOM(jsonObject)
 
-                val jsonObject = JSONObject()
-                if(isEditItem){
-                    try {
-                        Log.w("pdtediyyy",""+productEditId);
-                        jsonObject.put("CustomerCode", selectCustomerId)
-                        jsonObject.put("ItemCode",productEditId)
-                        getUOM(jsonObject)
-
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                        Log.w("Errort:", Objects.requireNonNull(e.message!!))
-                    }
-                }else{
-                    try {
-                        jsonObject.put("CustomerCode", selectCustomerId)
-                        jsonObject.put("ItemCode",productId)
-                        getUOM(jsonObject)
-
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                        Log.w("Errort:", Objects.requireNonNull(e.message!!))
-                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Log.w("Errort:", Objects.requireNonNull(e.message!!))
                 }
+            } else {
+                try {
+                    jsonObject.put("CustomerCode", selectCustomerId)
+                    jsonObject.put("ItemCode", productId)
+                    getUOM(jsonObject)
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Log.w("Errort:", Objects.requireNonNull(e.message!!))
+                }
+            }
 //            else{
 //                Toast.makeText(this, "UOM settings not enabled", Toast.LENGTH_LONG).show()
 //
@@ -573,8 +592,18 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             ) {
                 if (addProduct!!.getText().toString() == "Update") {
                     // if (!cartonPrice.getText().toString().isEmpty() && !cartonPrice.getText().toString().equals("0.00") && !cartonPrice.getText().toString().equals("0.0") && !cartonPrice.getText().toString().equals("0")){
-                    if (priceText!!.getText() != null && !priceText!!.getText().toString().isEmpty()) {
+                    if (priceText!!.getText() != null && !priceText!!.getText().toString()
+                            .isEmpty()
+                    ) {
                         if (priceText!!.getText().toString().toDouble() > 0) {
+                            Log.d("cg_batch_updt1:",
+                                batchListAdapter!!.getBatchDataList().size.toString())
+
+                            for (item in batchListAdapter!!.getBatchDataList()){
+                                Log.d("cg_batchEditUpd:", item.batchNo +" "+item.batchQty)
+                            }
+
+
                             insertProducts()
 //                            val minimumsellingprice =
 //                                minimumSellingPriceText!!.getText().toString().toDouble()
@@ -597,11 +626,12 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             .show()
                     }
                 } else {
-                    if (priceText!!.getText().toString() != null && !priceText!!.getText().toString()
+                    if (priceText!!.getText().toString() != null && !priceText!!.getText()
+                            .toString()
                             .isEmpty()
                     ) {
                         if (priceText!!.getText().toString().toDouble() > 0) {
-                           // val minimumsellingprice = minimumSellingPriceText!!.getText().toString().toDouble()
+                            // val minimumsellingprice = minimumSellingPriceText!!.getText().toString().toDouble()
                             addProduct("Add")
 
 //                            if (minimumsellingprice <= priceText!!.getText().toString().toDouble()) {
@@ -625,7 +655,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             }
         })
 //        returnAdj!!.setOnClickListener(View.OnClickListener { returnLayoutView!!.setVisibility(View.VISIBLE) })
-       // cancelReturn!!.setOnClickListener(View.OnClickListener { returnLayoutView!!.setVisibility(View.GONE) })
+        // cancelReturn!!.setOnClickListener(View.OnClickListener { returnLayoutView!!.setVisibility(View.GONE) })
         invoiceDate!!.setOnClickListener(View.OnClickListener { getDate(invoiceDate) })
         getProducts()
 
@@ -633,7 +663,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         // Setting the sorting
         sortButton!!.setOnClickListener(View.OnClickListener {
             val menuItemView = findViewById<View>(R.id.fab)
-            val popupMenu = PopupMenu(this@NewStockAdjustmentProductAddActivity, menuItemView)
+            val popupMenu = PopupMenu(this@GoodReceiptProductAddActivity, menuItemView)
             popupMenu.menuInflater.inflate(R.menu.sort_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
@@ -672,13 +702,13 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             filterdNames.add(s)
                         }
                     }
-                }  else if (action == "Out of Stock") {
+                } else if (action == "Out of Stock") {
                     if (s.stockQty != null && s.stockQty != "null") {
                         if (s.stockQty.toDouble() < 0 || s.stockQty.toDouble() == 0.0) {
                             filterdNames.add(s)
                         }
                     }
-                }else {
+                } else {
                     filterdNames.add(s)
                 }
             }
@@ -720,7 +750,8 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         mYear = c[Calendar.YEAR]
         mMonth = c[Calendar.MONTH]
         mDay = c[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(this@NewStockAdjustmentProductAddActivity,
+        val datePickerDialog = DatePickerDialog(
+            this@GoodReceiptProductAddActivity,
             { view, year, monthOfYear, dayOfMonth ->
                 dateEditext!!.text = dayOfMonth.toString() + "-" + (monthOfYear + 1) + "-" + year
                 currentDate = convertDate(
@@ -740,7 +771,9 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 Log.w("Product_Code:", model.productCode)
                 if (model.productCode == productId.trim { it <= ' ' }) {
                     if (model.stockQty != null && model.stockQty != "null") {
-                        if (model.stockQty.toDouble().equals("0") || model.stockQty.toDouble() < 0) {
+                        if (model.stockQty.toDouble()
+                                .equals("0") || model.stockQty.toDouble() < 0
+                        ) {
                             stockQtyValue!!.text = model.stockQty
                             stockQtyValue!!.setTextColor(Color.parseColor("#D24848"))
                         } else if (model.stockQty.toDouble() > 0) {
@@ -771,7 +804,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             ).show()
                             productAutoComplete!!.clearFocus()
                             productAutoComplete!!.setText("")
-                        //    qtyValue!!.isEnabled = false
+                            //    qtyValue!!.isEnabled = false
                         }
                     } else {
                         productAutoComplete!!.clearFocus()
@@ -811,6 +844,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             .setConfirmText("Cancel")
             .setConfirmClickListener { sDialog ->
                 dbHelper!!.removeAllInvoiceItems()
+                dbHelper!!.removeAllBAtch()
                 sDialog.dismissWithAnimation()
             }.show()
     }
@@ -830,7 +864,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     }
 
     fun addProduct(action: String?) {
-        Log.w("ProductIdView2Retr:",""+ isProductExist(productId))
+        Log.w("ProductIdView2Retr:", "" + isProductExist(productId))
         if (isProductExist(productId)) {
             if (!qtyValue!!.text.toString().isEmpty() && qtyValue!!.text.toString()
                     .toDouble() > 0
@@ -846,7 +880,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     }
 
     fun showExistingProductAlert(productId: String?, productName: String?) {
-        val builder1 = AlertDialog.Builder(this@NewStockAdjustmentProductAddActivity)
+        val builder1 = AlertDialog.Builder(this@GoodReceiptProductAddActivity)
         builder1.setTitle("Warning !")
         builder1.setMessage("$productName - $productId\nAlready Exist Do you want to replace ? ")
         builder1.setCancelable(false)
@@ -889,15 +923,15 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             val total = net_qty * price_value.toDouble()
             val sub_total = total - return_amt - discount.toDouble()
             var timeStamp: String? = Calendar.getInstance().timeInMillis.toString()
-            if(isEditItem){
+            if (isEditItem) {
                 timeStamp = editTimeStamp
-            }else{
+            } else {
                 timeStamp = SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(Date())
             }
             if (!uomText!!.text.toString().isEmpty()) {
                 uom = uomText!!.text.toString()
             }
-            Log.w("uomAdjust",""+uom)
+            Log.w("uomAdjust", "" + uom)
             val insertStatus = dbHelper!!.insertCreateInvoiceCart(
                 productId.toString().trim { it <= ' ' },
                 productName,
@@ -917,7 +951,21 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 "",
                 "",
                 "",
-                "","",timeStamp,"")
+                "", "", timeStamp, "", isItemBatchApi
+            )
+//            Log.d("cg_batch_updt:",
+//                batchListAdapter!!.getBatchDataList().size.toString())
+            //todo batch insert
+            if (batchListAdapter != null) {
+                dbHelper!!.insertBatchList(
+                    batchListAdapter!!.getBatchDataList(),
+                    productId,
+                    timeStamp
+                )
+
+                batchListAdapter = null
+            }
+
 
             // Adding Return Qty Table values
 //            if (qty_value.toInt() > 0) {
@@ -955,9 +1003,11 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 ischangeUOM = false
                 stockLayout!!.visibility = View.GONE
                 priceText!!.isEnabled = false
-               // qtyValue!!.isEnabled = false
+                // qtyValue!!.isEnabled = false
                 qtyValue!!.isEnabled = false
                 addProduct!!.text = "Add"
+
+                setButtonView()
                 hideKeyboard()
                 getProducts()
             } else {
@@ -976,13 +1026,13 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             itemCount!!.text = "Products ( " + products.size + " )"
             productSummaryView!!.layoutManager =
                 LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
-            productSummaryAdapter = NewStockAdjustmentProductAdapter(
+            productSummaryAdapter = NewGoodReceiptProductAdapter(
                 this,
                 products,
-                object : NewStockAdjustmentProductAdapter.CallBack {
+                object : NewGoodReceiptProductAdapter.CallBack {
                     override fun searchCustomer(letter: String, pos: Int) {}
-                    override fun removeItem(pid: String,updateTime: String) {
-                        showRemoveItemAlert(pid,updateTime)
+                    override fun removeItem(pid: String, updateTime: String) {
+                        showRemoveItemAlert(pid, updateTime)
                     }
 
                     override fun editItem(model: CreateInvoiceModel) {
@@ -992,7 +1042,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                         productId = model.productCode
                         editTimeStamp = model.updateTime
                         productName = model.productName
-                      //  qtyValue!!.setText("")
+                        //  qtyValue!!.setText("")
                         val netqty = model.netQty.toDouble()
 
                         /*  if (model.getMinimumSellingPrice()!=null && !model.getMinimumSellingPrice().isEmpty()){
@@ -1016,11 +1066,29 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 
                         val jsonObject = JSONObject()
                         jsonObject.put("CustomerCode", selectCustomerId)
-                        jsonObject.put("ItemCode",productEditId)
-                        getUOMEdit(jsonObject,model.uomCode,model.stockProductQty)
+                        jsonObject.put("ItemCode", productEditId)
+                        getUOMEdit(jsonObject, model.uomCode, model.stockProductQty)
 
-                        qtyValue!!.isEnabled = true
-                       // stockLayout!!.visibility = View.VISIBLE
+                        if (model.isBatch.equals("Yes", true)) {
+                            qtyValue!!.isEnabled = false
+                            addbatch!!.visibility = View.VISIBLE
+                        } else {
+                            qtyValue!!.isEnabled = true
+                            addbatch!!.visibility = View.GONE
+                        }
+                        if (model.isBatch != null && model.isBatch.isNotEmpty()) {
+                            isItemBatchApi = model.isBatch
+                        }
+                        Log.w("isbatchedit", "" + model.isBatch);
+                        //todo
+                        val batchProducts =
+                            dbHelper!!.getBatchProducts(model.productCode, model.updateTime)
+                        Log.w("batcharray1", "" + batchProducts.size)
+
+                        if (batchProducts.size > 0) {
+                            setBatchAdapter(batchProducts)
+                        }
+                        // stockLayout!!.visibility = View.VISIBLE
                         stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
                         stockQtyValue!!.text = model.stockQty
                         stockCount!!.setText(model.stockQty)
@@ -1060,19 +1128,19 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         setSummaryTotal()
     }
 
-    fun showRemoveItemAlert(pid: String?,updateTime:String) {
+    fun showRemoveItemAlert(pid: String?, updateTime: String) {
         try {
             SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE) // .setTitleText("Are you sure?")
                 .setContentText("Are you sure want to remove this item ?")
                 .setConfirmText("YES")
                 .setConfirmClickListener { sDialog ->
-                    dbHelper!!.deleteInvoiceProductNew(pid,updateTime)
+                    dbHelper!!.deleteInvoiceProductNew(pid, updateTime)
                     clearFields()
                     sDialog.dismissWithAnimation()
                     getProducts()
                     setSummaryTotal()
                     addProduct!!.setText("Add")
-                    Utils.refreshActionBarMenu(this@NewStockAdjustmentProductAddActivity)
+                    Utils.refreshActionBarMenu(this@GoodReceiptProductAddActivity)
                 }
                 .showCancelButton(true)
                 .setCancelText("No")
@@ -1081,6 +1149,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         } catch (ex: Exception) {
         }
     }
+
     fun hideKeyboard() {
         try {
             val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -1119,9 +1188,9 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //                if (taxType == "I") {
 //                    setCalculationSummaryView(net_total)
 //                } else {
-                  //  setCalculationSummaryView(net_sub_total)
+                //  setCalculationSummaryView(net_sub_total)
                 subTotalValue!!.text = Utils.twoDecimalPoint(net_sub_total)
-              //  }
+                //  }
             }
         } catch (ex: Exception) {
         }
@@ -1150,6 +1219,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         getProducts()
         setSummaryTotal()
     }
+
     fun isProductExist(productId: String?): Boolean {
         var isExist = false
         // try {
@@ -1158,7 +1228,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         if (localCart.size > 0) {
 
             for (cart in localCart) {
-                Log.w("localPdt1",""+cart.productCode)
+                Log.w("localPdt1", "" + cart.productCode)
 
                 if (cart.productCode != null) {
                     if (cart.productCode == productId) {
@@ -1230,18 +1300,20 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                     }
                     Log.w("SettingNameRet11:", model.settingName)
                 }
-            }else {
+            } else {
                 isAllowLowStock = false
             }
         }
-    fun uomValueVisible(uomcode:String){
+
+    fun uomValueVisible(uomcode: String) {
         ed_uomTxtl!!.setText(uomcode)
         uomChangel!!.visibility = View.VISIBLE
         ed_uomTxtl!!.visibility = View.VISIBLE
         uomSpinnerLayl!!.visibility = View.GONE
     }
 
-//    fun setCalculationSummaryView(subTotal: Double) {
+
+    //    fun setCalculationSummaryView(subTotal: Double) {
 //        try {
 //            var taxAmount1 = 0.0
 //            var netTotal1 = 0.0
@@ -1310,18 +1382,18 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //        }
 //    }
     fun setCalculationView() {
-       // try {
-            val taxAmount = 0.0
-            val netTotal = 0.0
-            var taxAmount1 = 0.0
-            var netTotal1 = 0.0
-            var return_qty = 0.0
-            val pcspercarton = 0.0
-            val cqtyCalc = 0.0
-            val lqtyCalc = 0.0
-            var net_qty = 0.0
-            val sharedPreferences = getSharedPreferences("customerPref", MODE_PRIVATE)
-            val selectCustomerId = sharedPreferences.getString("customerId", "")
+        // try {
+        val taxAmount = 0.0
+        val netTotal = 0.0
+        var taxAmount1 = 0.0
+        var netTotal1 = 0.0
+        var return_qty = 0.0
+        val pcspercarton = 0.0
+        val cqtyCalc = 0.0
+        val lqtyCalc = 0.0
+        var net_qty = 0.0
+        val sharedPreferences = getSharedPreferences("customerPref", MODE_PRIVATE)
+        val selectCustomerId = sharedPreferences.getString("customerId", "")
 
 //            if (selectCustomerId != null && !selectCustomerId.isEmpty()) {
 //                customerDetails = dbHelper!!.getCustomer(selectCustomerId)
@@ -1329,35 +1401,35 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //            val taxValue = customerDetails!![0].taxPerc
 //            val taxType = customerDetails!![0].taxType
 //            Log.w("TaxType12:", taxType)
-           // Log.w("TaxValue12:", taxValue)
+        // Log.w("TaxValue12:", taxValue)
 
-            var price = priceText!!.text.toString()
-            var qty = qtyValue!!.text.toString()
-            if (price.matches("".toRegex())) {
-                price = "0"
-            }
-            if (qty.matches("".toRegex())) {
-                qty = "0"
-            }
-            val cPriceCalc = price.toDouble()
-            net_qty = qty.toDouble() - return_qty
-            var tt = net_qty * cPriceCalc
-            Log.w("TOTALVALUES:", tt.toString())
-            val Prodtotal = Utils.twoDecimalPoint(tt)
-            var subTotal = 0.0
-            subTotal = tt
+        var price = priceText!!.text.toString()
+        var qty = qtyValue!!.text.toString()
+        if (price.matches("".toRegex())) {
+            price = "0"
+        }
+        if (qty.matches("".toRegex())) {
+            qty = "0"
+        }
+        val cPriceCalc = price.toDouble()
+        net_qty = qty.toDouble() - return_qty
+        var tt = net_qty * cPriceCalc
+        Log.w("TOTALVALUES:", tt.toString())
+        val Prodtotal = Utils.twoDecimalPoint(tt)
+        var subTotal = 0.0
+        subTotal = tt
 
 
-          subTotalValue!!.text = Utils.twoDecimalPoint(subTotal)
+        subTotalValue!!.text = Utils.twoDecimalPoint(subTotal)
 
-            /*  if (return_qty!=0){
-                double return_amt=0.0;
-                return_amt=(return_qty*cPriceCalc);
-                subTotal=subTotal-return_amt;
-            }*/
+        /*  if (return_qty!=0){
+            double return_amt=0.0;
+            return_amt=(return_qty*cPriceCalc);
+            subTotal=subTotal-return_amt;
+        }*/
 
-            // sl_total_inclusive.setText("" + sbTtl);
-            tt = subTotal
+        // sl_total_inclusive.setText("" + sbTtl);
+        tt = subTotal
 //            Log.w("SubTotalValues:", subTotal.toString())
 //            if (!taxType.matches("".toRegex()) && !taxValue.matches("".toRegex())) {
 //                val taxValueCalc = taxValue.toDouble()
@@ -1407,20 +1479,26 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //                subTotalValue!!.text = Utils.twoDecimalPoint(subTotal)
 //                taxTitle!!.text = "GST ( Zero )"
 //            }
-            setButtonView()
+        setButtonView()
 //        } catch (e: Exception) {
 //            Log.w("Error_Throwing::", e.message!!)
 //        }
     }
 
     fun setButtonView() {
-        if (subTotalValue!!.text.toString().toDouble() > 0) {
+        if( (qtyValue!!.text != null && !qtyValue!!.text.toString()
+                .isEmpty() && qtyValue!!.text.toString().toDouble() > 0
+        )  &&  (priceText!!.text != null && !priceText!!.text.toString()
+                .isEmpty() && priceText!!.text.toString().toDouble() > 0
+                    ) ) {
             addProduct!!.alpha = 0.9f
             addProduct!!.isEnabled = true
         } else {
-
+            addProduct!!.alpha = 0.4f
+            addProduct!!.isEnabled = false
         }
     }
+
 
     fun getAllProducts(jsonObject: JSONObject) {
         // Initialize a new RequestQueue instance
@@ -1442,7 +1520,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             Response.Listener { response: JSONObject ->
                 try {
 
-                   Log.w("Response_SAP_PRODUCTS:", response.toString())
+                    Log.w("Response_SAP_PRODUCTS:", response.toString())
                     // Loop through the array elements
                     val productArray = response.optJSONArray("responseData")
                     for (i in 0 until Objects.requireNonNull(productArray).length()) {
@@ -1483,6 +1561,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             }
                             product.uomCode = productObject.optString("uomCode")
                             product.isItemFOC = productObject.optString("itemAllowFOC")
+                            product.isBatch = productObject.optString("manageBatchOrSerial")
 
                             //  product.setProductBarcode(productObject.optString("BarCode")); Add values In Futue
                             // product.productBarcode = ""
@@ -1523,7 +1602,8 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Log.w("Errorn:", Objects.requireNonNull(e.message!!))                }
+                    Log.w("Errorn:", Objects.requireNonNull(e.message!!))
+                }
             },
             Response.ErrorListener { error: VolleyError ->
                 // Do something when error occurred
@@ -1613,14 +1693,15 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }*/
-                val jsonObject = JSONObject()
-                try {
-                    jsonObject.put("CustomerCode", selectCustomerId)
-                    jsonObject.put("ItemCode", model.productCode)
-                    getUOM(jsonObject)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    Log.w("Errors:", Objects.requireNonNull(e.message!!))                }
+            val jsonObject = JSONObject()
+            try {
+                jsonObject.put("CustomerCode", selectCustomerId)
+                jsonObject.put("ItemCode", model.productCode)
+                getUOM(jsonObject)
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                Log.w("Errors:", Objects.requireNonNull(e.message!!))
+            }
 
 
             productAutoComplete!!.setText(model.productName + " - " + model.productCode)
@@ -1632,7 +1713,13 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             // looseQtyValue.setEnabled(true);
             qtyValue!!.setText("")
             priceText!!.isEnabled = true
-            qtyValue!!.isEnabled = true
+            if (model.isBatch.equals("Yes", true)) {
+                qtyValue!!.isEnabled = false
+                addbatch!!.visibility = View.VISIBLE
+            } else {
+                qtyValue!!.isEnabled = true
+                addbatch!!.visibility = View.GONE
+            }
 
 //            if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
 //                minimumSellingPriceText!!.text = model.minimumSellingPrice
@@ -1775,9 +1862,27 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 e.printStackTrace()
                 Log.w("Errors:", Objects.requireNonNull(e.message!!))
             }
-                // looseQtyValue.setEnabled(true);
-            cartonPrice!!.isEnabled = true
-            qtyValue!!.isEnabled = true
+            // looseQtyValue.setEnabled(true);
+            cartonPrice!!.isEnabled = true //
+
+            if (model.isBatch.equals("Yes", true)) {
+                qtyValue!!.isEnabled = false
+                addbatch!!.visibility = View.VISIBLE
+            } else {
+                qtyValue!!.isEnabled = true
+                addbatch!!.visibility = View.GONE
+//                batchList!!.clear()
+//                val batchmodel1 = BatchDetailModule("", "", "","")
+//                batchList!!.add(batchmodel1)
+//                if(batchListAdapter != null) {
+//                    batchListAdapter!!.listAdd(false, batchList!!)
+//                    // setBatchAdapter(batchList!!)
+//                }
+            }
+
+            if (model.isBatch != null && model.isBatch.isNotEmpty()) {
+                isItemBatchApi = model.isBatch
+            }
 
             //stockLayout.setVisibility(View.VISIBLE);
             if (model.stockQty != null && model.stockQty != "null") {
@@ -1833,18 +1938,21 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                /*   Intent intent = new Intent(this, CustomerListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);*/finish()
+                val count = dbHelper!!.numberOfRowsInInvoice()
+                if (count > 0) {
+                    showDeleteAlert()
+                } else {
+                    finish()
+                }
                 true
             }
 
             R.id.action_save -> {
                 val localCart = dbHelper!!.allInvoiceProducts
                 if (localCart.size > 0) {
-                    if(!fromWarehouseName.equals("")) {
+                    if (!fromWarehouseName.equals("")) {
                         showSaveAlert()
-                    }else{
+                    } else {
                         toast("Select Location !")
                     }
 
@@ -1858,9 +1966,10 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 }
                 true
             }
+
             R.id.action_scan_menu -> {
                 scannedBarcode = ""
-                val intent = Intent(this@NewStockAdjustmentProductAddActivity, BarCodeScanner::class.java)
+                val intent = Intent(this@GoodReceiptProductAddActivity, BarCodeScanner::class.java)
                 startActivityForResult(intent, RESULT_CODE)
                 true
             }
@@ -1890,7 +1999,8 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             val copyMinus = customLayout.findViewById<Button>(R.id.decrease)
             val signatureButton = customLayout.findViewById<Button>(R.id.btn_signature)
             val printLayout = customLayout.findViewById<LinearLayout>(R.id.print_layout)
-            val attachement_layoutInvl = customLayout.findViewById<LinearLayout>(R.id.attachement_layoutInv)
+            val attachement_layoutInvl =
+                customLayout.findViewById<LinearLayout>(R.id.attachement_layoutInv)
             val signature_layoutl = customLayout.findViewById<LinearLayout>(R.id.signature_layout)
             selectImagel = customLayout.findViewById(R.id.select_imageInv)
 
@@ -1917,12 +2027,12 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 selectImagel!!.setTag("select_image")
             }
             //invoicePrintCheck.setVisibility(View.GONE);
-           // if (activityFrom == "sales_return") {
-                saveTitle!!.setText("Save Stock Adjustment")
-                saveMessage!!.setText("Are you sure want to save  Stock Adjustment?")
-                invoicePrintCheck!!.setText(" Stock Adjustment Print")
-                invoicePrintCheck!!.setChecked(false)
-                isPrintEnable = false
+            // if (activityFrom == "sales_return") {
+            saveTitle!!.setText("Save Good Receipt")
+            saveMessage!!.setText("Are you sure want to save  Good Receipt?")
+            invoicePrintCheck!!.setText(" Good Receipt Print")
+            invoicePrintCheck!!.setChecked(false)
+            isPrintEnable = false
 //            } else {
 //                invoicePrintCheck!!.setChecked(true)
 //                isPrintEnable = true
@@ -1935,9 +2045,9 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 }
             })
             okButton!!.setOnClickListener(View.OnClickListener { view1: View? ->
-               try {
-                   createStockAdjusJson()
-                   alert!!.dismiss()
+                try {
+                    createStockAdjusJson()
+                    alert!!.dismiss()
 
                 } catch (exception: Exception) {
                 }
@@ -1977,7 +2087,7 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         acceptButton.isEnabled = false
         acceptButton.alpha = 0.4f
         val mSig = CaptureSignatureView(
-            this@NewStockAdjustmentProductAddActivity,
+            this@GoodReceiptProductAddActivity,
             null
         ) {
             acceptButton.isEnabled = true
@@ -2007,183 +2117,201 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         signatureAlert!!.show()
     }
 
-    fun saveSalesOrder(jsonBody: JSONObject, action: String, copy: Int) {
-        try {
-            pDialog = SweetAlertDialog(
-                this@NewStockAdjustmentProductAddActivity,
-                SweetAlertDialog.PROGRESS_TYPE
-            )
-            pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
-            if (action == "SalesOrder") {
-                pDialog!!.setTitleText("Saving Sales Order...")
-            } else if (action == "DeliveryOrder") {
-                pDialog!!.setTitleText("Saving Delivery Order...")
+    private fun showBatchDialog() {
+        batchList = ArrayList()
+
+        val batchLay: LinearLayout
+        val batchAdd: ImageView
+        val saveBtn: TextView
+        val closeBtn: ImageView
+        val batch_pdtTxtl: TextView
+
+        val li = LayoutInflater.from(this)
+        val view: View = li.inflate(R.layout.dialog_batch, null)
+
+        val alertDialogBuilder = AlertDialog.Builder(this)
+
+        batchLay = view.findViewById(R.id.batch_lay)
+        batch_rv = view.findViewById(R.id.rv_batch)
+        batchAdd = view.findViewById(R.id.addBatch)
+        saveBtn = view.findViewById(R.id.save_batch)
+        closeBtn = view.findViewById(R.id.cancel_batch)
+        total_batchQty = view.findViewById(R.id.total_batch_qty)
+        batch_pdtTxtl = view.findViewById(R.id.batch_pdtTxt)
+
+        //  batch_pdtTxtl.setText(cartAddModel!!.get(position).productName)
+        batch_pdtTxtl.setText(productAutoComplete!!.text.toString())
+
+        alertDialogBuilder.setView(view)
+        val dialog: Dialog = alertDialogBuilder.create()
+        dialog.setCancelable(true)
+        dialog.show()
+
+        dialog.window!!
+            .clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        dialog.window!!
+            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        //  dialog.window!!.setLayout(1000, 1500)
+
+        batchAdd.visibility = View.VISIBLE
+        saveBtn.visibility = View.VISIBLE
+
+        Log.w("batchsi_pdt", "" + productId)
+        if (isEditItem) {
+            batchList = dbHelper!!.getBatchProducts(productId, editTimeStamp)
+            if (batchList!!.size > 0) {
+                setBatchAdapter(batchList!!)
             } else {
-                pDialog!!.setTitleText("Saving Invoice...")
+                val batchmodel1 = BatchDetailModule("", "", "", "")
+                batchList!!.add(batchmodel1)
+                setBatchAdapter(batchList!!)
             }
-            pDialog!!.setCancelable(false)
-            pDialog!!.show()
+            Log.w("batchsizzz", "" + batchList!!.size)
+        } else {
+            if (batchListAdapter != null) {
+                batchList = batchListAdapter!!.getBatchDataList()
+                setBatchAdapter(batchList!!)
+            } else {
+                val batchmodel1 = BatchDetailModule("", "", "", "")
+                batchList!!.add(batchmodel1)
+                setBatchAdapter(batchList!!)
+            }
+                Log.w("batchsicccc", "")
+            }
+
+            closeBtn.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            batchAdd.setOnClickListener {
+                val batchmodel1 = BatchDetailModule("", "", "", "")
+                batchList!!.add(batchmodel1)
+                if (batchListAdapter != null) {
+                    batchListAdapter!!.listAdd(false, batchList!!)
+                    // setBatchAdapter(batchList!!)
+                }
+            }
+            saveBtn.setOnClickListener {
+//            if(batchListAdapter != null) {
+//                dbHelper!!.insertBatchList(batchListAdapter!!.getBatchDataList(),productId,)
+//            }
+                dialog.dismiss()
+            }
+
+
+        }
+        fun setBatchAdapter(batchDetailModule: ArrayList<BatchDetailModule>) {
+
+            val totalBatchVal = batchDetailModule.sumOf {
+                if (it.batchQty != null && it.batchQty!!.isNotEmpty()) {
+                    it.batchQty!!.toDouble()
+                } else 0.0
+            }
+            total_batchQty!!.setText(totalBatchVal.toString())
+            qtyValue!!.setText(totalBatchVal.toString())
+
+            batchListAdapter = BatchListAdapter(this, batchDetailModule, this, this)
+            batch_rv!!.layoutManager =
+                androidx.recyclerview.widget.LinearLayoutManager(
+                    this,
+                    RecyclerView.VERTICAL,
+                    false
+                )
+            setCalculationView()
+            batch_rv!!.adapter = batchListAdapter
+        }
+
+        fun getCustomerDetails(customerCode: String?, isloader: Boolean, from: String?) {
+            // Initialize a new RequestQueue instance
             val requestQueue = Volley.newRequestQueue(this)
-            Log.w("GivenInvoiceRequest:", jsonBody.toString())
-            var URL = ""
-            URL = if (action == "SalesOrder") {
-                Utils.getBaseUrl(this) + "PostingSalesOrder"
-            } else if (action == "DeliveryOrder") {
-                Utils.getBaseUrl(this) + "PostingDeliveryOrder"
-            } else {
-                Utils.getBaseUrl(this) + "PostingInvoice"
+            // Initialize a new JsonArrayRequest instance
+            val jsonObject = JSONObject()
+            try {
+                jsonObject.put("CustomerCode", customerCode)
+                // jsonObject.put("CompanyCode",companyCode);
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-            Log.w("Given_InvoiceApi:", URL)
-            //    {"statusCode":2,"statusMessage":"Failed","responseData":{"docNum":null,"error":"Invoice :One of the base documents has already been closed  [INV1.BaseEntry][line: 1]"}}
-            val salesOrderRequest: JsonObjectRequest = object : JsonObjectRequest(
-                Method.POST,
-                URL,
-                jsonBody,
+            Log.w("JsonValueForCustomer:", jsonObject.toString())
+            val url = Utils.getBaseUrl(applicationContext) + "Customer"
+            Log.w("Given_url:", url)
+            val progressDialog = ProgressDialog(applicationContext)
+            progressDialog.setCancelable(false)
+            progressDialog.setMessage("Customer Details Loading...")
+            if (isloader) {
+                progressDialog.show()
+            }
+            val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(Method.POST,
+                url,
+                jsonObject,
                 Response.Listener { response: JSONObject ->
-                    Log.w("Invoice_ResponseSap:", response.toString())
-                    Utils.clearCustomerSession(this)
-                    AppUtils.setProductsList(null)
-                    dbHelper!!.removeAllReturn()
-                    // dbHelper.removeCustomer();
-                    // {"statusCode":1,"statusMessage":"Invoice Created Successfully","responseData":{"docNum":"35","error":null}}
-                    pDialog!!.dismiss()
-                    val statusCode = response.optString("statusCode")
-                    val message = response.optString("statusMessage")
-                    var responseData: JSONObject? = null
                     try {
-                        responseData = response.getJSONObject("responseData")
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                    if (statusCode == "1") {
-                        if (action == "SalesOrder" || action == "SalesEdit") {
-                            if (isPrintEnable) {
-                                try {
-                                    dbHelper!!.removeAllInvoiceItems()
-                                    val `object` = response.optJSONObject("responseData")
-                                    val doucmentNo = `object`.optString("docNum")
-                                    //   String result=object.optString("Result");
-                                    if (!doucmentNo.isEmpty()) {
-                                        // getSalesOrderDetails(doucmentNo, copy);
-                                        val intent =
-                                            Intent(this, SalesOrderListActivity::class.java)
-                                        intent.putExtra("printSoNumber", doucmentNo)
-                                        intent.putExtra("noOfCopy", copy.toString())
-                                        startActivity(intent)
-                                        finish()
-                                    } else {
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Error in getting printing data",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        redirectActivity()
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
+                        progressDialog.dismiss()
+                        Log.w("SAP-response_customer:", response.toString())
+                        val customerList = ArrayList<CustomerModel>()
+                        val statusCode = response.optString("statusCode")
+                        if (statusCode == "1") {
+                            customerResponse = response
+                            val customerDetailArray = response.optJSONArray("responseData")
+                            for (i in 0 until customerDetailArray.length()) {
+                                val `object` = customerDetailArray.optJSONObject(i)
+                                //  if (customerObject.optBoolean("IsActive")) {
+                                val model = CustomerModel()
+                                model.customerCode = `object`.optString("customerCode")
+                                model.customerName = `object`.optString("customerName")
+                                model.address1 = `object`.optString("address")
+                                model.address2 = `object`.optString("street")
+                                model.address3 = `object`.optString("city")
+                                model.customerAddress = `object`.optString("address")
+                                model.haveTax = `object`.optString("HaveTax")
+                                model.taxType = `object`.optString("taxType")
+                                model.taxPerc = `object`.optString("taxPercentage")
+                                model.taxCode = `object`.optString("taxCode")
+                                //  model.setCustomerBarcode(object.optString("BarCode"));
+                                // model.setCustomerBarcode(String.valueOf(i));
+                                if (`object`.optString("outstandingAmount") == "null" || `object`.optString(
+                                        "outstandingAmount"
+                                    ).isEmpty()
+                                ) {
+                                    model.outstandingAmount = "0.00"
+                                } else {
+                                    model.outstandingAmount =
+                                        `object`.optString("outstandingAmount")
                                 }
-                            } else {
-                                dbHelper!!.removeAllInvoiceItems()
-                                redirectActivity()
+                                customerList.add(model)
+                                // }
                             }
-                            isPrintEnable = false
-                        } /*else if (action.equals("DeliveryOrder") || action.equals("DeliveryOrderEdit")){
-                        if (isPrintEnable){
-                            // {"statusCode":1,"statusMessage":"Delivery Order Created Successfully","responseData":{"docNum":"11","error":null}}
-                            try {
-                                dbHelper.removeAllItems();
-                                JSONObject object=response.optJSONObject("responseData");
-                                String doucmentNo =object.optString("docNum");
-                                //   String result=object.optString("Result");
-                                if (!doucmentNo.isEmpty()) {
-                                    getDoDetails(doucmentNo, copy);
-                                }else {
-                                    Toast.makeText(getApplicationContext(),"Error in getting printing data",Toast.LENGTH_SHORT).show();
-                                    redirectActivity();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }else {
-                            dbHelper.removeAllItems();
-                            redirectActivity();
-                        }
-                        isPrintEnable=false;
-                    }*/ else {
-                            if (isPrintEnable) {
-                                try {
-                                    //updateStockQty();
-                                    dbHelper!!.removeAllInvoiceItems()
-                                    val `object` = response.optJSONObject("responseData")
-                                    val doucmentNo = `object`.optString("docNum")
-                                    //   String result=object.optString("Result");
-                                    if (!doucmentNo.isEmpty()) {
-                                        getInvoicePrintDetails(doucmentNo, copy)
-                                        val intent = Intent(
-                                            applicationContext,
-                                            NewInvoiceListActivity::class.java
-                                        )
-                                        startActivity(intent)
-                                        finish()
-                                    } else {
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Error in getting printing data",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        redirectActivity()
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            } else {
-                                dbHelper!!.removeAllInvoiceItems()
-                                redirectActivity()
-                            }
-                            isPrintEnable = false
-                        }
-                    } else {
-//                    Log.w("ErrorValues:",responseData.optString("error"));
-                        if (responseData != null) {
-                            Toast.makeText(
-                                applicationContext,
-                                responseData.optString("error"),
-                                Toast.LENGTH_LONG
-                            ).show()
                         } else {
                             Toast.makeText(
                                 applicationContext,
-                                "Error in Saving Data...",
-                                Toast.LENGTH_SHORT
+                                "Error,in getting Customer list",
+                                Toast.LENGTH_LONG
                             ).show()
                         }
+                        // pDialog.dismiss();
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                },
-                Response.ErrorListener { error: VolleyError ->
-                    Log.w("SalesOrder_Response:", error.toString())
-                    pDialog!!.dismiss()
+                }, Response.ErrorListener { error: VolleyError ->
+                    // Do something when error occurred
+                    //  pDialog.dismiss();
+                    Log.w("Error_throwing:", error.toString())
+                    progressDialog.dismiss()
                 }) {
-                /* @Override
-                 public byte[] getBody() {
-                     return jsonBody.toString().getBytes();
-                 }*/
-                override fun getBodyContentType(): String {
-                    return "application/json"
-                }
-
                 override fun getHeaders(): Map<String, String> {
                     val params = HashMap<String, String>()
-                    val creds = String.format(
-                        "%s:%s",
-                        Constants.API_SECRET_CODE,
-                        Constants.API_SECRET_PASSWORD
-                    )
+                    val creds =
+                        String.format(
+                            "%s:%s",
+                            Constants.API_SECRET_CODE,
+                            Constants.API_SECRET_PASSWORD
+                        )
                     val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
                     params["Authorization"] = auth
                     return params
                 }
             }
-            salesOrderRequest.setRetryPolicy(object : RetryPolicy {
+            jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
                 override fun getCurrentTimeout(): Int {
                     return 50000
                 }
@@ -2196,142 +2324,44 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                 override fun retry(error: VolleyError) {
                 }
             })
-            requestQueue.add(salesOrderRequest)
-        } catch (e: Exception) {
-            e.printStackTrace()
+            // Add JsonArrayRequest to the RequestQueue
+            requestQueue.add(jsonObjectRequest)
         }
-    }
 
-    fun getCustomerDetails(customerCode: String?, isloader: Boolean, from: String?) {
-        // Initialize a new RequestQueue instance
-        val requestQueue = Volley.newRequestQueue(this)
-        // Initialize a new JsonArrayRequest instance
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("CustomerCode", customerCode)
-            // jsonObject.put("CompanyCode",companyCode);
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        Log.w("JsonValueForCustomer:", jsonObject.toString())
-        val url = Utils.getBaseUrl(applicationContext) + "Customer"
-        Log.w("Given_url:", url)
-        val progressDialog = ProgressDialog(applicationContext)
-        progressDialog.setCancelable(false)
-        progressDialog.setMessage("Customer Details Loading...")
-        if (isloader) {
-            progressDialog.show()
-        }
-        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(Method.POST,
-            url,
-            jsonObject,
-            Response.Listener { response: JSONObject ->
-                try {
-                    progressDialog.dismiss()
-                    Log.w("SAP-response_customer:", response.toString())
-                    val customerList = ArrayList<CustomerModel>()
-                    val statusCode = response.optString("statusCode")
-                    if (statusCode == "1") {
-                        customerResponse = response
-                        val customerDetailArray = response.optJSONArray("responseData")
-                        for (i in 0 until customerDetailArray.length()) {
-                            val `object` = customerDetailArray.optJSONObject(i)
-                            //  if (customerObject.optBoolean("IsActive")) {
-                            val model = CustomerModel()
-                            model.customerCode = `object`.optString("customerCode")
-                            model.customerName = `object`.optString("customerName")
-                            model.address1 = `object`.optString("address")
-                            model.address2 = `object`.optString("street")
-                            model.address3 = `object`.optString("city")
-                            model.customerAddress = `object`.optString("address")
-                            model.haveTax = `object`.optString("HaveTax")
-                            model.taxType = `object`.optString("taxType")
-                            model.taxPerc = `object`.optString("taxPercentage")
-                            model.taxCode = `object`.optString("taxCode")
-                            //  model.setCustomerBarcode(object.optString("BarCode"));
-                            // model.setCustomerBarcode(String.valueOf(i));
-                            if (`object`.optString("outstandingAmount") == "null" || `object`.optString(
-                                    "outstandingAmount"
-                                ).isEmpty()
-                            ) {
-                                model.outstandingAmount = "0.00"
-                            } else {
-                                model.outstandingAmount = `object`.optString("outstandingAmount")
-                            }
-                            customerList.add(model)
-                            // }
-                        }
-                    } else {
-                        Toast.makeText(
-                            applicationContext,
-                            "Error,in getting Customer list",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    // pDialog.dismiss();
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }, Response.ErrorListener { error: VolleyError ->
-                // Do something when error occurred
-                //  pDialog.dismiss();
-                Log.w("Error_throwing:", error.toString())
-                progressDialog.dismiss()
-            }) {
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                val creds =
-                    String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD)
-                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                params["Authorization"] = auth
-                return params
-            }
-        }
-        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
-            override fun getCurrentTimeout(): Int {
-                return 50000
-            }
-
-            override fun getCurrentRetryCount(): Int {
-                return 50000
-            }
-
-            @Throws(VolleyError::class)
-            override fun retry(error: VolleyError) {
-            }
-        })
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
-    }
-
-    private fun setupGroup(itemGroupLists: ArrayList<ItemGroupList>) {
-        val myAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, itemGroupLists)
-        groupspinner!!.adapter = myAdapter
-        groupspinner!!.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>?, view: View, i: Int, l: Long) {
-                val jsonObject = JSONObject()
-                try {
-                    val itemCode = itemGroup!![i].groupCode
-                    Log.e("selectspinn", "" + itemCode)
-                  //  if (itemCode != "Select Brand") {
+        private fun setupGroup(itemGroupLists: ArrayList<ItemGroupList>) {
+            val myAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, itemGroupLists)
+            groupspinner!!.adapter = myAdapter
+            groupspinner!!.onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    adapterView: AdapterView<*>?,
+                    view: View,
+                    i: Int,
+                    l: Long
+                ) {
                     val jsonObject = JSONObject()
-                    jsonObject.put("WarehouseCode", locationCode)
-                    jsonObject.put("ItemGroupCode", "All")
+                    try {
+                        val itemCode = itemGroup!![i].groupCode
+                        Log.e("selectspinn", "" + itemCode)
+                        //  if (itemCode != "Select Brand") {
+                        val jsonObject = JSONObject()
+                        jsonObject.put("WarehouseCode", locationCode)
+                        jsonObject.put("ItemGroupCode", "All")
                         getAllProducts(jsonObject)
-                  //  }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+                        //  }
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onNothingSelected(adapterView: AdapterView<*>?) {
+                    return
                 }
             }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                return
-            }
         }
-    }
-    @get:Throws(JSONException::class)
-    private val locationList: Unit
-        private get() {
+
+        @get:Throws(JSONException::class)
+        private val locationList: Unit
+        private get () {
             val requestQueue = Volley.newRequestQueue(this)
             val url = Utils.getBaseUrl(this) + "WarehouseList"
             // Initialize a new JsonArrayRequest instance
@@ -2406,181 +2436,183 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
         }
 
 
-    fun getfromlocationDialog(locationDetailsArrayList: java.util.ArrayList<NewLocationModel.LocationDetails>) {
-        val builderSingle = AlertDialog.Builder(this)
-        builderSingle.setTitle("Select Location")
-        val arrayAdapter = ArrayAdapter<String>(this, R.layout.selection_single_dialog)
-        for (i in locationDetailsArrayList.indices) {
-            arrayAdapter.add(locationDetailsArrayList[i].getLocationName())
-        }
-        val checkedItem = -1
-        builderSingle.setSingleChoiceItems(
-            arrayAdapter, checkedItem
-        ) { dialog, which -> // user checked an item
-            val strName = arrayAdapter.getItem(which)
-            location_adjustl!!.setText(strName)
+        fun getfromlocationDialog(locationDetailsArrayList: java.util.ArrayList<NewLocationModel.LocationDetails>) {
+            val builderSingle = AlertDialog.Builder(this)
+            builderSingle.setTitle("Select Location")
+            val arrayAdapter = ArrayAdapter<String>(this, R.layout.selection_single_dialog)
             for (i in locationDetailsArrayList.indices) {
-                if (strName == locationDetailsArrayList[i].getLocationName()) {
-                    fromWarehouseCode = locationDetailsArrayList[i].getLocationCode()
-                    fromWarehouseName = locationDetailsArrayList[i].getLocationName()
-                }
+                arrayAdapter.add(locationDetailsArrayList[i].getLocationName())
             }
-            dialog.dismiss()
-        }
-        builderSingle.setNegativeButton(
-            "cancel"
-        ) { dialog, which -> dialog.dismiss() }
-        builderSingle.setCancelable(false)
-        builderSingle.show()
-    }
-
-    private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            // Create the File where the photo should go
-            var photoFile: File? = null
-            try {
-                photoFile = createImageFile()
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-                // Error occurred while creating the File
-            }
-            if (photoFile != null) {
-                val photoURI = FileProvider.getUriForFile(
-                    this,
-                    BuildConfig.APPLICATION_ID + ".provider",
-                    photoFile
-                )
-                mPhotoFile = photoFile
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
-            }
-        }
-    }
-
-    /**
-     * Select image fro gallery
-     */
-    private fun dispatchGalleryIntent() {
-        val pickPhoto = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO)
-    }
-    fun showImage() {
-        val builder = AlertDialog.Builder(this@NewStockAdjustmentProductAddActivity)
-        val inflater = layoutInflater
-        val dialogView = inflater.inflate(R.layout.image_view_layout, null)
-        val imageView = dialogView.findViewById<ImageView>(R.id.invoice_image)
-        Glide.with(this)
-            .load(mPhotoFile)
-            .error(R.drawable.no_image_found)
-            .listener(object : RequestListener<Drawable?> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any,
-                    target: Target<Drawable?>,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    return false
+            val checkedItem = -1
+            builderSingle.setSingleChoiceItems(
+                arrayAdapter, checkedItem
+            ) { dialog, which -> // user checked an item
+                val strName = arrayAdapter.getItem(which)
+                location_adjustl!!.setText(strName)
+                for (i in locationDetailsArrayList.indices) {
+                    if (strName == locationDetailsArrayList[i].getLocationName()) {
+                        fromWarehouseCode = locationDetailsArrayList[i].getLocationCode()
+                        fromWarehouseName = locationDetailsArrayList[i].getLocationName()
+                    }
                 }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any,
-                    target: Target<Drawable?>,
-                    dataSource: DataSource,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    return false
-                }
-            }).into(imageView)
-        builder.setCancelable(false)
-        builder.setTitle("Invoice Image")
-        builder.setView(dialogView)
-        builder.setNeutralButton(
-            "NEW IMAGE"
-        ) { dialogInterface, i -> selectImage() }
-        builder.setPositiveButton(
-            "OK"
-        ) { dialog, which ->
-            selectImagel!!.setTag("view_image")
-            selectImagel!!.setText("View Image")
-            dialog.dismiss()
-        }.create().show()
-    }
-
-    fun selectImage() {
-        val items = arrayOf<CharSequence>(
-            "Take Photo",  /* "Choose from Library",*/
-            "Cancel"
-        )
-        val builder = AlertDialog.Builder(this@NewStockAdjustmentProductAddActivity)
-        builder.setItems(
-            items
-        ) { dialog: DialogInterface, item: Int ->
-            if (items[item] == "Take Photo") {
-                requestStoragePermission(true)
-            } //else if (items[item].equals("Choose from Library")) {
-            else if (items[item] == "Cancel") {
                 dialog.dismiss()
             }
+            builderSingle.setNegativeButton(
+                "cancel"
+            ) { dialog, which -> dialog.dismiss() }
+            builderSingle.setCancelable(false)
+            builderSingle.show()
         }
-        builder.show()
-    }
 
-    private fun requestStoragePermission(isCamera: Boolean) {
-        var permission = listOf(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA)
+        private fun dispatchTakePictureIntent() {
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                // Create the File where the photo should go
+                var photoFile: File? = null
+                try {
+                    photoFile = createImageFile()
+                } catch (ex: IOException) {
+                    ex.printStackTrace()
+                    // Error occurred while creating the File
+                }
+                if (photoFile != null) {
+                    val photoURI = FileProvider.getUriForFile(
+                        this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        photoFile
+                    )
+                    mPhotoFile = photoFile
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
+                }
+            }
+        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permission = listOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
+        /**
+         * Select image fro gallery
+         */
+        private fun dispatchGalleryIntent() {
+            val pickPhoto = Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            )
+            pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO)
+        }
+
+        fun showImage() {
+            val builder = AlertDialog.Builder(this@GoodReceiptProductAddActivity)
+            val inflater = layoutInflater
+            val dialogView = inflater.inflate(R.layout.image_view_layout, null)
+            val imageView = dialogView.findViewById<ImageView>(R.id.invoice_image)
+            Glide.with(this)
+                .load(mPhotoFile)
+                .error(R.drawable.no_image_found)
+                .listener(object : RequestListener<Drawable?> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any,
+                        target: Target<Drawable?>,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any,
+                        target: Target<Drawable?>,
+                        dataSource: DataSource,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+                }).into(imageView)
+            builder.setCancelable(false)
+            builder.setTitle("Invoice Image")
+            builder.setView(dialogView)
+            builder.setNeutralButton(
+                "NEW IMAGE"
+            ) { dialogInterface, i -> selectImage() }
+            builder.setPositiveButton(
+                "OK"
+            ) { dialog, which ->
+                selectImagel!!.setTag("view_image")
+                selectImagel!!.setText("View Image")
+                dialog.dismiss()
+            }.create().show()
+        }
+
+        fun selectImage() {
+            val items = arrayOf<CharSequence>(
+                "Take Photo",  /* "Choose from Library",*/
+                "Cancel"
+            )
+            val builder = AlertDialog.Builder(this@GoodReceiptProductAddActivity)
+            builder.setItems(
+                items
+            ) { dialog: DialogInterface, item: Int ->
+                if (items[item] == "Take Photo") {
+                    requestStoragePermission(true)
+                } //else if (items[item].equals("Choose from Library")) {
+                else if (items[item] == "Cancel") {
+                    dialog.dismiss()
+                }
+            }
+            builder.show()
+        }
+
+        private fun requestStoragePermission(isCamera: Boolean) {
+            var permission = listOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
             )
-        }
-        Dexter.withContext(this)
-            .withPermissions(
-                permission
-            )
-            .withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport) {
-                    // check if all permissions are granted
-                    if (report.areAllPermissionsGranted()) {
-                        if (isCamera) {
-                            dispatchTakePictureIntent()
-                        } else {
-                            dispatchGalleryIntent()
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permission = listOf(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.CAMERA
+                )
+            }
+            Dexter.withContext(this)
+                .withPermissions(
+                    permission
+                )
+                .withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                        // check if all permissions are granted
+                        if (report.areAllPermissionsGranted()) {
+                            if (isCamera) {
+                                dispatchTakePictureIntent()
+                            } else {
+                                dispatchGalleryIntent()
+                            }
+                        }
+                        // check for permanent denial of any permission
+                        if (report.isAnyPermissionPermanentlyDenied) {
+                            // show alert dialog navigating to Settings
+                            showSettingsDialog()
                         }
                     }
-                    // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied) {
-                        // show alert dialog navigating to Settings
-                        showSettingsDialog()
+
+                    override fun onPermissionRationaleShouldBeShown(
+                        permissions: List<PermissionRequest>,
+                        token: PermissionToken
+                    ) {
+                        token.continuePermissionRequest()
                     }
+                })
+                .withErrorListener { error: DexterError? ->
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
+                        .show()
                 }
+                .onSameThread()
+                .check()
+        }
 
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: List<PermissionRequest>,
-                    token: PermissionToken
-                ) {
-                    token.continuePermissionRequest()
-                }
-            })
-            .withErrorListener { error: DexterError? ->
-                Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
-                    .show()
-            }
-            .onSameThread()
-            .check()
-    }
-
-    @get:Throws(JSONException::class)
-    private val grouplist: ArrayList<ItemGroupList>
-        private get() {
+        @get:Throws(JSONException::class)
+        private val grouplist: ArrayList<ItemGroupList>
+        private get () {
             val requestQueue = Volley.newRequestQueue(this)
             val url = Utils.getBaseUrl(applicationContext) + "ItemGroupList"
             // Initialize a new JsonArrayRequest instance
@@ -2654,141 +2686,336 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
             return itemGroup!!
         }
 
-    fun redirectActivity() {
-        val intent: Intent
-        intent = if (activityFrom == "iv" || activityFrom == "ConvertInvoice") {
-            Intent(this@NewStockAdjustmentProductAddActivity, NewInvoiceListActivity::class.java)
-        } else {
-            Intent(this@NewStockAdjustmentProductAddActivity, SalesOrderListActivity::class.java)
-        }
-        startActivity(intent)
-        finish()
-    }
-
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val count = dbHelper!!.numberOfRowsInInvoice()
-            if (count > 0) {
-                showDeleteAlert()
+        fun redirectActivity() {
+            val intent: Intent
+            intent = if (activityFrom == "iv" || activityFrom == "ConvertInvoice") {
+                Intent(this@GoodReceiptProductAddActivity, NewInvoiceListActivity::class.java)
             } else {
-                finish()
+                Intent(this@GoodReceiptProductAddActivity, SalesOrderListActivity::class.java)
             }
-            return true
-        } else if (keyCode == KeyEvent.KEYCODE_HOME) {
+            startActivity(intent)
             finish()
+        }
+
+        override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                val count = dbHelper!!.numberOfRowsInInvoice()
+                if (count > 0) {
+                    showDeleteAlert()
+                } else {
+                    finish()
+                }
+                return true
+            } else if (keyCode == KeyEvent.KEYCODE_HOME) {
+                finish()
+                return true
+            }
+            return super.onKeyDown(keyCode, event)
+        }
+
+        override fun onCreateOptionsMenu(menu: Menu): Boolean {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            menuInflater.inflate(R.menu.save_menu, menu)
             return true
         }
-        return super.onKeyDown(keyCode, event)
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.save_menu, menu)
-        return true
-    }
-
-    fun showDeleteAlert() {
-        val builder1 = AlertDialog.Builder(this@NewStockAdjustmentProductAddActivity)
-        builder1.setMessage("Data Will be Cleared are you sure want to back?")
-        builder1.setCancelable(false)
-        builder1.setPositiveButton(
-            "Yes"
-        ) { dialog, id ->
-            dbHelper!!.removeAllInvoiceItems()
-            dbHelper!!.removeAllReturn()
-            finish()
-            dialog.cancel()
+        fun showDeleteAlert() {
+            val builder1 = AlertDialog.Builder(this@GoodReceiptProductAddActivity)
+            builder1.setMessage("Data Will be Cleared are you sure want to back?")
+            builder1.setCancelable(false)
+            builder1.setPositiveButton(
+                "Yes"
+            ) { dialog, id ->
+                dbHelper!!.removeAllInvoiceItems()
+                dbHelper!!.removeAllReturn()
+                dbHelper!!.removeAllBAtch()
+                finish()
+                dialog.cancel()
+            }
+            builder1.setNegativeButton(
+                "No"
+            ) { dialog, id -> dialog.cancel() }
+            val alert11 = builder1.create()
+            alert11.show()
         }
-        builder1.setNegativeButton(
-            "No"
-        ) { dialog, id -> dialog.cancel() }
-        val alert11 = builder1.create()
-        alert11.show()
-    }
 
-    @Throws(JSONException::class)
-    private fun getInvoicePrintDetails(invoiceNumber: String, copy: Int) {
-        // Initialize a new RequestQueue instance
-        val jsonObject = JSONObject()
-        // jsonObject.put("CompanyCode", companyId);
-        jsonObject.put("InvoiceNo", invoiceNumber)
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this) + "InvoiceDetails"
-        // Initialize a new JsonArrayRequest instance
-        Log.w("Given_url:", url)
-        //  pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-        // pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        // pDialog.setTitleText("Processing please wait...");
-        // pDialog.setCancelable(false);
-        // pDialog.show();
-        invoiceHeaderDetails = ArrayList()
-        invoicePrintList = ArrayList()
-        salesReturnList = ArrayList()
-        // {"statusCode":1,"statusMessage":"Success","responseData":[{"customerCode":"WinApp","customerName":"WinApp","invoiceNumber":"33",
-        // "invoiceStatus":"O","invoiceDate":"6\/8\/2021 12:00:00 am","netTotal":"26.750000","balanceAmount":"26.750000","totalDiscount":
-        // "0.000000","paidAmount":"0.000000","contactPersonCode":"","createDate":"6\/8\/2021 12:00:00 am","updateDate":"6\/8\/2021 12:00:00 am",
-        // "remark":"","fDocTotal":"0.000000","fTaxAmount":"0.000000","receivedAmount":"0.000000","total":"26.750000","fTotal":"0.000000",
-        // "iTotalDiscount":"0.000000","taxTotal":"1.750000","iPaidAmount":"0.000000","currencyCode":"SGD","currencyName":"Singapore Dollar",
-        // "companyCode":"WINAPP_DEMO","docEntry":"20","invoiceDetails":[{"slNo":"1","companyCode":"WINAPP_DEMO","invoiceNo":"33",
-        // "productCode":"FG\/001245","productName":"RUM","quantity":"5.000000","price":"5.000000","currency":"SGD","taxRate":"0.000000",
-        // "discountPercentage":"0.000000","lineTotal":"26.750000","fRowTotal":"0.000000","warehouseCode":"01","salesEmployeeCode":"-1",
-        // "accountCode":"400000","taxStatus":"Y","unitPrice":"5.000000","customerCategoryNo":"","barCodes":"","totalTax":"1.750000",
-        // "fTaxAmount":"0.000000","taxCode":"","taxType":"Y","taxPerc":"0.000000","uoMCode":null,"invoiceDate":"6\/8\/2021 12:00:00 am",
-        // "dueDate":"6\/8\/2021 12:00:00 am","createDate":"6\/8\/2021 12:00:00 am","updateDate":"6\/8\/2021 12:00:00 am","createdUser":"manager"}]}]}
-        val jsonObjectRequest: JsonObjectRequest =
-            object : JsonObjectRequest(Method.POST, url, jsonObject,
+        @Throws(JSONException::class)
+        private fun getInvoicePrintDetails(invoiceNumber: String, copy: Int) {
+            // Initialize a new RequestQueue instance
+            val jsonObject = JSONObject()
+            // jsonObject.put("CompanyCode", companyId);
+            jsonObject.put("InvoiceNo", invoiceNumber)
+            val requestQueue = Volley.newRequestQueue(this)
+            val url = Utils.getBaseUrl(this) + "InvoiceDetails"
+            // Initialize a new JsonArrayRequest instance
+            Log.w("Given_url:", url)
+            //  pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+            // pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            // pDialog.setTitleText("Processing please wait...");
+            // pDialog.setCancelable(false);
+            // pDialog.show();
+            invoiceHeaderDetails = ArrayList()
+            invoicePrintList = ArrayList()
+            salesReturnList = ArrayList()
+            // {"statusCode":1,"statusMessage":"Success","responseData":[{"customerCode":"WinApp","customerName":"WinApp","invoiceNumber":"33",
+            // "invoiceStatus":"O","invoiceDate":"6\/8\/2021 12:00:00 am","netTotal":"26.750000","balanceAmount":"26.750000","totalDiscount":
+            // "0.000000","paidAmount":"0.000000","contactPersonCode":"","createDate":"6\/8\/2021 12:00:00 am","updateDate":"6\/8\/2021 12:00:00 am",
+            // "remark":"","fDocTotal":"0.000000","fTaxAmount":"0.000000","receivedAmount":"0.000000","total":"26.750000","fTotal":"0.000000",
+            // "iTotalDiscount":"0.000000","taxTotal":"1.750000","iPaidAmount":"0.000000","currencyCode":"SGD","currencyName":"Singapore Dollar",
+            // "companyCode":"WINAPP_DEMO","docEntry":"20","invoiceDetails":[{"slNo":"1","companyCode":"WINAPP_DEMO","invoiceNo":"33",
+            // "productCode":"FG\/001245","productName":"RUM","quantity":"5.000000","price":"5.000000","currency":"SGD","taxRate":"0.000000",
+            // "discountPercentage":"0.000000","lineTotal":"26.750000","fRowTotal":"0.000000","warehouseCode":"01","salesEmployeeCode":"-1",
+            // "accountCode":"400000","taxStatus":"Y","unitPrice":"5.000000","customerCategoryNo":"","barCodes":"","totalTax":"1.750000",
+            // "fTaxAmount":"0.000000","taxCode":"","taxType":"Y","taxPerc":"0.000000","uoMCode":null,"invoiceDate":"6\/8\/2021 12:00:00 am",
+            // "dueDate":"6\/8\/2021 12:00:00 am","createDate":"6\/8\/2021 12:00:00 am","updateDate":"6\/8\/2021 12:00:00 am","createdUser":"manager"}]}]}
+            val jsonObjectRequest: JsonObjectRequest =
+                object : JsonObjectRequest(Method.POST, url, jsonObject,
+                    Response.Listener { response: JSONObject ->
+                        try {
+                            Log.w("DetailsResponse::", response.toString())
+                            val statusCode = response.optString("statusCode")
+                            if (statusCode == "1") {
+                                val responseData = response.getJSONArray("responseData")
+                                val `object` = responseData.optJSONObject(0)
+                                val model = InvoicePrintPreviewModel()
+                                model.invoiceNumber = `object`.optString("invoiceNumber")
+                                model.invoiceDate = `object`.optString("invoiceDate")
+                                model.customerCode = `object`.optString("customerCode")
+                                model.customerName = `object`.optString("customerName")
+                                model.overAllTotal = `object`.optString("overAllTotal")
+                                //  model.setAddress(object.optString("street"));
+                                model.address =
+                                    `object`.optString("address1") + `object`.optString("address2") + `object`.optString(
+                                        "address3"
+                                    )
+                                model.address1 = `object`.optString("address1")
+                                model.address2 = `object`.optString("address2")
+                                model.address3 = `object`.optString("address3")
+                                model.addressstate =
+                                    (`object`.optString("street") + " " +
+                                            `object`.optString("block") + " " + `object`.optString("city"))
+                                model.addresssZipcode =
+                                    (`object`.optString("countryName") + " " + `object`.optString("state") + " "
+                                            + `object`.optString("zipcode"))
+
+                                // model.setDeliveryAddress(model.getAddress());
+                                model.subTotal = `object`.optString("subTotal")
+                                model.netTax = `object`.optString("taxTotal")
+                                model.netTotal = `object`.optString("netTotal")
+                                model.paymentTerm = `object`.optString("paymentTerm")
+                                model.taxType = `object`.optString("taxType")
+                                model.taxValue = `object`.optString("taxPerc")
+                                model.outStandingAmount =
+                                    `object`.optString("totalOutstandingAmount")
+                                model.balanceAmount = `object`.optString("balanceAmount")
+                                Utils.setInvoiceOutstandingAmount(`object`.optString("balanceAmount"))
+                                Utils.setInvoiceMode("Invoice")
+                                model.billDiscount = `object`.optString("billDiscount")
+                                model.itemDiscount = `object`.optString("totalDiscount")
+                                model.soNumber = `object`.optString("soNumber")
+                                model.soDate = `object`.optString("soDate")
+                                model.doDate = `object`.optString("doDate")
+                                model.doNumber = `object`.optString("doNumber")
+                                model.allowDeliveryAddress =
+                                    response.optString("showShippingAddress")
+                                model.deliveryAddress =
+                                    `object`.optString("shipAddress2") + `object`.optString("shipAddress3") + `object`.optString(
+                                        "shipStreet"
+                                    )
+                                model.currentAddress = `object`.optString("CurrentAddress")
+
+                                val signFlag = `object`.optString("signFlag")
+                                if (signFlag == "Y") {
+                                    val signature = `object`.optString("signature")
+                                    Utils.setSignature(signature)
+                                    createSignature()
+                                } else {
+                                    Utils.setSignature("")
+                                }
+                                val detailsArray = `object`.optJSONArray("invoiceDetails")
+                                for (i in 0 until detailsArray.length()) {
+                                    val detailObject = detailsArray.optJSONObject(i)
+                                    val invoiceListModel = InvoicePrintPreviewModel.InvoiceList()
+                                    invoiceListModel.productCode =
+                                        detailObject.optString("productCode")
+                                    invoiceListModel.description =
+                                        detailObject.optString("productName")
+                                    invoiceListModel.lqty = detailObject.optString("unitQty")
+                                    invoiceListModel.cqty = detailObject.optString("cartonQty")
+                                    invoiceListModel.netQty = detailObject.optString("quantity")
+                                    invoiceListModel.netQuantity =
+                                        detailObject.optString("netQuantity")
+                                    invoiceListModel.focQty = detailObject.optString("foc_Qty")
+                                    invoiceListModel.returnQty = detailObject.optString("returnQty")
+                                    invoiceListModel.cartonPrice =
+                                        detailObject.optString("cartonPrice")
+                                    invoiceListModel.unitPrice = detailObject.optString("price")
+                                    invoiceListModel.uomCode = detailObject.optString("uomCode")
+                                    val qty1 = detailObject.optString("quantity").toDouble()
+                                    val price1 = detailObject.optString("price").toDouble()
+                                    val nettotal1 = qty1 * price1
+                                    invoiceListModel.total = detailObject.optString("lineTotal")
+                                    invoiceListModel.pricevalue = price1.toString()
+                                    invoiceListModel.uomCode = detailObject.optString("uomCode")
+                                    invoiceListModel.pcsperCarton =
+                                        detailObject.optString("pcsPerCarton")
+                                    invoiceListModel.itemtax = detailObject.optString("totalTax")
+                                    invoiceListModel.subTotal = detailObject.optString("subTotal")
+                                    invoicePrintList!!.add(invoiceListModel)
+                                    model.invoiceList = invoicePrintList
+                                    invoiceHeaderDetails!!.add(model)
+                                }
+                                val SRArray = `object`.optJSONArray("sR_Details")!!
+                                if (SRArray.length() > 0) {
+                                    val SRoblect = SRArray.optJSONObject(0)
+                                    val salesReturnModel =
+                                        InvoicePrintPreviewModel.SalesReturnList()
+                                    salesReturnModel.salesReturnNumber =
+                                        SRoblect.optString("salesReturnNumber")
+                                    salesReturnModel.setsRSubTotal(SRoblect.optString("sR_SubTotal"))
+                                    salesReturnModel.setsRTaxTotal(SRoblect.optString("sR_TaxTotal"))
+                                    salesReturnModel.setsRNetTotal(SRoblect.optString("sR_NetTotal"))
+                                    salesReturnList!!.add(salesReturnModel)
+                                }
+                                model.salesReturnList = salesReturnList
+                                invoiceHeaderDetails!!.add(model)
+                                printInvoice(copy)
+                            } else {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Error in printing Data...",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }, Response.ErrorListener { error: VolleyError ->
+                        // Do something when error occurred
+                        //  pDialog.dismiss();
+                        Log.w("Error_throwing:", error.toString())
+                    }) {
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        val creds = String.format(
+                            "%s:%s",
+                            Constants.API_SECRET_CODE,
+                            Constants.API_SECRET_PASSWORD
+                        )
+                        val auth =
+                            "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+                        params["Authorization"] = auth
+                        return params
+                    }
+                }
+            jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
+                override fun getCurrentTimeout(): Int {
+                    return 50000
+                }
+
+                override fun getCurrentRetryCount(): Int {
+                    return 50000
+                }
+
+                @Throws(VolleyError::class)
+                override fun retry(error: VolleyError) {
+                }
+            })
+            // Add JsonArrayRequest to the RequestQueue
+            requestQueue.add(jsonObjectRequest)
+        }
+
+        private fun createSignature() {
+            if (Utils.getSignature() != null && !Utils.getSignature().isEmpty()) {
+                try {
+                    ImageUtil.saveStamp(this, Utils.getSignature(), "Signature")
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        fun printInvoice(copy: Int) {
+            try {
+                /* if (pDialog!=null && pDialog.isShowing()){
+                    pDialog.dismiss();
+                }*/
+                val printerUtils = PrinterUtils(this, printerMacId)
+                printerUtils.printInvoice(copy, invoiceHeaderDetails, invoicePrintList, "false")
+                Utils.setSignature("")
+            } catch (e: Exception) {
+            }
+        }
+
+        @Throws(JSONException::class)
+        private fun getSalesOrderDetails(soNumber: String, copy: Int) {
+            // Initialize a new RequestQueue instance
+            val jsonObject = JSONObject()
+            //  jsonObject.put("CompanyCode",companyId);
+            jsonObject.put("SalesOrderNo", soNumber)
+            // jsonObject.put("LocationCode",locationCode);
+            val requestQueue = Volley.newRequestQueue(this)
+            val url = Utils.getBaseUrl(this) + "SalesOrderDetails"
+            // Initialize a new JsonArrayRequest instance
+            Log.w("Given_url:", url)
+            //   pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+            //   pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            //  pDialog.setTitleText("Generating Print Preview...");
+            //  pDialog.setCancelable(false);
+            //  pDialog.show();
+            salesOrderHeaderDetails = ArrayList()
+            salesPrintList = ArrayList()
+            val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
+                Method.POST,
+                url,
+                jsonObject,
                 Response.Listener { response: JSONObject ->
                     try {
-                        Log.w("DetailsResponse::", response.toString())
+                        // {"statusCode":1,"statusMessage":"Success","responseData":[{"customerCode":"WinApp","customerName":"WinApp","soNumber":"3",
+                        // "soStatus":"O","soDate":"6\/8\/2021 12:00:00 am","netTotal":"26.750000","balanceAmount":"26.750000",
+                        // "totalDiscount":"0.000000","paidAmount":"0.000000","contactPersonCode":"","createDate":"7\/8\/2021 12:00:00 am",
+                        // "updateDate":"7\/8\/2021 12:00:00 am","remark":"","fDocTotal":"0.000000","fTaxAmount":"0.000000",
+                        // "receivedAmount":"0.000000","total":"26.750000","fTotal":"0.000000","iTotalDiscount":"0.000000",
+                        // "taxTotal":"1.750000","iPaidAmount":"0.000000","currencyCode":"SGD","currencyName":"Singapore Dollar",
+                        // "companyCode":"WINAPP_DEMO","docEntry":"3","address1":"SingaporeShipTo1   Changi 890323 SG","taxPercentage":"0.000000",
+                        // "discountPercentage":"0.000000",
+                        //
+                        //
+                        // "salesOrderDetails":[{"slNo":"1","companyCode":"WINAPP_DEMO","soNo":"3",
+                        // "productCode":"FG\/001245","productName":"Milk","quantity":"5.000000","cartonQty":"1.000000",
+                        // "price":"5.000000","currency":"SGD","taxRate":"0.000000","discountPercentage":"0.000000",
+                        // "lineTotal":"26.750000","fRowTotal":"0.000000","warehouseCode":"01","salesEmployeeCode":"-1","accountCode":"400000",
+                        // "taxStatus":"Y","unitPrice":"5.000000","customerCategoryNo":"","barCodes":"","totalTax":"1.750000",
+                        // "fTaxAmount":"0.000000","taxCode":"","taxType":"E","taxPerc":"0.000000","uoMCode":null,"soDate":"6\/8\/2021 12:00:00 am",
+                        // "dueDate":"6\/8\/2021 12:00:00 am","createDate":"7\/8\/2021 12:00:00 am","updateDate":"7\/8\/2021 12:00:00 am",
+                        // "createdUser":"manager","uomCode":"Ctn","uoMName":"Carton","cartonPrice":"3000.000000","piecePrice":"0.000000",
+                        // "pcsPerCarton":"100.000000","lPrice":"100.000000","unitQty":"1.000000","retailPrice":"100.000000"}]}]}
+                        Log.w("Sales_Details:", response.toString())
                         val statusCode = response.optString("statusCode")
                         if (statusCode == "1") {
                             val responseData = response.getJSONArray("responseData")
                             val `object` = responseData.optJSONObject(0)
-                            val model = InvoicePrintPreviewModel()
-                            model.invoiceNumber = `object`.optString("invoiceNumber")
-                            model.invoiceDate = `object`.optString("invoiceDate")
+                            val model = SalesOrderPrintPreviewModel()
+                            model.soNumber = `object`.optString("soNumber")
+                            model.soDate = `object`.optString("soDate")
                             model.customerCode = `object`.optString("customerCode")
                             model.customerName = `object`.optString("customerName")
-                            model.overAllTotal = `object`.optString("overAllTotal")
-                            //  model.setAddress(object.optString("street"));
                             model.address =
                                 `object`.optString("address1") + `object`.optString("address2") + `object`.optString(
                                     "address3"
                                 )
-                            model.address1 = `object`.optString("address1")
                             model.address2 = `object`.optString("address2")
                             model.address3 = `object`.optString("address3")
-                            model.addressstate =
-                                ( `object`.optString("street") + " "+
-                                        `object`.optString("block") + " " + `object`.optString("city"))
-                            model.addresssZipcode =
-                                (`object`.optString("countryName") + " " + `object`.optString("state") + " "
-                                        + `object`.optString("zipcode"))
-
                             // model.setDeliveryAddress(model.getAddress());
                             model.subTotal = `object`.optString("subTotal")
                             model.netTax = `object`.optString("taxTotal")
                             model.netTotal = `object`.optString("netTotal")
-                            model.paymentTerm = `object`.optString("paymentTerm")
                             model.taxType = `object`.optString("taxType")
                             model.taxValue = `object`.optString("taxPerc")
-                            model.outStandingAmount = `object`.optString("totalOutstandingAmount")
-                            model.balanceAmount = `object`.optString("balanceAmount")
-                            Utils.setInvoiceOutstandingAmount(`object`.optString("balanceAmount"))
-                            Utils.setInvoiceMode("Invoice")
+                            model.outStandingAmount = `object`.optString("outstandingAmount")
                             model.billDiscount = `object`.optString("billDiscount")
                             model.itemDiscount = `object`.optString("totalDiscount")
-                            model.soNumber = `object`.optString("soNumber")
-                            model.soDate = `object`.optString("soDate")
-                            model.doDate = `object`.optString("doDate")
-                            model.doNumber = `object`.optString("doNumber")
-                            model.allowDeliveryAddress = response.optString("showShippingAddress")
-                            model.deliveryAddress =
-                                `object`.optString("shipAddress2") + `object`.optString("shipAddress3") + `object`.optString(
-                                    "shipStreet"
-                                )
-                            model.currentAddress = `object`.optString("CurrentAddress")
-
+                            Utils.setInvoiceMode("SalesOrder")
                             val signFlag = `object`.optString("signFlag")
                             if (signFlag == "Y") {
                                 val signature = `object`.optString("signature")
@@ -2797,411 +3024,241 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
                             } else {
                                 Utils.setSignature("")
                             }
-                            val detailsArray = `object`.optJSONArray("invoiceDetails")
+                            val detailsArray = `object`.optJSONArray("salesOrderDetails")
                             for (i in 0 until detailsArray.length()) {
                                 val detailObject = detailsArray.optJSONObject(i)
-                                val invoiceListModel = InvoicePrintPreviewModel.InvoiceList()
-                                invoiceListModel.productCode = detailObject.optString("productCode")
-                                invoiceListModel.description = detailObject.optString("productName")
-                                invoiceListModel.lqty = detailObject.optString("unitQty")
-                                invoiceListModel.cqty = detailObject.optString("cartonQty")
-                                invoiceListModel.netQty = detailObject.optString("quantity")
-                                invoiceListModel.netQuantity = detailObject.optString("netQuantity")
-                                invoiceListModel.focQty = detailObject.optString("foc_Qty")
-                                invoiceListModel.returnQty = detailObject.optString("returnQty")
-                                invoiceListModel.cartonPrice = detailObject.optString("cartonPrice")
-                                invoiceListModel.unitPrice = detailObject.optString("price")
-                                invoiceListModel.uomCode = detailObject.optString("uomCode")
+                                var salesListModel = SalesList()
+                                salesListModel.productCode = detailObject.optString("productCode")
+                                salesListModel.description = detailObject.optString("productName")
+                                salesListModel.lqty = detailObject.optString("unitQty")
+                                salesListModel.cqty = detailObject.optString("cartonQty")
+                                salesListModel.netQty = detailObject.optString("quantity")
+                                salesListModel.cartonPrice = detailObject.optString("cartonPrice")
+                                salesListModel.unitPrice = detailObject.optString("price")
                                 val qty1 = detailObject.optString("quantity").toDouble()
                                 val price1 = detailObject.optString("price").toDouble()
                                 val nettotal1 = qty1 * price1
-                                invoiceListModel.total = detailObject.optString("lineTotal")
-                                invoiceListModel.pricevalue = price1.toString()
-                                invoiceListModel.uomCode = detailObject.optString("uomCode")
-                                invoiceListModel.pcsperCarton =
-                                    detailObject.optString("pcsPerCarton")
-                                invoiceListModel.itemtax = detailObject.optString("totalTax")
-                                invoiceListModel.subTotal = detailObject.optString("subTotal")
-                                invoicePrintList!!.add(invoiceListModel)
-                                model.invoiceList = invoicePrintList
-                                invoiceHeaderDetails!!.add(model)
+                                salesListModel.total = nettotal1.toString()
+                                salesListModel.pricevalue = price1.toString()
+                                salesListModel.uomCode = detailObject.optString("uomCode")
+                                salesListModel.pcsperCarton = detailObject.optString("pcsPerCarton")
+                                salesListModel.itemtax = detailObject.optString("totalTax")
+                                salesListModel.subTotal = detailObject.optString("subTotal")
+                                salesPrintList!!.add(salesListModel)
+                                if (!detailObject.optString("ReturnQty")
+                                        .isEmpty() && detailObject.optString("ReturnQty")
+                                        .toDouble() > 0
+                                ) {
+                                    salesListModel = SalesList()
+                                    salesListModel.productCode =
+                                        detailObject.optString("ProductCode")
+                                    salesListModel.description =
+                                        detailObject.optString("ProductName")
+                                    salesListModel.lqty = detailObject.optString("LQty")
+                                    salesListModel.cqty = detailObject.optString("CQty")
+                                    salesListModel.netQty =
+                                        "-" + detailObject.optString("ReturnQty")
+                                    val qty12 = detailObject.optString("ReturnQty").toDouble()
+                                    val price12 = detailObject.optString("Price").toDouble()
+                                    val nettotal12 = qty12 * price12
+                                    salesListModel.total = nettotal12.toString()
+                                    salesListModel.pricevalue = price12.toString()
+                                    salesListModel.uomCode = detailObject.optString("UOMCode")
+                                    salesListModel.cartonPrice =
+                                        detailObject.optString("CartonPrice")
+                                    salesListModel.unitPrice = detailObject.optString("Price")
+                                    salesListModel.pcsperCarton =
+                                        detailObject.optString("PcsPerCarton")
+                                    salesListModel.itemtax = detailObject.optString("Tax")
+                                    salesListModel.subTotal = detailObject.optString("subTotal")
+                                    salesPrintList!!.add(salesListModel)
+                                }
+                                model.salesList = salesPrintList
+                                salesOrderHeaderDetails!!.add(model)
                             }
-                            val SRArray = `object`.optJSONArray("sR_Details")!!
-                            if (SRArray.length() > 0) {
-                                val SRoblect = SRArray.optJSONObject(0)
-                                val salesReturnModel = InvoicePrintPreviewModel.SalesReturnList()
-                                salesReturnModel.salesReturnNumber =
-                                    SRoblect.optString("salesReturnNumber")
-                                salesReturnModel.setsRSubTotal(SRoblect.optString("sR_SubTotal"))
-                                salesReturnModel.setsRTaxTotal(SRoblect.optString("sR_TaxTotal"))
-                                salesReturnModel.setsRNetTotal(SRoblect.optString("sR_NetTotal"))
-                                salesReturnList!!.add(salesReturnModel)
-                            }
-                            model.salesReturnList = salesReturnList
-                            invoiceHeaderDetails!!.add(model)
-                            printInvoice(copy)
+                            sentSalesOrderDataPrint(copy)
+                            // pDialog.dismiss();
                         } else {
-                            Toast.makeText(
-                                applicationContext,
-                                "Error in printing Data...",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }, Response.ErrorListener { error: VolleyError ->
                     // Do something when error occurred
-                    //  pDialog.dismiss();
+                    pDialog!!.dismiss()
                     Log.w("Error_throwing:", error.toString())
                 }) {
                 override fun getHeaders(): Map<String, String> {
                     val params = HashMap<String, String>()
-                    val creds = String.format(
-                        "%s:%s",
-                        Constants.API_SECRET_CODE,
-                        Constants.API_SECRET_PASSWORD
-                    )
+                    val creds =
+                        String.format(
+                            "%s:%s",
+                            Constants.API_SECRET_CODE,
+                            Constants.API_SECRET_PASSWORD
+                        )
                     val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
                     params["Authorization"] = auth
                     return params
                 }
             }
-        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
-            override fun getCurrentTimeout(): Int {
-                return 50000
-            }
-
-            override fun getCurrentRetryCount(): Int {
-                return 50000
-            }
-
-            @Throws(VolleyError::class)
-            override fun retry(error: VolleyError) {
-            }
-        })
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
-    }
-
-    private fun createSignature() {
-        if (Utils.getSignature() != null && !Utils.getSignature().isEmpty()) {
-            try {
-                ImageUtil.saveStamp(this, Utils.getSignature(), "Signature")
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun printInvoice(copy: Int) {
-        try {
-            /* if (pDialog!=null && pDialog.isShowing()){
-                pDialog.dismiss();
-            }*/
-            val printerUtils = PrinterUtils(this, printerMacId)
-            printerUtils.printInvoice(copy, invoiceHeaderDetails, invoicePrintList, "false")
-            Utils.setSignature("")
-        } catch (e: Exception) {
-        }
-    }
-
-    @Throws(JSONException::class)
-    private fun getSalesOrderDetails(soNumber: String, copy: Int) {
-        // Initialize a new RequestQueue instance
-        val jsonObject = JSONObject()
-        //  jsonObject.put("CompanyCode",companyId);
-        jsonObject.put("SalesOrderNo", soNumber)
-        // jsonObject.put("LocationCode",locationCode);
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this) + "SalesOrderDetails"
-        // Initialize a new JsonArrayRequest instance
-        Log.w("Given_url:", url)
-        //   pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-        //   pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        //  pDialog.setTitleText("Generating Print Preview...");
-        //  pDialog.setCancelable(false);
-        //  pDialog.show();
-        salesOrderHeaderDetails = ArrayList()
-        salesPrintList = ArrayList()
-        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
-            Method.POST,
-            url,
-            jsonObject,
-            Response.Listener { response: JSONObject ->
-                try {
-                    // {"statusCode":1,"statusMessage":"Success","responseData":[{"customerCode":"WinApp","customerName":"WinApp","soNumber":"3",
-                    // "soStatus":"O","soDate":"6\/8\/2021 12:00:00 am","netTotal":"26.750000","balanceAmount":"26.750000",
-                    // "totalDiscount":"0.000000","paidAmount":"0.000000","contactPersonCode":"","createDate":"7\/8\/2021 12:00:00 am",
-                    // "updateDate":"7\/8\/2021 12:00:00 am","remark":"","fDocTotal":"0.000000","fTaxAmount":"0.000000",
-                    // "receivedAmount":"0.000000","total":"26.750000","fTotal":"0.000000","iTotalDiscount":"0.000000",
-                    // "taxTotal":"1.750000","iPaidAmount":"0.000000","currencyCode":"SGD","currencyName":"Singapore Dollar",
-                    // "companyCode":"WINAPP_DEMO","docEntry":"3","address1":"SingaporeShipTo1   Changi 890323 SG","taxPercentage":"0.000000",
-                    // "discountPercentage":"0.000000",
-                    //
-                    //
-                    // "salesOrderDetails":[{"slNo":"1","companyCode":"WINAPP_DEMO","soNo":"3",
-                    // "productCode":"FG\/001245","productName":"Milk","quantity":"5.000000","cartonQty":"1.000000",
-                    // "price":"5.000000","currency":"SGD","taxRate":"0.000000","discountPercentage":"0.000000",
-                    // "lineTotal":"26.750000","fRowTotal":"0.000000","warehouseCode":"01","salesEmployeeCode":"-1","accountCode":"400000",
-                    // "taxStatus":"Y","unitPrice":"5.000000","customerCategoryNo":"","barCodes":"","totalTax":"1.750000",
-                    // "fTaxAmount":"0.000000","taxCode":"","taxType":"E","taxPerc":"0.000000","uoMCode":null,"soDate":"6\/8\/2021 12:00:00 am",
-                    // "dueDate":"6\/8\/2021 12:00:00 am","createDate":"7\/8\/2021 12:00:00 am","updateDate":"7\/8\/2021 12:00:00 am",
-                    // "createdUser":"manager","uomCode":"Ctn","uoMName":"Carton","cartonPrice":"3000.000000","piecePrice":"0.000000",
-                    // "pcsPerCarton":"100.000000","lPrice":"100.000000","unitQty":"1.000000","retailPrice":"100.000000"}]}]}
-                    Log.w("Sales_Details:", response.toString())
-                    val statusCode = response.optString("statusCode")
-                    if (statusCode == "1") {
-                        val responseData = response.getJSONArray("responseData")
-                        val `object` = responseData.optJSONObject(0)
-                        val model = SalesOrderPrintPreviewModel()
-                        model.soNumber = `object`.optString("soNumber")
-                        model.soDate = `object`.optString("soDate")
-                        model.customerCode = `object`.optString("customerCode")
-                        model.customerName = `object`.optString("customerName")
-                        model.address =
-                            `object`.optString("address1") + `object`.optString("address2") + `object`.optString(
-                                "address3"
-                            )
-                        model.address2 = `object`.optString("address2")
-                        model.address3 = `object`.optString("address3")
-                        // model.setDeliveryAddress(model.getAddress());
-                        model.subTotal = `object`.optString("subTotal")
-                        model.netTax = `object`.optString("taxTotal")
-                        model.netTotal = `object`.optString("netTotal")
-                        model.taxType = `object`.optString("taxType")
-                        model.taxValue = `object`.optString("taxPerc")
-                        model.outStandingAmount = `object`.optString("outstandingAmount")
-                        model.billDiscount = `object`.optString("billDiscount")
-                        model.itemDiscount = `object`.optString("totalDiscount")
-                        Utils.setInvoiceMode("SalesOrder")
-                        val signFlag = `object`.optString("signFlag")
-                        if (signFlag == "Y") {
-                            val signature = `object`.optString("signature")
-                            Utils.setSignature(signature)
-                            createSignature()
-                        } else {
-                            Utils.setSignature("")
-                        }
-                        val detailsArray = `object`.optJSONArray("salesOrderDetails")
-                        for (i in 0 until detailsArray.length()) {
-                            val detailObject = detailsArray.optJSONObject(i)
-                            var salesListModel = SalesList()
-                            salesListModel.productCode = detailObject.optString("productCode")
-                            salesListModel.description = detailObject.optString("productName")
-                            salesListModel.lqty = detailObject.optString("unitQty")
-                            salesListModel.cqty = detailObject.optString("cartonQty")
-                            salesListModel.netQty = detailObject.optString("quantity")
-                            salesListModel.cartonPrice = detailObject.optString("cartonPrice")
-                            salesListModel.unitPrice = detailObject.optString("price")
-                            val qty1 = detailObject.optString("quantity").toDouble()
-                            val price1 = detailObject.optString("price").toDouble()
-                            val nettotal1 = qty1 * price1
-                            salesListModel.total = nettotal1.toString()
-                            salesListModel.pricevalue = price1.toString()
-                            salesListModel.uomCode = detailObject.optString("uomCode")
-                            salesListModel.pcsperCarton = detailObject.optString("pcsPerCarton")
-                            salesListModel.itemtax = detailObject.optString("totalTax")
-                            salesListModel.subTotal = detailObject.optString("subTotal")
-                            salesPrintList!!.add(salesListModel)
-                            if (!detailObject.optString("ReturnQty")
-                                    .isEmpty() && detailObject.optString("ReturnQty").toDouble() > 0
-                            ) {
-                                salesListModel = SalesList()
-                                salesListModel.productCode = detailObject.optString("ProductCode")
-                                salesListModel.description = detailObject.optString("ProductName")
-                                salesListModel.lqty = detailObject.optString("LQty")
-                                salesListModel.cqty = detailObject.optString("CQty")
-                                salesListModel.netQty = "-" + detailObject.optString("ReturnQty")
-                                val qty12 = detailObject.optString("ReturnQty").toDouble()
-                                val price12 = detailObject.optString("Price").toDouble()
-                                val nettotal12 = qty12 * price12
-                                salesListModel.total = nettotal12.toString()
-                                salesListModel.pricevalue = price12.toString()
-                                salesListModel.uomCode = detailObject.optString("UOMCode")
-                                salesListModel.cartonPrice = detailObject.optString("CartonPrice")
-                                salesListModel.unitPrice = detailObject.optString("Price")
-                                salesListModel.pcsperCarton = detailObject.optString("PcsPerCarton")
-                                salesListModel.itemtax = detailObject.optString("Tax")
-                                salesListModel.subTotal = detailObject.optString("subTotal")
-                                salesPrintList!!.add(salesListModel)
-                            }
-                            model.salesList = salesPrintList
-                            salesOrderHeaderDetails!!.add(model)
-                        }
-                        sentSalesOrderDataPrint(copy)
-                        // pDialog.dismiss();
-                    } else {
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+            jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
+                override fun getCurrentTimeout(): Int {
+                    return 50000
                 }
-            }, Response.ErrorListener { error: VolleyError ->
-                // Do something when error occurred
-                pDialog!!.dismiss()
-                Log.w("Error_throwing:", error.toString())
-            }) {
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                val creds =
-                    String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD)
-                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                params["Authorization"] = auth
-                return params
-            }
-        }
-        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
-            override fun getCurrentTimeout(): Int {
-                return 50000
-            }
 
-            override fun getCurrentRetryCount(): Int {
-                return 50000
-            }
-
-            @Throws(VolleyError::class)
-            override fun retry(error: VolleyError) {
-            }
-        })
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
-    }
-    fun getUOM(jsonObject: JSONObject) {
-        // Initialize a new RequestQueue instance
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this) + "ItemUOMDetails"
-        // Initialize a new JsonArrayRequest instance
-        Log.w("Given_UOM_URL:", url + jsonObject.toString())
-        val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
-        pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
-        pDialog.setTitleText("Loading UOM...")
-        pDialog.setCancelable(false)
-        pDialog.show()
-        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
-            Method.POST,
-            url,
-            jsonObject,
-            Response.Listener { response: JSONObject ->
-                try {
-                    uomList = ArrayList()
-                    Log.w("Res_UOM:", response.toString())
-                    // Loop through the array elements
-                    val uomArray = response.optJSONArray("responseData")
-                    if (uomArray != null && uomArray.length() > 0) {
-                        for (j in 0 until uomArray.length()) {
-                            val uomObject = uomArray.getJSONObject(j)
-                            val uomModel = UomModel()
-                            uomModel.uomCode = uomObject.optString("uomCode")
-                            uomModel.uomName = uomObject.optString("uomName")
-                            uomModel.uomEntry = uomObject.optString("uomEntry")
-                            uomModel.altQty = uomObject.optString("altQty")
-                            uomModel.baseQty = uomObject.optString("baseQty")
-                            uomModel.price = uomObject.optString("price")
-                            uomList!!.add(uomModel)
-                        }
-                    }
-                    Log.w("UOM_TEXT:", uomArray.toString())
-                    pDialog.dismiss()
-                    if (uomList!!.size > 0) {
-                        runOnUiThread {
-                            if(ischangeUOM) {
-                                setUomList(uomList!!)
-                            }else{
-                                setUomList(uomList!!)
-                                //  defaultUOMset(uomList!!)
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.w("Errory:", Objects.requireNonNull(e.message!!))
+                override fun getCurrentRetryCount(): Int {
+                    return 50000
                 }
-            },
-            Response.ErrorListener { error: VolleyError ->
-                // Do something when error occurred
-                pDialog.dismiss()
-                Log.w("Error_throwing:", error.toString())
-            }) {
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                val creds =
-                    String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD)
-                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                params["Authorization"] = auth
-                return params
-            }
+
+                @Throws(VolleyError::class)
+                override fun retry(error: VolleyError) {
+                }
+            })
+            // Add JsonArrayRequest to the RequestQueue
+            requestQueue.add(jsonObjectRequest)
         }
-        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
-            override fun getCurrentTimeout(): Int {
-                return 50000
-            }
 
-            override fun getCurrentRetryCount(): Int {
-                return 50000
-            }
-
-            @Throws(VolleyError::class)
-            override fun retry(error: VolleyError) {
-            }
-        })
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
-    }
-    fun getUOMEdit(jsonObject: JSONObject, uomcode:String, pdtStockStr :String) {
-        // Initialize a new RequestQueue instance
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this) + "ItemUOMDetails"
-        // Initialize a new JsonArrayRequest instance
-        Log.w("Given_UOM_URL:", url + jsonObject.toString())
-        val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
-        pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
-        pDialog.setTitleText("Loading UOM...")
-        pDialog.setCancelable(false)
-        pDialog.show()
-        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
-            Method.POST,
-            url,
-            jsonObject,
-            Response.Listener { response: JSONObject ->
-                try {
-                    uomListEdit = ArrayList()
-                    Log.w("Res_UOM:", response.toString())
-                    // Loop through the array elements
-                    val uomArray = response.optJSONArray("responseData")
-                    if (uomArray != null && uomArray.length() > 0) {
-                        for (j in 0 until uomArray.length()) {
-                            val uomObject = uomArray.getJSONObject(j)
-                            val uomModel = UomModel()
-                            uomModel.uomCode = uomObject.optString("uomCode")
-                            uomModel.uomName = uomObject.optString("uomName")
-                            uomModel.uomEntry = uomObject.optString("uomEntry")
-                            uomModel.altQty = uomObject.optString("altQty")
-                            uomModel.baseQty = uomObject.optString("baseQty")
-                            uomModel.price = uomObject.optString("price")
-                            uomListEdit!!.add(uomModel)
-                        }
-                    }
-                    Log.w("UOM_TEXT:", uomArray.toString())
-                    pDialog.dismiss()
-                    var pdtStockl = 0.0
-                    if (uomListEdit!!.size > 0) {
-                        for (i in uomListEdit!!.indices) {
-                            if (uomcode.equals("CTN", true)) {
-                               // stockLayout!!.visibility = View.VISIBLE
-                                var baseCtnQty = uomListEdit!![i].baseQty.toDouble()
-                              //  pdtStockl = pdtStockStr.toDouble()
-                              //  var ctnStockVal = pdtStockl / baseCtnQty!!
-                               //// stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
-
-                              //  stockQtyValue!!.setText(Utils.twoDecimalPoint(ctnStockVal).toString())
-                                Log.w("baseCtnQtyEditaa", "" + baseCtnQty)
-                            } else {
-                               // stockLayout!!.visibility = View.VISIBLE
-                               // stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
-
-                               // stockQtyValue!!.text = pdtStockStr
+        fun getUOM(jsonObject: JSONObject) {
+            // Initialize a new RequestQueue instance
+            val requestQueue = Volley.newRequestQueue(this)
+            val url = Utils.getBaseUrl(this) + "ItemUOMDetails"
+            // Initialize a new JsonArrayRequest instance
+            Log.w("Given_UOM_URL:", url + jsonObject.toString())
+            val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
+            pDialog.setTitleText("Loading UOM...")
+            pDialog.setCancelable(false)
+            pDialog.show()
+            val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
+                Method.POST,
+                url,
+                jsonObject,
+                Response.Listener { response: JSONObject ->
+                    try {
+                        uomList = ArrayList()
+                        Log.w("Res_UOM:", response.toString())
+                        // Loop through the array elements
+                        val uomArray = response.optJSONArray("responseData")
+                        if (uomArray != null && uomArray.length() > 0) {
+                            for (j in 0 until uomArray.length()) {
+                                val uomObject = uomArray.getJSONObject(j)
+                                val uomModel = UomModel()
+                                uomModel.uomCode = uomObject.optString("uomCode")
+                                uomModel.uomName = uomObject.optString("uomName")
+                                uomModel.uomEntry = uomObject.optString("uomEntry")
+                                uomModel.altQty = uomObject.optString("altQty")
+                                uomModel.baseQty = uomObject.optString("baseQty")
+                                uomModel.price = uomObject.optString("price")
+                                uomList!!.add(uomModel)
                             }
                         }
+                        Log.w("UOM_TEXT:", uomArray.toString())
+                        pDialog.dismiss()
+                        if (uomList!!.size > 0) {
+                            runOnUiThread {
+                                if (ischangeUOM) {
+                                    setUomList(uomList!!)
+                                } else {
+                                    setUomList(uomList!!)
+                                    //  defaultUOMset(uomList!!)
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.w("Errory:", Objects.requireNonNull(e.message!!))
+                    }
+                },
+                Response.ErrorListener { error: VolleyError ->
+                    // Do something when error occurred
+                    pDialog.dismiss()
+                    Log.w("Error_throwing:", error.toString())
+                }) {
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    val creds =
+                        String.format(
+                            "%s:%s",
+                            Constants.API_SECRET_CODE,
+                            Constants.API_SECRET_PASSWORD
+                        )
+                    val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+                    params["Authorization"] = auth
+                    return params
+                }
+            }
+            jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
+                override fun getCurrentTimeout(): Int {
+                    return 50000
+                }
+
+                override fun getCurrentRetryCount(): Int {
+                    return 50000
+                }
+
+                @Throws(VolleyError::class)
+                override fun retry(error: VolleyError) {
+                }
+            })
+            // Add JsonArrayRequest to the RequestQueue
+            requestQueue.add(jsonObjectRequest)
+        }
+
+        fun getUOMEdit(jsonObject: JSONObject, uomcode: String, pdtStockStr: String) {
+            // Initialize a new RequestQueue instance
+            val requestQueue = Volley.newRequestQueue(this)
+            val url = Utils.getBaseUrl(this) + "ItemUOMDetails"
+            // Initialize a new JsonArrayRequest instance
+            Log.w("Given_UOM_URL:", url + jsonObject.toString())
+            val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
+            pDialog.setTitleText("Loading UOM...")
+            pDialog.setCancelable(false)
+            pDialog.show()
+            val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
+                Method.POST,
+                url,
+                jsonObject,
+                Response.Listener { response: JSONObject ->
+                    try {
+                        uomListEdit = ArrayList()
+                        Log.w("Res_UOM:", response.toString())
+                        // Loop through the array elements
+                        val uomArray = response.optJSONArray("responseData")
+                        if (uomArray != null && uomArray.length() > 0) {
+                            for (j in 0 until uomArray.length()) {
+                                val uomObject = uomArray.getJSONObject(j)
+                                val uomModel = UomModel()
+                                uomModel.uomCode = uomObject.optString("uomCode")
+                                uomModel.uomName = uomObject.optString("uomName")
+                                uomModel.uomEntry = uomObject.optString("uomEntry")
+                                uomModel.altQty = uomObject.optString("altQty")
+                                uomModel.baseQty = uomObject.optString("baseQty")
+                                uomModel.price = uomObject.optString("price")
+                                uomListEdit!!.add(uomModel)
+                            }
+                        }
+                        Log.w("UOM_TEXT:", uomArray.toString())
+                        pDialog.dismiss()
+                        var pdtStockl = 0.0
+                        if (uomListEdit!!.size > 0) {
+                            for (i in uomListEdit!!.indices) {
+                                if (uomcode.equals("CTN", true)) {
+                                    // stockLayout!!.visibility = View.VISIBLE
+                                    var baseCtnQty = uomListEdit!![i].baseQty.toDouble()
+                                    //  pdtStockl = pdtStockStr.toDouble()
+                                    //  var ctnStockVal = pdtStockl / baseCtnQty!!
+                                    //// stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
+
+                                    //  stockQtyValue!!.setText(Utils.twoDecimalPoint(ctnStockVal).toString())
+                                    Log.w("baseCtnQtyEditaa", "" + baseCtnQty)
+                                } else {
+                                    // stockLayout!!.visibility = View.VISIBLE
+                                    // stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
+
+                                    // stockQtyValue!!.text = pdtStockStr
+                                }
+                            }
 //                        runOnUiThread {
 //                            if(ischangeUOM) {
 //                                setUomList(uomList!!)
@@ -3209,47 +3266,52 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //                                defaultUOMset(uomList!!)
 //                            }
 //                        }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.w("Errory:", Objects.requireNonNull(e.message!!))
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.w("Errory:", Objects.requireNonNull(e.message!!))
+                },
+                Response.ErrorListener { error: VolleyError ->
+                    // Do something when error occurred
+                    pDialog.dismiss()
+                    Log.w("Error_throwing:", error.toString())
+                }) {
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    val creds =
+                        String.format(
+                            "%s:%s",
+                            Constants.API_SECRET_CODE,
+                            Constants.API_SECRET_PASSWORD
+                        )
+                    val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+                    params["Authorization"] = auth
+                    return params
                 }
-            },
-            Response.ErrorListener { error: VolleyError ->
-                // Do something when error occurred
-                pDialog.dismiss()
-                Log.w("Error_throwing:", error.toString())
-            }) {
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                val creds =
-                    String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD)
-                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                params["Authorization"] = auth
-                return params
             }
+            jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
+                override fun getCurrentTimeout(): Int {
+                    return 50000
+                }
+
+                override fun getCurrentRetryCount(): Int {
+                    return 50000
+                }
+
+                @Throws(VolleyError::class)
+                override fun retry(error: VolleyError) {
+                }
+            })
+            // Add JsonArrayRequest to the RequestQueue
+            requestQueue.add(jsonObjectRequest)
         }
-        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
-            override fun getCurrentTimeout(): Int {
-                return 50000
-            }
 
-            override fun getCurrentRetryCount(): Int {
-                return 50000
-            }
-
-            @Throws(VolleyError::class)
-            override fun retry(error: VolleyError) {
-            }
-        })
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
-    }
-    private fun setUomList(uomList: ArrayList<UomModel>) {
-        Log.w("UOMList:", uomList.toString())
-        val adapter = ArrayAdapter(this, R.layout.cust_spinner_item, uomList)
-        uomSpinner!!.adapter = adapter
-        setUOMCode(uomList)
+        private fun setUomList(uomList: ArrayList<UomModel>) {
+            Log.w("UOMList:", uomList.toString())
+            val adapter = ArrayAdapter(this, R.layout.cust_spinner_item, uomList)
+            uomSpinner!!.adapter = adapter
+            setUOMCode(uomList)
 
 //        if (productsModel != null) {
 //            //setuom
@@ -3267,187 +3329,196 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //
 //            }
 
-    }
-    private fun setUOMCode(uomList: ArrayList<UomModel>) {
-        uomSpinner!!.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View,
-                position: Int,
-                id: Long
-            ) {
+        }
+
+        private fun setUOMCode(uomList: ArrayList<UomModel>) {
+            uomSpinner!!.onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View,
+                    position: Int,
+                    id: Long
+                ) {
 //                if (isEditItem) {
 //                    selectValue(uomList, uomName, uomPriceEd!!)
 //                    Log.w("uomentyy:", uomName + "kk"+uomPriceEd)
 //
 //                } else {
-                uomName = uomSpinner!!.selectedItem.toString()
-                uomText!!.setText(uomName)
-                Log.w("uomentyy:", uomName+pdtStockVal)
-                if(uomName.equals("CTN",true)) {
-                    var ctnStockVal = 0.00
-                    var baseCtnQty = uomList[position].baseQty.toDouble()
+                    uomName = uomSpinner!!.selectedItem.toString()
+                    uomText!!.setText(uomName)
+                    Log.w("uomentyy:", uomName + pdtStockVal)
+                    if (uomName.equals("CTN", true)) {
+                        var ctnStockVal = 0.00
+                        var baseCtnQty = uomList[position].baseQty.toDouble()
 
-                   // var pdtStock = pdtStockVal!!.toDouble()
+                        // var pdtStock = pdtStockVal!!.toDouble()
 
-                    //ctnStockVal = pdtStock / baseCtnQty
-                   // stockQtyValue!!.setText(Utils.twoDecimalPoint(ctnStockVal).toString())
-                    Log.w("ctnStockaa",""+ctnStockVal+".."+ Utils.twoDecimalPoint(ctnStockVal).toString())
-                    Log.w("ctnStock22",""+baseCtnQty)
-                }
-                else{
-                 //   stockQtyValue!!.setText(pdtStockVal.toString())
-                }
-                uomText!!.setText(uomList[position].uomCode)
-                priceText!!.setText(uomList[position].price)
-                Log.w("uomentyy1:", uomName)
+                        //ctnStockVal = pdtStock / baseCtnQty
+                        // stockQtyValue!!.setText(Utils.twoDecimalPoint(ctnStockVal).toString())
+                        Log.w(
+                            "ctnStockaa",
+                            "" + ctnStockVal + ".." + Utils.twoDecimalPoint(ctnStockVal).toString()
+                        )
+                        Log.w("ctnStock22", "" + baseCtnQty)
+                    } else {
+                        //   stockQtyValue!!.setText(pdtStockVal.toString())
+                    }
+                    uomText!!.setText(uomList[position].uomCode)
+                    priceText!!.setText(uomList[position].price)
+                    Log.w("uomentyy1:", uomName)
 
-                Log.w("UOMQtyValue:", uomList[position].uomEntry)
-                Log.w("SelectedUOM:", uomName + "")
-                // }
-                qtyValue!!.setText("")
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            if (requestCode == RESULT_CODE) {
-                val barcodeText = data!!.extras!!.getString("Contents")
-                Log.w("BarcodeTextInv:", barcodeText!!)
-                val mp = MediaPlayer.create(this, R.raw.beep) // sound is inside res/raw/mysound
-                mp.start()
-                scannedBarcode = barcodeText
-                searchAndSendActivity(barcodeText)
-            }
-            else if (requestCode == REQUEST_TAKE_PHOTO) {
-                try {
-                    mPhotoFile = mCompressor!!.compressToFile(mPhotoFile)
-                    imageString = ImageUtil.getBase64StringImage(mPhotoFile)
-                    //  Log.w("GivenImage1:",imageString);
-                    Utils.w("GivenImage1Inv", imageString)
-                    showImage()
-                } catch (e: IOException) {
-                    e.printStackTrace()
+                    Log.w("UOMQtyValue:", uomList[position].uomEntry)
+                    Log.w("SelectedUOM:", uomName + "")
+                    // }
+                    qtyValue!!.setText("")
                 }
 
-
-                /* Glide.with(MainActivity.this)
-                        .load(mPhotoFile)
-                        .apply(new RequestOptions().centerCrop()
-                                .circleCrop()
-                                .placeholder(R.drawable.profile_pic_place_holder))
-                        .into(imageViewProfilePic);*/
-            } else if (requestCode == REQUEST_GALLERY_PHOTO) {
-                val selectedImage = data!!.data
-                try {
-                    mPhotoFile =
-                        mCompressor!!.compressToFile(File(getRealPathFromUri(selectedImage)))
-                    selectImagel!!.setText(selectedImage.toString())
-                    imageString = ImageUtil.getBase64StringImage(mPhotoFile)
-                    // Log.w("GivenImage2:",imageString);
-                    Utils.w("GivenImage2Inv", imageString)
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
         }
-    }
 
-    private fun showSettingsDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Need Permissions")
-        builder.setMessage(
-            "This app needs permission to use this feature. You can grant them in app settings."
-        )
-        builder.setPositiveButton("GOTO SETTINGS") { dialog: DialogInterface, which: Int ->
-            dialog.cancel()
-            openSettings()
+        public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            if (resultCode == RESULT_OK) {
+                if (requestCode == RESULT_CODE) {
+                    val barcodeText = data!!.extras!!.getString("Contents")
+                    Log.w("BarcodeTextInv:", barcodeText!!)
+                    val mp = MediaPlayer.create(this, R.raw.beep) // sound is inside res/raw/mysound
+                    mp.start()
+                    scannedBarcode = barcodeText
+                    searchAndSendActivity(barcodeText)
+                } else if (requestCode == REQUEST_TAKE_PHOTO) {
+                    try {
+                        mPhotoFile = mCompressor!!.compressToFile(mPhotoFile)
+                        imageString = ImageUtil.getBase64StringImage(mPhotoFile)
+                        //  Log.w("GivenImage1:",imageString);
+                        Utils.w("GivenImage1Inv", imageString)
+                        showImage()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+
+                    /* Glide.with(MainActivity.this)
+                            .load(mPhotoFile)
+                            .apply(new RequestOptions().centerCrop()
+                                    .circleCrop()
+                                    .placeholder(R.drawable.profile_pic_place_holder))
+                            .into(imageViewProfilePic);*/
+                } else if (requestCode == REQUEST_GALLERY_PHOTO) {
+                    val selectedImage = data!!.data
+                    try {
+                        mPhotoFile =
+                            mCompressor!!.compressToFile(File(getRealPathFromUri(selectedImage)))
+                        selectImagel!!.setText(selectedImage.toString())
+                        imageString = ImageUtil.getBase64StringImage(mPhotoFile)
+                        // Log.w("GivenImage2:",imageString);
+                        Utils.w("GivenImage2Inv", imageString)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
-        builder.setNegativeButton(
-            "Cancel"
-        ) { dialog: DialogInterface, which: Int -> dialog.cancel() }
-        builder.show()
-    }
 
-    // navigating user to app settings
-    private fun openSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
-        startActivityForResult(intent, 101)
-    }
-
-    /**
-     * Create file with current timestamp name
-     *
-     * @throws IOException
-     */
-    @Throws(IOException::class)
-    private fun createImageFile(): File? {
-        // Create an image file name
-        val timeStamp =
-            SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-        val mFileName = "JPEG_" + timeStamp + "_"
-        val storageDir =
-            getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(mFileName, ".jpg", storageDir)
-    }
-
-    /**
-     * Get real file path from URI
-     */
-    fun getRealPathFromUri(contentUri: Uri?): String? {
-        var cursor: Cursor? = null
-        return try {
-            val proj = arrayOf(MediaStore.Images.Media.DATA)
-            cursor = contentResolver.query(contentUri!!, proj, null, null, null)
-            assert(cursor != null)
-            val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            cursor.getString(column_index)
-        } finally {
-            cursor?.close()
+        private fun showSettingsDialog() {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Need Permissions")
+            builder.setMessage(
+                "This app needs permission to use this feature. You can grant them in app settings."
+            )
+            builder.setPositiveButton("GOTO SETTINGS") { dialog: DialogInterface, which: Int ->
+                dialog.cancel()
+                openSettings()
+            }
+            builder.setNegativeButton(
+                "Cancel"
+            ) { dialog: DialogInterface, which: Int -> dialog.cancel() }
+            builder.show()
         }
-    }
-    fun searchAndSendActivity(barcode: String?) {
-        try {
-            val model = getProductData(barcode)
-            if (model != null) {
-                if (productSummaryList != null && productSummaryList.size > 0) {
-                    if (!isAlreadyExist(barcode)) {
+
+        // navigating user to app settings
+        private fun openSettings() {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", packageName, null)
+            intent.setData(uri)
+            startActivityForResult(intent, 101)
+        }
+
+        /**
+         * Create file with current timestamp name
+         *
+         * @throws IOException
+         */
+        @Throws(IOException::class)
+        private fun createImageFile(): File? {
+            // Create an image file name
+            val timeStamp =
+                SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+            val mFileName = "JPEG_" + timeStamp + "_"
+            val storageDir =
+                getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            return File.createTempFile(mFileName, ".jpg", storageDir)
+        }
+
+        /**
+         * Get real file path from URI
+         */
+        fun getRealPathFromUri(contentUri: Uri?): String? {
+            var cursor: Cursor? = null
+            return try {
+                val proj = arrayOf(MediaStore.Images.Media.DATA)
+                cursor = contentResolver.query(contentUri!!, proj, null, null, null)
+                assert(cursor != null)
+                val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                cursor.moveToFirst()
+                cursor.getString(column_index)
+            } finally {
+                cursor?.close()
+            }
+        }
+
+        fun searchAndSendActivity(barcode: String?) {
+            try {
+                val model = getProductData(barcode)
+                if (model != null) {
+                    if (productSummaryList != null && productSummaryList.size > 0) {
+                        if (!isAlreadyExist(barcode)) {
+                            Toast.makeText(
+                                applicationContext,
+                                "Product Found...",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                            Log.w("entypdt", "" + model.barcode)
+                            setProductDetails(model)
+                            //  addItem(model);
+
+                        }
+                    } else {
                         Toast.makeText(applicationContext, "Product Found...", Toast.LENGTH_SHORT)
                             .show()
-                        Log.w("entypdt",""+model.barcode)
+                        Log.w("entypdt2", "" + model.barcode)
+                        //addItem(model);
                         setProductDetails(model)
-                        //  addItem(model);
-
+                        // setProductDetails(model)
                     }
                 } else {
-                    Toast.makeText(applicationContext, "Product Found...", Toast.LENGTH_SHORT)
+                    //  showBarcodeAlert(barcode);
+                    Toast.makeText(applicationContext, "No Product found", Toast.LENGTH_SHORT)
                         .show()
-                    Log.w("entypdt2",""+model.barcode)
-                    //addItem(model);
-                    setProductDetails(model)
-                    // setProductDetails(model)
                 }
-            } else {
-                //  showBarcodeAlert(barcode);
-                Toast.makeText(applicationContext, "No Product found", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
             }
-        } catch (e: Exception) {
         }
-    }
-    private fun setProductDetails(model: ProductsModel) {
-        productsModel = model
-        productId = productsModel!!.productCode
-        Log.w("pdtsInv1", "" + model.productName + "  .. " + model.barcode)
-        Log.w("pdtsInvCode", "" + model.productCode)
-        // setUomList(model.getProductUOMList());
-       // uomTextView!!.text = model.uomText
+
+        private fun setProductDetails(model: ProductsModel) {
+            productsModel = model
+            productId = productsModel!!.productCode
+            Log.w("pdtsInv1", "" + model.productName + "  .. " + model.barcode)
+            Log.w("pdtsInvCode", "" + model.productCode)
+            // setUomList(model.getProductUOMList());
+            // uomTextView!!.text = model.uomText
 //        if (isUomSetting) {
 //            val jsonObject = JSONObject()
 //            try {
@@ -3460,315 +3531,365 @@ class NewStockAdjustmentProductAddActivity : AppCompatActivity() {
 //            }
 //        }
 
-        // Need to implement the product price concept in SAP
-        /*  try {
-                    getProductPrice(productId);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
+            // Need to implement the product price concept in SAP
+            /*  try {
+                        getProductPrice(productId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }*/
 //        if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
 //            minimumSellingPriceText!!.text = model.minimumSellingPrice
 //        } else {
 //            minimumSellingPriceText!!.text = "0.00"
 //        }
-        productName = productsModel!!.productName
-        productAutoComplete!!.setText(model.productName + " - " + model.productCode)
-        //  cartonPrice.setText(model.getUnitCost()+"");
-        //  loosePrice.setText(model.getUnitCost());
+            productName = productsModel!!.productName
+            productAutoComplete!!.setText(model.productName + " - " + model.productCode)
+            //  cartonPrice.setText(model.getUnitCost()+"");
+            //  loosePrice.setText(model.getUnitCost());
 
-        //todo old code price
+            //todo old code price
 //        if (model.lastPrice != null && !model.lastPrice.isEmpty() && model.lastPrice.toDouble() > 0.00) {
 //            priceText!!.setText(model.lastPrice)
 //        } else {
 //            priceText!!.setText(model.unitCost)
 //        }
-        //todo new price set
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("CustomerCode", selectCustomerId)
-            jsonObject.put("ItemCode", model.productCode)
-            getUOM(jsonObject)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-            Log.w("Errors:", Objects.requireNonNull(e.message!!))
-        }
+            //todo new price set
+            val jsonObject = JSONObject()
+            try {
+                jsonObject.put("CustomerCode", selectCustomerId)
+                jsonObject.put("ItemCode", model.productCode)
+                getUOM(jsonObject)
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                Log.w("Errors:", Objects.requireNonNull(e.message!!))
+            }
 
-        // uomText.setText(model.getUomCode());
-        stockCount!!.setText(model.stockQty)
-        pcsPerCarton!!.setText(model.pcsPerCarton)
+            // uomText.setText(model.getUomCode());
+            stockCount!!.setText(model.stockQty)
+            pcsPerCarton!!.setText(model.pcsPerCarton)
 //        qtyValue!!.isEnabled = true
-        qtyValue!!.requestFocus()
-        priceText!!.visibility = View.VISIBLE
-        priceText!!.isEnabled = true
-        stockCount!!.visibility = View.GONE
+            qtyValue!!.requestFocus()
+            priceText!!.visibility = View.VISIBLE
+            priceText!!.isEnabled = true
+            stockCount!!.visibility = View.GONE
 
-        //  behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        openKeyborard(qtyValue)
+            if (model.isBatch != null && model.isBatch.isNotEmpty()) {
+                isItemBatchApi = model.isBatch
+            }
+            //  behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            openKeyborard(qtyValue)
 
-        // looseQtyValue.setEnabled(true);
-        cartonPrice!!.isEnabled = true
+            // looseQtyValue.setEnabled(true);
+            cartonPrice!!.isEnabled = true
 //        if(isFOCStr.equals("Yes")){
 //            focEditText!!.isEnabled = true
 //        }
 //        else{
-        //}
-        qtyValue!!.isEnabled = true
+            //}
 
-        stockLayout!!.visibility = View.VISIBLE
-        if (model.stockQty != null && model.stockQty != "null") {
-            pdtStockVal = model.stockQty
-            if (model.stockQty.toDouble() == 0.0 || model.stockQty.toDouble() < 0) {
-                stockQtyValue!!.text = model.stockQty
-                stockQtyValue!!.setTextColor(Color.parseColor("#D24848"))
-            } else if (model.stockQty.toDouble() > 0) {
-                stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
-                stockQtyValue!!.text = model.stockQty
+            if (model.isBatch.equals("Yes", true)) {
+                qtyValue!!.isEnabled = false
+                addbatch!!.visibility = View.VISIBLE
+            } else {
+                qtyValue!!.isEnabled = true
+                addbatch!!.visibility = View.GONE
             }
-        }
-    }
-    fun getProductData(keyId: String?): ProductsModel? {
-        var index = 0
-        if (AppUtils.getProductsList() != null && AppUtils.getProductsList().size > 0) {
-            for (model in AppUtils.getProductsList()) {
-                //   Log.w("pdtsbarcodd", "" + keyId + "  .. "+AppUtils.getProductsList().get(1).barcode)
 
-                if (keyId == model.barcode || keyId == model.productCode) {
-                    Log.w("pdtsbarcodd1", "" + keyId + "  .. "+model.barcode)
-
-                    return model
-                }
-                index++
-            }
-        }
-        return null
-    }
-    private fun isAlreadyExist(scannedBarcode: String?): Boolean {
-        var check = false
-        try {
-            for (pdt in productSummaryAdapter!!.getList()) {
-                if (pdt.productBarCode.trim { it <= ' ' } == scannedBarcode!!.trim { it <= ' ' }) {
-                    Toast.makeText(
-                        applicationContext,
-                        "This Products Already Added..",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    check = true
-                    break
+            stockLayout!!.visibility = View.VISIBLE
+            if (model.stockQty != null && model.stockQty != "null") {
+                pdtStockVal = model.stockQty
+                if (model.stockQty.toDouble() == 0.0 || model.stockQty.toDouble() < 0) {
+                    stockQtyValue!!.text = model.stockQty
+                    stockQtyValue!!.setTextColor(Color.parseColor("#D24848"))
+                } else if (model.stockQty.toDouble() > 0) {
+                    stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
+                    stockQtyValue!!.text = model.stockQty
                 }
             }
-        } catch (exception: Exception) {
-        }
-        return check
-    }
-
-    fun createStockAdjusJson() {
-        val c = Calendar.getInstance().time
-        println("Current time => $c")
-        val df = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        currentDateString = df.format(c)
-        val df3 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        currentDate = df3.format(c)
-        stockAdjustDetailList = arrayListOf()
-
-        val df5 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        var currentDate1:String = df5.format(c)
-
-        val localCart = dbHelper!!.allInvoiceProducts
-        Log.w("Given_local_cart_size:", localCart.size.toString())
-        var model1 : StockAdjustSaveDetail? = null
-        if(localCart.size > 0) {
-            for (model in localCart) {
-                    model1 = StockAdjustSaveDetail(
-                    arrayListOf(),
-                    model.productCode,
-                    Utils.twoDecimalPoint(model.price.toDouble()),
-                    model.uomCode,
-                        fromWarehouseCode!!,
-                    Utils.twoDecimalPoint(model.netQty.toDouble())
-                )
-                stockAdjustDetailList!!.add(model1!!)
-            }
         }
 
-        val reqModel = StockAdjustSaveModel(
-            currentDate1,
-            stockAdjustDetailList!!
-        )
-        savetockAdjust(reqModel,1)
+        fun getProductData(keyId: String?): ProductsModel? {
+            var index = 0
+            if (AppUtils.getProductsList() != null && AppUtils.getProductsList().size > 0) {
+                for (model in AppUtils.getProductsList()) {
+                    //   Log.w("pdtsbarcodd", "" + keyId + "  .. "+AppUtils.getProductsList().get(1).barcode)
 
-        Log.w("gson_adjust_saveee", ".." + Gson().toJson(reqModel).toString())
-    }
+                    if (keyId == model.barcode || keyId == model.productCode) {
+                        Log.w("pdtsbarcodd1", "" + keyId + "  .. " + model.barcode)
 
-    fun savetockAdjust(jsonBody: StockAdjustSaveModel, noofCopyPrint: Int) {
-        try {
-            pDialog = SweetAlertDialog(
-                this@NewStockAdjustmentProductAddActivity,
-                SweetAlertDialog.PROGRESS_TYPE
-            )
-            pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
-            pDialog!!.setTitleText("Saving Stock Adjustment...")
-            pDialog!!.setCancelable(false)
-            pDialog!!.show()
-            val requestQueue = Volley.newRequestQueue(this@NewStockAdjustmentProductAddActivity)
-            Log.w("GivenStockAdjust:", jsonBody.toString())
-            val URL = Utils.getBaseUrl(applicationContext) + "PostingGoodsReceipt"
-            Log.w("Given_StockAdjustApi:", URL)
-            val salesOrderRequest: JsonObjectRequest = object : JsonObjectRequest(
-                Method.POST,
-                URL,
-                null,
-                Response.Listener { response: JSONObject ->
-                    Log.w("StockAdj_Res:", response.toString())
-                    try {
-                        //   {"statusCode":1,"statusMessage":"Sales Return Created Successfully","responseData":{"docNum":"1000005","error":null}}
-                        val statusCode = response.optString("statusCode")
-                        val statusMessage = response.optString("statusMessage")
-                        val jsonObject = response.optJSONObject("responseData")
-                        val salesReturnNumber = jsonObject.optString("docNum")
-                        var errorMessage = ""
-                        val error = jsonObject.optString("error")
-                        if (error != "null") {
-                            errorMessage = error
-                        }
-                        if (statusCode == "1") {
-                            dbHelper!!.removeAllItems()
-                            dbHelper!!.removeCustomer()
-                            dbHelper!!.removeAllReturn()
-                            Utils.clearCustomerSession(applicationContext)
-                            AppUtils.setProductsList(null)
-                            pDialog!!.dismiss()
-                            isEdit = false
-                            if (isPrintEnable) {
-                                val intent = Intent(
-                                    applicationContext,
-                                    NewStockAdjustmentProductAddActivity::class.java
-                                )
-                                intent.putExtra("srNumber", salesReturnNumber)
-                                intent.putExtra("noOfCopy", noofCopyPrint.toString())
-                                startActivity(intent)
-                                finish()
-                            } else {
-                                val intent = Intent(
-                                    applicationContext,
-                                    NewStockAdjustmentProductAddActivity::class.java
-                                )
-                                startActivity(intent)
-                                finish()
-                            }
-                        } else {
-                            pDialog!!.dismiss()
-                            Toast.makeText(
-                                applicationContext,
-                                "$statusMessage : $errorMessage",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                        return model
                     }
-                },
-                Response.ErrorListener { error: VolleyError ->
-                    Log.w("SR_Error:", error.toString())
-                    pDialog!!.dismiss()
-                }) {
-
-                override fun getBody(): ByteArray {
-                    return Gson().toJson(jsonBody).toString().toByteArray()
-                }
-
-                override fun getBodyContentType(): String {
-                    return "application/json"
-                }
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    val creds = String.format(
-                        "%s:%s",
-                        Constants.API_SECRET_CODE,
-                        Constants.API_SECRET_PASSWORD
-                    )
-                    val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                    params["Authorization"] = auth
-                    return params
+                    index++
                 }
             }
-            salesOrderRequest.setRetryPolicy(object : RetryPolicy {
-                override fun getCurrentTimeout(): Int {
-                    return 50000
-                }
-
-                override fun getCurrentRetryCount(): Int {
-                    return 50000
-                }
-
-                @Throws(VolleyError::class)
-                override fun retry(error: VolleyError) {
-                }
-            })
-            requestQueue.add(salesOrderRequest)
-        } catch (e: Exception) {
-            e.printStackTrace()
+            return null
         }
-    }
 
-    @Throws(IOException::class)
-    private fun sentSalesOrderDataPrint(copy: Int) {
-        if (printerType == "TSC Printer") {
-            val printer =
-                TSCPrinter(this@NewStockAdjustmentProductAddActivity, printerMacId, "SalesOrder")
-            printer.printSalesOrder(copy, salesOrderHeaderDetails, salesPrintList)
-            printer.setOnCompletionListener {
-                Utils.setSignature("")
-                Toast.makeText(
-                    applicationContext,
-                    "SalesOrder printed successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        } else if (printerType == "Zebra Printer") {
-            val zebraPrinterActivity =
-                ZebraPrinterActivity(this@NewStockAdjustmentProductAddActivity, printerMacId)
-            zebraPrinterActivity.printSalesOrder(copy, salesOrderHeaderDetails, salesPrintList)
-        }
-    }
-
-    fun setNewPrint() {
-        val printerUtils = PrinterUtils(this, printerMacId)
-        printerUtils.printLabel()
-    }
-
-    companion object {
-        var productList: ArrayList<ProductsModel>? = null
-        var behavior: BottomSheetBehavior<*>? = null
-        var progressDialog: ProgressDialog? = null
-        var stockProductView = "2"
-        var barcodeText: EditText? = null
-        var customerCode: String? = null
-        var isPrintEnable = false
-        var selectedBank: TextView? = null
-        var amountText: EditText? = null
-        var currentLocationLatitude = 0.0
-        var currentLocationLongitude = 0.0
-        var signatureString = ""
-        var imageString: String? = ""
-        var current_latitude = "0.00"
-        var current_longitude = "0.00"
-        var currentDate: String? = null
-        var customerResponse = JSONObject()
-        var salesReturnNo: String? = null
-
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        private fun convertDate(strDate: String): String {
-            @SuppressLint("SimpleDateFormat") val inputFormat: DateFormat =
-                SimpleDateFormat("dd-MM-yyyy")
-            @SuppressLint("SimpleDateFormat") val outputFormat: DateFormat =
-                SimpleDateFormat("yyyyMMdd")
-            var resultDate = ""
+        private fun isAlreadyExist(scannedBarcode: String?): Boolean {
+            var check = false
             try {
-                resultDate = outputFormat.format(inputFormat.parse(strDate))
-            } catch (e: ParseException) {
+                for (pdt in productSummaryAdapter!!.getList()) {
+                    if (pdt.productBarCode.trim { it <= ' ' } == scannedBarcode!!.trim { it <= ' ' }) {
+                        Toast.makeText(
+                            applicationContext,
+                            "This Products Already Added..",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        check = true
+                        break
+                    }
+                }
+            } catch (exception: Exception) {
+            }
+            return check
+        }
+
+        fun createStockAdjusJson() {
+            val c = Calendar.getInstance().time
+            println("Current time => $c")
+            val df = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            currentDateString = df.format(c)
+            val df3 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            currentDate = df3.format(c)
+            stockAdjustDetailList = arrayListOf()
+
+
+            val df5 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            var currentDate1: String = df5.format(c)
+
+            val localCart = dbHelper!!.allInvoiceProducts
+            Log.w("Given_local_cart_size:", localCart.size.toString())
+            var model1: GoodReceiptSaveDetail? = null
+            if (localCart.size > 0) {
+                for (model in localCart) {
+                    batchListSave = arrayListOf()
+
+                    if (model.isBatch.equals("Yes", true)) {
+
+                        val batchProducts =
+                            dbHelper!!.getBatchProducts(model.productCode, model.updateTime)
+                        Log.w("batcarray1", "" + batchProducts.size + model.isBatch)
+
+                        if (batchProducts.size > 0) {
+                            for (batchModel in batchProducts) {
+
+                                batchListSave =
+                                    batchProducts.filter { it.batchQty!!.toDouble() > 0.0 } as
+                                            ArrayList<BatchDetailModule>
+                            }
+                        }
+                    }
+                    model1 = GoodReceiptSaveDetail(
+                        //todo
+                        batchListSave!!,
+                        model.productCode,
+                        Utils.twoDecimalPoint(model.price.toDouble()),
+                        model.uomCode,
+                        fromWarehouseCode!!,
+                        Utils.twoDecimalPoint(model.netQty.toDouble())
+                    )
+                    stockAdjustDetailList!!.add(model1!!)
+                }
+            }
+
+            val reqModel = GoodReceiptSaveModel(
+                currentDate1,
+                stockAdjustDetailList!!
+            )
+            savetockAdjust(reqModel, 1)
+
+            Log.w("gson_adjust_saveee", ".." + Gson().toJson(reqModel).toString())
+        }
+
+        fun savetockAdjust(jsonBody: GoodReceiptSaveModel, noofCopyPrint: Int) {
+            try {
+                pDialog = SweetAlertDialog(
+                    this@GoodReceiptProductAddActivity,
+                    SweetAlertDialog.PROGRESS_TYPE
+                )
+                pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
+                pDialog!!.setTitleText("Saving Good Receipt...")
+                pDialog!!.setCancelable(false)
+                pDialog!!.show()
+                val requestQueue = Volley.newRequestQueue(this@GoodReceiptProductAddActivity)
+                Log.w("GivenStockAdjust:", jsonBody.toString())
+                val URL = Utils.getBaseUrl(applicationContext) + "PostingGoodReceipt"
+                Log.w("Given_StockAdjustApi:", URL)
+                val salesOrderRequest: JsonObjectRequest = object : JsonObjectRequest(
+                    Method.POST,
+                    URL,
+                    null,
+                    Response.Listener { response: JSONObject ->
+                        Log.w("StockAdj_Res:", response.toString())
+                        try {
+                            //   {"statusCode":1,"statusMessage":"Sales Return Created Successfully","responseData":{"docNum":"1000005","error":null}}
+                            val statusCode = response.optString("statusCode")
+                            val statusMessage = response.optString("statusMessage")
+                            val jsonObject = response.optJSONObject("responseData")
+                            val salesReturnNumber = jsonObject.optString("docNum")
+                            var errorMessage = ""
+                            val error = jsonObject.optString("error")
+                            if (error != "null") {
+                                errorMessage = error
+                            }
+                            if (statusCode == "1") {
+                                dbHelper!!.removeAllItems()
+                                dbHelper!!.removeCustomer()
+                                dbHelper!!.removeAllBAtch()
+
+                                Utils.clearCustomerSession(applicationContext)
+                                AppUtils.setProductsList(null)
+                                pDialog!!.dismiss()
+                                isEdit = false
+                                if (isPrintEnable) {
+                                    val intent = Intent(
+                                        applicationContext,
+                                        GoodReceiptProductAddActivity::class.java
+                                    )
+                                    intent.putExtra("srNumber", salesReturnNumber)
+                                    intent.putExtra("noOfCopy", noofCopyPrint.toString())
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    val intent = Intent(
+                                        applicationContext,
+                                        GoodReceiptListActivity::class.java
+                                    )
+                                    startActivity(intent)
+                                    finish()
+                                }
+                            } else {
+                                pDialog!!.dismiss()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "$statusMessage : $errorMessage",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    },
+                    Response.ErrorListener { error: VolleyError ->
+                        Log.w("SR_Error:", error.toString())
+                        pDialog!!.dismiss()
+                    }) {
+
+                    override fun getBody(): ByteArray {
+                        return Gson().toJson(jsonBody).toString().toByteArray()
+                    }
+
+                    override fun getBodyContentType(): String {
+                        return "application/json"
+                    }
+
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        val creds = String.format(
+                            "%s:%s",
+                            Constants.API_SECRET_CODE,
+                            Constants.API_SECRET_PASSWORD
+                        )
+                        val auth =
+                            "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+                        params["Authorization"] = auth
+                        return params
+                    }
+                }
+                salesOrderRequest.setRetryPolicy(object : RetryPolicy {
+                    override fun getCurrentTimeout(): Int {
+                        return 50000
+                    }
+
+                    override fun getCurrentRetryCount(): Int {
+                        return 50000
+                    }
+
+                    @Throws(VolleyError::class)
+                    override fun retry(error: VolleyError) {
+                    }
+                })
+                requestQueue.add(salesOrderRequest)
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
-            return resultDate
+        }
+
+        @Throws(IOException::class)
+        private fun sentSalesOrderDataPrint(copy: Int) {
+            if (printerType == "TSC Printer") {
+                val printer =
+                    TSCPrinter(this@GoodReceiptProductAddActivity, printerMacId, "SalesOrder")
+                printer.printSalesOrder(copy, salesOrderHeaderDetails, salesPrintList)
+                printer.setOnCompletionListener {
+                    Utils.setSignature("")
+                    Toast.makeText(
+                        applicationContext,
+                        "SalesOrder printed successfully!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else if (printerType == "Zebra Printer") {
+                val zebraPrinterActivity =
+                    ZebraPrinterActivity(this@GoodReceiptProductAddActivity, printerMacId)
+                zebraPrinterActivity.printSalesOrder(copy, salesOrderHeaderDetails, salesPrintList)
+            }
+        }
+
+        fun setNewPrint() {
+            val printerUtils = PrinterUtils(this, printerMacId)
+            printerUtils.printLabel()
+        }
+
+        companion object {
+            var productList: ArrayList<ProductsModel>? = null
+            var behavior: BottomSheetBehavior<*>? = null
+            var progressDialog: ProgressDialog? = null
+            var stockProductView = "2"
+            var barcodeText: EditText? = null
+            var customerCode: String? = null
+            var isPrintEnable = false
+            var selectedBank: TextView? = null
+            var amountText: EditText? = null
+            var currentLocationLatitude = 0.0
+            var currentLocationLongitude = 0.0
+            var signatureString = ""
+            var imageString: String? = ""
+            var current_latitude = "0.00"
+            var current_longitude = "0.00"
+            var currentDate: String? = null
+            var customerResponse = JSONObject()
+            var salesReturnNo: String? = null
+
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            private fun convertDate(strDate: String): String {
+                @SuppressLint("SimpleDateFormat") val inputFormat: DateFormat =
+                    SimpleDateFormat("dd-MM-yyyy")
+                @SuppressLint("SimpleDateFormat") val outputFormat: DateFormat =
+                    SimpleDateFormat("yyyyMMdd")
+                var resultDate = ""
+                try {
+                    resultDate = outputFormat.format(inputFormat.parse(strDate))
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                }
+                return resultDate
+            }
+        }
+
+        override fun removeBatchSelected(position: Int?) {
+
+        }
+
+        override fun batchQtySelected(arrayList: ArrayList<BatchDetailModule>) {
+
+            val totalBatchVal = arrayList.sumOf {
+                if (it.batchQty != null && it.batchQty!!.isNotEmpty()) {
+                    it.batchQty!!.toDouble()
+                } else 0.0
+            }
+            total_batchQty!!.setText(totalBatchVal.toString())
+            qtyValue!!.setText(totalBatchVal.toString())
+
         }
     }
-}

@@ -37,13 +37,13 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.winapp.saperp.R;
-import com.winapp.saperp.adapter.StockAdjustmentAdapter;
+import com.winapp.saperp.adapter.GoodReceiptAdapter;
 import com.winapp.saperp.db.DBHelper;
 import com.winapp.saperp.fragments.CustomerFragment;
 import com.winapp.saperp.model.CustomerDetails;
 import com.winapp.saperp.model.SalesOrderModel;
 import com.winapp.saperp.model.SalesOrderPrintPreviewModel;
-import com.winapp.saperp.model.StockAdjustmentModuleModel;
+import com.winapp.saperp.model.GoodReceiptModuleModel;
 import com.winapp.saperp.printpreview.StockAdjustPrintPreview;
 import com.winapp.saperp.utils.Constants;
 import com.winapp.saperp.utils.SessionManager;
@@ -56,7 +56,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,11 +68,11 @@ import java.util.Objects;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class StockAdjustmentListActivity extends NavigationActivity implements StockAdjustmentAdapter.CallBack {
+public class GoodReceiptListActivity extends NavigationActivity implements GoodReceiptAdapter.CallBack {
 
     public static RecyclerView stockAdjustListView;
-    public static StockAdjustmentAdapter stockAdjustAdapter;
-    private ArrayList<StockAdjustmentModuleModel> stockAdjustmentList;
+    public static GoodReceiptAdapter stockAdjustAdapter;
+    private ArrayList<GoodReceiptModuleModel> GoodReceiptList;
     private SweetAlertDialog pDialog;
     private SessionManager session;
     private HashMap<String,String > user;
@@ -138,7 +137,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
         FrameLayout contentFrameLayout = findViewById(R.id.content_frame);
         getLayoutInflater().inflate(R.layout.activity_stock_adjustment_list, contentFrameLayout);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Stock Adjustment");
+        getSupportActionBar().setTitle("Good Receipt");
 
 
         dbHelper=new DBHelper(this);
@@ -274,11 +273,11 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_COLLAPSED");
-                        getSupportActionBar().setTitle("Stock Adjustment");
+                        getSupportActionBar().setTitle("Good Receipt");
                         transLayout.setVisibility(View.GONE);
                         if (redirectInvoice){
                             CustomerFragment.isLoad=true;
-                            Intent intent=new Intent(StockAdjustmentListActivity.this, AddInvoiceActivityOld.class);
+                            Intent intent=new Intent(GoodReceiptListActivity.this, AddInvoiceActivityOld.class);
                             intent.putExtra("customerId",selectedCustomerId);
                             intent.putExtra("activityFrom","DeliveryOrder");
                             startActivity(intent);
@@ -314,7 +313,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
             @Override
             public void onClick(View view) {
                 viewCloseBottomSheet();
-                Intent intent=new Intent(StockAdjustmentListActivity.this, StockAdjustPrintPreview.class);
+                Intent intent=new Intent(GoodReceiptListActivity.this, StockAdjustPrintPreview.class);
                 intent.putExtra("adjustNumber", number.getText().toString());
                 startActivity(intent);
             }
@@ -324,7 +323,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
             @Override
             public void onClick(View view) {
                 viewCloseBottomSheet();
-                Intent intent=new Intent(StockAdjustmentListActivity.this, StockAdjustPrintPreview.class);
+                Intent intent=new Intent(GoodReceiptListActivity.this, StockAdjustPrintPreview.class);
                 intent.putExtra("adjustNumber", number.getText().toString());
                 startActivity(intent);
             }
@@ -412,7 +411,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
            // Toast.makeText(getApplicationContext(),"TSC printer in progress",Toast.LENGTH_SHORT).show();
             // TSCPrinter tscPrinter=new TSCPrinter(SalesOrderPrintPreview.this,printerMacId);
             //  tscPrinter.printInvoice(invoiceHeaderDetails,invoiceList);
-            TSCPrinter printer=new TSCPrinter(StockAdjustmentListActivity.this,printerMacId,"DO");
+            TSCPrinter printer=new TSCPrinter(GoodReceiptListActivity.this,printerMacId,"DO");
           //  printer.printDeliveryOrder1(copy,salesOrderHeaderDetails,salesPrintList);
             printer.setOnCompletionListener(new TSCPrinter.OnCompletionListener() {
                 @Override
@@ -422,7 +421,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
                 }
             });
         }else if (printerType.equals("Zebra Printer")){
-            ZebraPrinterActivity zebraPrinterActivity=new ZebraPrinterActivity(StockAdjustmentListActivity.this,printerMacId);
+            ZebraPrinterActivity zebraPrinterActivity=new ZebraPrinterActivity(GoodReceiptListActivity.this,printerMacId);
             zebraPrinterActivity.printSalesOrder(copy,salesOrderHeaderDetails,salesPrintList);
         }
     }
@@ -471,14 +470,14 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
 
         stockAdjustListView.setHasFixedSize(true);
         stockAdjustListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        stockAdjustAdapter = new StockAdjustmentAdapter(this, stockAdjustListView, stockAdjustmentList, this);
+        stockAdjustAdapter = new GoodReceiptAdapter(this, stockAdjustListView, GoodReceiptList, this);
         stockAdjustListView.setAdapter(stockAdjustAdapter);
     }
 
     public void redirectActivity(String action,String customer_code,String customer_name,String do_code,String customerBill_Disc){
         //  if (products.length()==dbHelper.numberOfRowsInInvoice()){
         Log.w("acttionDO",""+action);
-        Utils.setCustomerSession(StockAdjustmentListActivity.this,customer_code);
+        Utils.setCustomerSession(GoodReceiptListActivity.this,customer_code);
         if (action.equals("Edit")){
             Intent intent=new Intent(getApplicationContext(),CreateNewInvoiceActivity.class);
             intent.putExtra("customerName",customer_name);
@@ -589,14 +588,14 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-            stockAdjustmentList =new ArrayList<>();
+            GoodReceiptList =new ArrayList<>();
 
             // Initialize a new JsonArrayRequest instance
         String url = Utils.getBaseUrl(this) + "GoodsReceiptList";
         Log.w("Given_url_adjustList:",url+jsonObject);
         pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        pDialog.setTitleText("Getting stock adjustment...");
+        pDialog.setTitleText("Getting Good Receipt...");
         pDialog.setCancelable(false);
         if (pageNo.equals("1")){
             pDialog.show();
@@ -615,7 +614,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
                             JSONArray salesOrderArray=response.optJSONArray("responseData");
                             for (int i=0;i<salesOrderArray.length();i++){
                                 JSONObject object=salesOrderArray.optJSONObject(i);
-                                StockAdjustmentModuleModel model=new StockAdjustmentModuleModel();
+                                GoodReceiptModuleModel model=new GoodReceiptModuleModel();
 
                                 model.setDate(object.optString("docDate"));
                                 model.setCode(object.optString("code"));
@@ -623,10 +622,10 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
                                 model.setNetTotal(object.optString("netTotal"));
                                 model.setDoStatus(object.optString("docStatus"));
 
-                                stockAdjustmentList.add(model);
+                                GoodReceiptList.add(model);
                             }
 //
-                            if (stockAdjustmentList.size()>0){
+                            if (GoodReceiptList.size()>0){
                                 if(stockAdjustAdapter !=null) {
                                     stockAdjustAdapter.notifyDataSetChanged();
                                 }
@@ -686,7 +685,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
     }
 
     public void setShowHide(){
-        if (stockAdjustmentList.size()>0){
+        if (GoodReceiptList.size()>0){
             stockAdjustListView.setVisibility(View.VISIBLE);
             //outstandingLayout.setVisibility(View.VISIBLE);
         }else {
@@ -703,17 +702,17 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
         outstandingLayout.setVisibility(View.GONE);
         stockAdjustListView.setHasFixedSize(true);
         stockAdjustListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        stockAdjustAdapter =new StockAdjustmentAdapter(this, stockAdjustListView,
-                stockAdjustmentList,this);
+        stockAdjustAdapter =new GoodReceiptAdapter(this, stockAdjustListView,
+                GoodReceiptList,this);
 
         stockAdjustListView.setAdapter(stockAdjustAdapter);
 
-        stockAdjustAdapter.setOnLoadMoreListener(new StockAdjustmentAdapter.OnLoadMoreListener() {
+        stockAdjustAdapter.setOnLoadMoreListener(new GoodReceiptAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 Log.e("haint", "Load More");
-                stockAdjustmentList.add(null);
-                stockAdjustAdapter.notifyItemInserted(stockAdjustmentList.size() - 1);
+                GoodReceiptList.add(null);
+                stockAdjustAdapter.notifyItemInserted(GoodReceiptList.size() - 1);
                 //Load more data for reyclerview
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -721,10 +720,10 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
                         Log.e("haint", "Load More 2");
 
                         //Remove loading item
-                        stockAdjustmentList.remove(stockAdjustmentList.size() - 1);
-                        stockAdjustAdapter.notifyItemRemoved(stockAdjustmentList.size());
+                        GoodReceiptList.remove(GoodReceiptList.size() - 1);
+                        stockAdjustAdapter.notifyItemRemoved(GoodReceiptList.size());
                         //Load data
-                        int index = stockAdjustmentList.size();
+                        int index = GoodReceiptList.size();
                         int end = index + 20;
                         pageNo=pageNo+1;
                        // getSalesOrderList(companyId, String.valueOf(pageNo));
@@ -753,7 +752,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
         if (item.getItemId() == android.R.id.home) {//finish();
             onBackPressed();
         }else if (item.getItemId()==R.id.action_add){
-            Intent intent=new Intent(getApplicationContext(), NewStockAdjustmentProductAddActivity.class);
+            Intent intent=new Intent(getApplicationContext(), GoodReceiptProductAddActivity.class);
             startActivity(intent);
 //            intent.putExtra("from","do");
 //            startActivityForResult(intent,customerSelectCode);
@@ -787,7 +786,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("customerCode");
                 Utils.setCustomerSession(this, result);
-                Intent intent = new Intent(StockAdjustmentListActivity.this, AddInvoiceActivityOld.class);
+                Intent intent = new Intent(GoodReceiptListActivity.this, AddInvoiceActivityOld.class);
                 intent.putExtra("customerId", result);
                 intent.putExtra("activityFrom", "DeliveryOrder");
                 startActivity(intent);
@@ -846,7 +845,7 @@ public class StockAdjustmentListActivity extends NavigationActivity implements S
         mYear = c.get(Calendar.YEAR);
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(StockAdjustmentListActivity.this,
+        DatePickerDialog datePickerDialog = new DatePickerDialog(GoodReceiptListActivity.this,
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {

@@ -189,7 +189,7 @@ public class StockTakeListActivity extends NavigationActivity implements View.On
 //                        transLayout.setVisibility(View.GONE);
 ////                        if (redirectInvoice){
 ////                            CustomerFragment.isLoad=true;
-////                            Intent intent=new Intent(StockAdjustmentListActivity.this, AddInvoiceActivityOld.class);
+////                            Intent intent=new Intent(GoodReceiptListActivity.this, AddInvoiceActivityOld.class);
 ////                            intent.putExtra("customerId",selectedCustomerId);
 ////                            intent.putExtra("activityFrom","DeliveryOrder");
 ////                            startActivity(intent);

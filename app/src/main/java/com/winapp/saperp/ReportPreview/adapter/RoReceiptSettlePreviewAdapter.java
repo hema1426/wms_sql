@@ -15,12 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperp.R;
-import com.winapp.saperp.adapter.InvoiceAdapter;
-import com.winapp.saperp.adapter.InvoicePrintPreviewAdapter;
-import com.winapp.saperp.adapter.ROReceiptSettleInvoiceAdapter;
-import com.winapp.saperp.model.InvoicePrintPreviewModel;
 import com.winapp.saperp.model.SettlementReceiptDetailModel;
-import com.winapp.saperp.model.SettlementReceiptModel;
 
 import java.util.ArrayList;
 

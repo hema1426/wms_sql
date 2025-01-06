@@ -59,7 +59,7 @@ import com.winapp.saperp.model.ItemGroupList;
 import com.winapp.saperp.model.ProductSummaryModel;
 import com.winapp.saperp.model.ProductsModel;
 import com.winapp.saperp.model.SettingsModel;
-import com.winapp.saperp.model.StockAdjustmentModel;
+import com.winapp.saperp.model.GoodReceiptModel;
 import com.winapp.saperp.utils.BarCodeScanner;
 import com.winapp.saperp.utils.Constants;
 import com.winapp.saperp.utils.SessionManager;
@@ -145,10 +145,10 @@ public class SalesReturnProduct extends Fragment {
     LinearLayout stockLayout;
     private TextWatcher cqtyTW, lqtyTW, qtyTW;
     String beforeLooseQty,ss_Cqty;
-    EditText stockAdjustmentText;
+    EditText GoodReceiptText;
 
-    String[] stockAdjustmentList;
-    ArrayList<StockAdjustmentModel> stockAdjustList;
+    String[] GoodReceiptList;
+    ArrayList<GoodReceiptModel> stockAdjustList;
     public static String stockAdjustRefCode="0";
     public RecyclerView adjustmentRecyclerView;
     public View productLayout;
@@ -233,7 +233,7 @@ public class SalesReturnProduct extends Fragment {
         damageReturnQty=view.findViewById(R.id.damage_qty);
         products=new ArrayList<>();
         productAutoComplete.clearFocus();
-        stockAdjustmentText =view.findViewById(R.id.select_stock_adjusment);
+        GoodReceiptText =view.findViewById(R.id.select_stock_adjusment);
         saveReturn.setVisibility(View.GONE);
         cancelReturn.setVisibility(View.GONE);
 
@@ -753,10 +753,10 @@ public class SalesReturnProduct extends Fragment {
                 if (!qtyValue.getText().toString().isEmpty() && !s.isEmpty() && !qtyValue.getText().toString().equals("0") && !qtyValue.getText().toString().equals("00") && !qtyValue.getText().toString().equals("000") && !qtyValue.getText().toString().equals("0000") && !netTotalValue.getText().toString().equals("0.00")){
                     if (addProduct.getText().toString().equals("Update")){
                         // if (!cartonPrice.getText().toString().isEmpty() && !cartonPrice.getText().toString().equals("0.00") && !cartonPrice.getText().toString().equals("0.0") && !cartonPrice.getText().toString().equals("0")){
-                       /* if (!stockAdjustmentText.getText().toString().equals("Select")){
+                       /* if (!GoodReceiptText.getText().toString().equals("Select")){
                             updateProduct();
                         }else {
-                            Toast.makeText(getActivity(),"Select Stock Adjustment",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(),"Select Good Receipt",Toast.LENGTH_SHORT).show();
                         }*/
 
                         updateProduct();
@@ -765,10 +765,10 @@ public class SalesReturnProduct extends Fragment {
 
                     }else {
                         addProduct("Add");
-                       /* if (!stockAdjustmentText.getText().toString().equals("Select")){
+                       /* if (!GoodReceiptText.getText().toString().equals("Select")){
                             addProduct("Add");
                         }else {
-                            Toast.makeText(getActivity(),"Select Stock Adjustment",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(),"Select Good Receipt",Toast.LENGTH_SHORT).show();
                         }*/
                     }
                 }else {
@@ -839,17 +839,17 @@ public class SalesReturnProduct extends Fragment {
             }
         });
 
-        // Onclick Listener in StockAdjustment
+        // Onclick Listener in GoodReceipt
 
-        stockAdjustmentText.setOnClickListener(new View.OnClickListener() {
+        GoodReceiptText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
               /*  AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
                 mBuilder.setTitle("Choose an item");
-                mBuilder.setSingleChoiceItems(stockAdjustmentList, -1, new DialogInterface.OnClickListener() {
+                mBuilder.setSingleChoiceItems(GoodReceiptList, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        stockAdjustmentText.setText(stockAdjustmentList[i]);
+                        GoodReceiptText.setText(GoodReceiptList[i]);
                         for (StockAdjustmentModel model:stockAdjustList){
                             if (model.getDescription().equals(stockAdjustmentText.getText().toString().trim())){
                                 stockAdjustRefCode=model.getRefCode();
@@ -865,7 +865,7 @@ public class SalesReturnProduct extends Fragment {
                   adjustmentLayout.setVisibility(View.VISIBLE);
                   viewCloseBottomSheet();
               }else {
-                  Toast.makeText(getActivity(),"Stock Adjustment not found",Toast.LENGTH_SHORT).show();
+                  Toast.makeText(getActivity(),"Good Receipt not found",Toast.LENGTH_SHORT).show();
               }
             }
         });
@@ -1702,7 +1702,7 @@ public class SalesReturnProduct extends Fragment {
             damageReturnQty.setText("");
             Utils.refreshActionBarMenu(requireActivity());
             addProduct.setText("Add");
-            stockAdjustmentText.setText("Select");
+         //   stockAdjustmentText.setText("Select");
             setSummaryTotal();
         }else {
             Toast.makeText(getActivity(),"Error in Add product",Toast.LENGTH_LONG).show();
@@ -2290,73 +2290,73 @@ public class SalesReturnProduct extends Fragment {
     }
 
 
-    public void getAllAdjustment(JSONObject jsonObject){
-        // Initialize a new RequestQueue instance
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        String url=Utils.getBaseUrl(getContext()) +"ProductApi/GetStockAdjustmentMaster?Requestdata="+jsonObject.toString();
-        // Initialize a new JsonArrayRequest instance
-        Log.w("Given_product_url:",url);
-        stockAdjustList=new ArrayList<>();
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    try{
-                        Log.w("Response_is:",response.toString());
-                        // Loop through the array elements
-                        for(int i=0;i<response.length();i++){
-                            // Get current json object
-                            JSONObject stockObject = response.getJSONObject(i);
-                            if (!stockObject.optString("ErrorMessage").equals("No StockAdjustmentMaster data Found.")){
-                                StockAdjustmentModel stockadjustment =new StockAdjustmentModel();
-                                stockadjustment.setDescription(stockObject.optString("Description"));
-                                stockadjustment.setRefCode(stockObject.optString("RefCode"));
-                                stockAdjustList.add(stockadjustment);
-                            }
-                        }
-                        if (stockAdjustList.size()>0){
-                            stockAdjustmentList = new String[stockAdjustList.size()];
-                            for(int j =0;j<stockAdjustList.size();j++){
-                                stockAdjustmentList[j] = stockAdjustList.get(j).getDescription();
-                            }
-                            setAdjustmentAdapter();
-                        }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                    // Do something when error occurred
-                    pDialog.dismiss();
-                    Log.w("Error_throwing:",error.toString());
-                }){
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap<String, String> params = new HashMap<>();
-                String creds = String.format("%s:%s","winapp","admin");
-                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
-                params.put("Authorization", auth);
-                return params;
-            }
-        };
-        jsonArrayRequest.setRetryPolicy(new RetryPolicy() {
-            @Override
-            public int getCurrentTimeout() {
-                return 50000;
-            }
-            @Override
-            public int getCurrentRetryCount() {
-                return 50000;
-            }
-            @Override
-            public void retry(VolleyError error) throws VolleyError {
-
-            }
-        });
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonArrayRequest);
-    }
+//    public void getAllAdjustment(JSONObject jsonObject){
+//        // Initialize a new RequestQueue instance
+//        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+//        String url=Utils.getBaseUrl(getContext()) +"ProductApi/GetStockAdjustmentMaster?Requestdata="+jsonObject.toString();
+//        // Initialize a new JsonArrayRequest instance
+//        Log.w("Given_product_url:",url);
+//        stockAdjustList=new ArrayList<>();
+//        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+//                Request.Method.GET,
+//                url,
+//                null,
+//                response -> {
+//                    try{
+//                        Log.w("Response_is:",response.toString());
+//                        // Loop through the array elements
+//                        for(int i=0;i<response.length();i++){
+//                            // Get current json object
+//                            JSONObject stockObject = response.getJSONObject(i);
+//                            if (!stockObject.optString("ErrorMessage").equals("No StockAdjustmentMaster data Found.")){
+//                                StockAdjustmentModel stockadjustment =new StockAdjustmentModel();
+//                                stockadjustment.setDescription(stockObject.optString("Description"));
+//                                stockadjustment.setRefCode(stockObject.optString("RefCode"));
+//                                stockAdjustList.add(stockadjustment);
+//                            }
+//                        }
+//                        if (stockAdjustList.size()>0){
+//                            stockAdjustmentList = new String[stockAdjustList.size()];
+//                            for(int j =0;j<stockAdjustList.size();j++){
+//                                stockAdjustmentList[j] = stockAdjustList.get(j).getDescription();
+//                            }
+//                            setAdjustmentAdapter();
+//                        }
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                },
+//                error -> {
+//                    // Do something when error occurred
+//                    pDialog.dismiss();
+//                    Log.w("Error_throwing:",error.toString());
+//                }){
+//            @Override
+//            public Map<String, String> getHeaders() {
+//                HashMap<String, String> params = new HashMap<>();
+//                String creds = String.format("%s:%s","winapp","admin");
+//                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+//                params.put("Authorization", auth);
+//                return params;
+//            }
+//        };
+//        jsonArrayRequest.setRetryPolicy(new RetryPolicy() {
+//            @Override
+//            public int getCurrentTimeout() {
+//                return 50000;
+//            }
+//            @Override
+//            public int getCurrentRetryCount() {
+//                return 50000;
+//            }
+//            @Override
+//            public void retry(VolleyError error) throws VolleyError {
+//
+//            }
+//        });
+//        // Add JsonArrayRequest to the RequestQueue
+//        requestQueue.add(jsonArrayRequest);
+//    }
 
 
     private void setupGroup(ArrayList<ItemGroupList> itemGroupLists) {
@@ -2459,109 +2459,109 @@ public class SalesReturnProduct extends Fragment {
         return itemGroup;
     }
 
-    public void setAdjustmentAdapter(){
-        adjustmentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        AdjustmentAdapter adjustmentAdapter=new AdjustmentAdapter(stockAdjustList, new AdjustmentAdapter.CallBack() {
-            @Override
-            public void setAdjustment(String adjustment, String adjustmentId) {
-                stockAdjustmentText.setText(adjustment);
-                viewCloseBottomSheet();
-                stockAdjustRefCode=adjustmentId;
-              /*  if (SalesReturnList.stockAdjustRefNoList!=null && SalesReturnList.stockAdjustRefNoList.size()>0){
-                    SalesReturnList.stockAdjustRefNoList.set(editItemPosition,adjustmentId);
-                    for (String s:SalesReturnList.stockAdjustRefNoList){
-                        Log.w("AdjustRefCode_EDIT:",s);
-                    }
-                }else {
-                    if (productSummaryList.size()==0){
-                        SalesReturnList.stockAdjustRefNoList.add(0,adjustmentId);
-                    }else {
-                        SalesReturnList.stockAdjustRefNoList.add(productSummaryList.size(),adjustmentId);
-                    }
-                    Log.w("Position:",productSummaryList.size()+"");
-                    Log.w("AdjustmentId",adjustmentId);
-                }*/
-            }
-        });
-        adjustmentRecyclerView.setAdapter(adjustmentAdapter);
-    }
+//    public void setAdjustmentAdapter(){
+//        adjustmentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+//        AdjustmentAdapter adjustmentAdapter=new AdjustmentAdapter(stockAdjustList, new AdjustmentAdapter.CallBack() {
+//            @Override
+//            public void setAdjustment(String adjustment, String adjustmentId) {
+//                stockAdjustmentText.setText(adjustment);
+//                viewCloseBottomSheet();
+//                stockAdjustRefCode=adjustmentId;
+//              /*  if (SalesReturnList.stockAdjustRefNoList!=null && SalesReturnList.stockAdjustRefNoList.size()>0){
+//                    SalesReturnList.stockAdjustRefNoList.set(editItemPosition,adjustmentId);
+//                    for (String s:SalesReturnList.stockAdjustRefNoList){
+//                        Log.w("AdjustRefCode_EDIT:",s);
+//                    }
+//                }else {
+//                    if (productSummaryList.size()==0){
+//                        SalesReturnList.stockAdjustRefNoList.add(0,adjustmentId);
+//                    }else {
+//                        SalesReturnList.stockAdjustRefNoList.add(productSummaryList.size(),adjustmentId);
+//                    }
+//                    Log.w("Position:",productSummaryList.size()+"");
+//                    Log.w("AdjustmentId",adjustmentId);
+//                }*/
+//            }
+//        });
+//        adjustmentRecyclerView.setAdapter(adjustmentAdapter);
+//    }
 
-    public static class AdjustmentAdapter extends RecyclerView.Adapter<AdjustmentAdapter.ViewHolder> {
-        private ArrayList<StockAdjustmentModel> letters;
-        private int selectedPosition = -1;// no selection by default
-        private CallBack callBack;
-
-        public AdjustmentAdapter(ArrayList<StockAdjustmentModel> countries,CallBack callBack) {
-            this.letters = countries;
-            this.callBack=callBack;
-        }
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.adjustment_layout_items, viewGroup, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, @SuppressLint("RecyclerView") int position) {
-            viewHolder.title.setText(letters.get(position).getDescription());
-            viewHolder.selectTitleCheck.setChecked(letters.get(position).isIschecked());
-
-            if (selectedPosition == position) {
-                viewHolder.itemView.setSelected(true);
-                viewHolder.selectTitleCheck.setChecked(true);
-            } else {
-                viewHolder.itemView.setSelected(false);
-                viewHolder.selectTitleCheck.setChecked(false);
-            }
-
-            viewHolder.selectTitleCheck.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (selectedPosition >= 0)
-                        notifyItemChanged(selectedPosition);
-                        selectedPosition = viewHolder.getAdapterPosition();
-                        notifyItemChanged(selectedPosition);
-                        callBack.setAdjustment(letters.get(position).getDescription(),letters.get(position).getRefCode());
-                  }
-             });
-
-    /*    viewHolder.tv_letters.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (selectedPosition >= 0)
-                    notifyItemChanged(selectedPosition);
-                    selectedPosition = viewHolder.getAdapterPosition();
-                    notifyItemChanged(selectedPosition);
-                    callBack.sortProduct(viewHolder.tv_letters.getText().toString());
-            }
-        });*/
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return letters.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder{
-            private TextView title;
-            private CheckBox selectTitleCheck;
-            public ViewHolder(View view) {
-                super(view);
-                title = view.findViewById(R.id.title);
-                selectTitleCheck=view.findViewById(R.id.adjustment_check);
-            }
-        }
-        public void resetPosition(){
-            selectedPosition=-1;
-            notifyDataSetChanged();
-        }
-
-        interface CallBack {
-            void setAdjustment(String adjustment,String adjustmentId);
-        }
-    }
+//    public static class AdjustmentAdapter extends RecyclerView.Adapter<AdjustmentAdapter.ViewHolder> {
+//        private ArrayList<StockAdjustmentModel> letters;
+//        private int selectedPosition = -1;// no selection by default
+//        private CallBack callBack;
+//
+//        public AdjustmentAdapter(ArrayList<StockAdjustmentModel> countries,CallBack callBack) {
+//            this.letters = countries;
+//            this.callBack=callBack;
+//        }
+//        @NonNull
+//        @Override
+//        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+//            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.adjustment_layout_items, viewGroup, false);
+//            return new ViewHolder(view);
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(ViewHolder viewHolder, @SuppressLint("RecyclerView") int position) {
+//            viewHolder.title.setText(letters.get(position).getDescription());
+//            viewHolder.selectTitleCheck.setChecked(letters.get(position).isIschecked());
+//
+//            if (selectedPosition == position) {
+//                viewHolder.itemView.setSelected(true);
+//                viewHolder.selectTitleCheck.setChecked(true);
+//            } else {
+//                viewHolder.itemView.setSelected(false);
+//                viewHolder.selectTitleCheck.setChecked(false);
+//            }
+//
+//            viewHolder.selectTitleCheck.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (selectedPosition >= 0)
+//                        notifyItemChanged(selectedPosition);
+//                        selectedPosition = viewHolder.getAdapterPosition();
+//                        notifyItemChanged(selectedPosition);
+//                        callBack.setAdjustment(letters.get(position).getDescription(),letters.get(position).getRefCode());
+//                  }
+//             });
+//
+//    /*    viewHolder.tv_letters.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (selectedPosition >= 0)
+//                    notifyItemChanged(selectedPosition);
+//                    selectedPosition = viewHolder.getAdapterPosition();
+//                    notifyItemChanged(selectedPosition);
+//                    callBack.sortProduct(viewHolder.tv_letters.getText().toString());
+//            }
+//        });*/
+//
+//        }
+//
+//        @Override
+//        public int getItemCount() {
+//            return letters.size();
+//        }
+//
+//        public class ViewHolder extends RecyclerView.ViewHolder{
+//            private TextView title;
+//            private CheckBox selectTitleCheck;
+//            public ViewHolder(View view) {
+//                super(view);
+//                title = view.findViewById(R.id.title);
+//                selectTitleCheck=view.findViewById(R.id.adjustment_check);
+//            }
+//        }
+//        public void resetPosition(){
+//            selectedPosition=-1;
+//            notifyDataSetChanged();
+//        }
+//
+//        interface CallBack {
+//            void setAdjustment(String adjustment,String adjustmentId);
+//        }
+//    }
 
     public void getProductPrice(String productId) throws JSONException {
         JSONObject jsonObject=new JSONObject();

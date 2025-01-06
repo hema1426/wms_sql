@@ -1553,7 +1553,7 @@ class CreateNewInvoiceActivityBillDisc : AppCompatActivity() {
                 "",
                 "",
                 "",
-                "","","",""
+                "","","","",""
             )
 
             // Adding Return Qty Table values

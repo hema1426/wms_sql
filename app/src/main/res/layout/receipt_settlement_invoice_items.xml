@@ -40,6 +40,18 @@
             android:text="0"
             android:textSize="11sp"
             />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:textStyle="bold"
+            android:id="@+id/invoice_type_settle"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textColor="#757575"
+            android:text="0"
+            android:textSize="11sp"
+            />
 
         <TextView
             android:layout_width="match_parent"

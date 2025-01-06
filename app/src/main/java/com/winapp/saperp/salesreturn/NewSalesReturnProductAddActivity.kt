@@ -1149,7 +1149,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 "",
                 "",
                 "",
-                "","",timeStamp,"")
+                "","",timeStamp,"","")
 
             // Adding Return Qty Table values
             if (qty_value.toInt() > 0) {

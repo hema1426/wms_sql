@@ -1864,7 +1864,16 @@ public class DescriptionActivity extends AppCompatActivity {
                         uomCode,
                         "0.00",availability.getText().toString());
 
-
+//                if (Double.parseDouble(returnEditext.getText().toString()) > 0) {
+//                    dbHelper.updateReturnQty("Delete", "0", "Saleable Return",
+//                            productId);
+//                    dbHelper.updateReturnQty("Delete", "0", "Damaged/Expired",
+//                            productId);
+//
+//                    dbHelper.insertReturnProduct(productId,productName,return_qty, "Saleable Return");
+////                                            dbHelper.insertReturnProduct(object.optString("productCode"),object.optString("productName"),
+//                               Log.w("returnlistcart1",""+return_qty);
+//                }
                     /*boolean status= dbHelper.insertCart(
                             model.getProductCode(),
                             model.getProductName(),

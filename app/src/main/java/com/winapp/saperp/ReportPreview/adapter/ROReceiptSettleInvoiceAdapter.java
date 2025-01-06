@@ -1,4 +1,4 @@
-package com.winapp.saperp.adapter;
+package com.winapp.saperp.ReportPreview.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperp.R;
 import com.winapp.saperp.model.SettlementReceiptDetailModel;
-import com.winapp.saperp.receipts.ReceiptsListAdapter;
 
 import java.util.ArrayList;
 
@@ -36,6 +35,7 @@ public class ROReceiptSettleInvoiceAdapter extends RecyclerView.Adapter<ROReceip
         viewHolder.invoiceNo.setText(model.getInvoiceNo());
         viewHolder.invoiceDate.setText(model.getInvoiceDate());
         viewHolder.netAmoint.setText(model.getTotal());
+        viewHolder.type.setText(model.getType());
 //        viewHolder.paidAmount.setText(model.getPaidAmount());
     }
 
@@ -47,7 +47,7 @@ public class ROReceiptSettleInvoiceAdapter extends RecyclerView.Adapter<ROReceip
     public class ViewHolder extends RecyclerView.ViewHolder{
         private TextView invoiceNo;
         private TextView invoiceDate;
-        private TextView netAmoint;
+        private TextView netAmoint,type;
         private TextView paidAmount;
 
         public ViewHolder(View view) {
@@ -55,6 +55,7 @@ public class ROReceiptSettleInvoiceAdapter extends RecyclerView.Adapter<ROReceip
            invoiceNo=view.findViewById(R.id.invoice_no_settle);
            invoiceDate=view.findViewById(R.id.invoice_date_settle);
            netAmoint=view.findViewById(R.id.net_amount_settle);
+           type=view.findViewById(R.id.invoice_type_settle);
            //paidAmount=view.findViewById(R.id.paid_amount);
 
         }

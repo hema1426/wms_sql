@@ -15,19 +15,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperp.R;
-import com.winapp.saperp.activity.TransferProductAddActivity;
 import com.winapp.saperp.model.CreateInvoiceModel;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class NewStockAdjustmentProductAdapter extends RecyclerView.Adapter<NewStockAdjustmentProductAdapter.ViewHolder>{
+public class NewGoodReceiptProductAdapter extends RecyclerView.Adapter<NewGoodReceiptProductAdapter.ViewHolder>{
 
     private ArrayList<CreateInvoiceModel> summaryList;
     public CallBack callBack;
     public Context context;
 
-    public NewStockAdjustmentProductAdapter(Context context, ArrayList<CreateInvoiceModel> customers, CallBack callBack) {
+    public NewGoodReceiptProductAdapter(Context context, ArrayList<CreateInvoiceModel> customers, CallBack callBack) {
         this.summaryList = customers;
         this.callBack=callBack;
         this.context=context;

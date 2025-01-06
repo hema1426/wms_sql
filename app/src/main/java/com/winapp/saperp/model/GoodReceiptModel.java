@@ -1,6 +1,6 @@
 package com.winapp.saperp.model;
 
-public class StockAdjustmentModel {
+public class GoodReceiptModel {
 
     private String refCode;
     private String description;

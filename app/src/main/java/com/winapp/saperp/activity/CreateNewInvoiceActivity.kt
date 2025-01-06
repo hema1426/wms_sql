@@ -2178,7 +2178,7 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
                 saleable,
                 damaged,
                 exchange,
-                minimumSellingPricel,pdtStockVal,timeStamp,isItemFOCApi
+                minimumSellingPricel,pdtStockVal,timeStamp,isItemFOCApi,""
             )
             Log.w("itemds_inv",""+exchange+".. "+
                     sharedPref_billdisc!!.getString("billDisc_amt", ""))
@@ -2373,7 +2373,6 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
                         else{
                             focEditText!!.isEnabled = false
                             Log.w("focStrApSS",""+isFOCStr+model.isItemFOC)
-
                         }
 
                         returnQtyText!!.isEnabled = true
@@ -2383,10 +2382,8 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
                         }
                         uomValueVisible(model.uomCode)
 
-
                         stockCount!!.setText(model.stockQty)
                         minimumSellingPriceText!!.setText(model.minimumSellingPrice)
-
                         /* for (ProductsModel m:productList) {
                         if (m.getProductCode().equals(productId)) {
                             if (m.getStockQty()!=null && !m.getStockQty().equals("null")){

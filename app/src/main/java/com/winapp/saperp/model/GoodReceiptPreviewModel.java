@@ -2,7 +2,7 @@ package com.winapp.saperp.model;
 
 import java.util.ArrayList;
 
-public class StockAdjustmentPreviewModel {
+public class GoodReceiptPreviewModel {
 
     private String soNumber;
     private String soDate;

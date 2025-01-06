@@ -29,9 +29,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_weight="1"
             android:id="@+id/tran_type"
-            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="9dp"
+            android:text="text"
             android:textStyle="bold"
             android:textColor="@color/colorPrimary"
             android:textSize="12sp"
@@ -74,7 +75,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/pink_clr"
                 android:text="12/08/2020"
-                android:textSize="@dimen/_9sdp" />
+                android:textSize="11dp" />
 
         </LinearLayout>
 

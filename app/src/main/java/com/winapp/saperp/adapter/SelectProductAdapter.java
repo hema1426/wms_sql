@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.winapp.saperp.R;
 import com.winapp.saperp.activity.AddInvoiceActivityOld;
 import com.winapp.saperp.activity.CreateNewInvoiceActivity;
-import com.winapp.saperp.activity.NewStockAdjustmentProductAddActivity;
+import com.winapp.saperp.activity.GoodReceiptProductAddActivity;
 import com.winapp.saperp.activity.ProductAnalyzeActivity;
 import com.winapp.saperp.activity.SearchProductActivity;
 import com.winapp.saperp.activity.StockProductsActivity;
@@ -126,7 +126,7 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
                 if (Double.parseDouble(model.getStockQty()) == 0 || Double.parseDouble(model.getStockQty()) < 0) {
                     if (context instanceof SalesReturnActivity ||
                             context instanceof NewSalesReturnProductAddActivity ||
-                            context instanceof NewStockAdjustmentProductAddActivity ||
+                            context instanceof GoodReceiptProductAddActivity ||
                             context instanceof TransferProductAddActivity){
                         callBack.searchProduct(model);
                     }else {
@@ -175,7 +175,7 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
         if (context instanceof NewSalesReturnProductAddActivity || context instanceof TransferProductAddActivity
                 || context instanceof CreateNewInvoiceActivity || context instanceof StockProductsActivity
                 || context instanceof SearchProductActivity || context instanceof SalesReturnActivity ||
-                context instanceof NewStockAdjustmentProductAddActivity ||
+                context instanceof GoodReceiptProductAddActivity ||
                 AddInvoiceActivityOld.activityFrom.equals("SalesOrder") ||
                 AddInvoiceActivityOld.activityFrom.equals("SalesEdit") ||
                 AddInvoiceActivityOld.activityFrom.equals("ReOrderSales") ){
@@ -206,7 +206,7 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
                         if (context instanceof SalesReturnActivity
                                 || context instanceof NewSalesReturnProductAddActivity
                                 || context instanceof TransferProductAddActivity ||
-                                context instanceof NewStockAdjustmentProductAddActivity){
+                                context instanceof GoodReceiptProductAddActivity){
                             Log.w("stokpdtqty",""+model.getStockQty());
 
                             callBack.searchProduct(model);

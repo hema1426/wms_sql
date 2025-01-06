@@ -371,7 +371,7 @@ open class NavigationActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }else if (itemId == R.id.navigation_stock_adjust) {
                 val intent: Intent
-                intent = Intent(this@NavigationActivity, StockAdjustmentListActivity::class.java)
+                intent = Intent(this@NavigationActivity, GoodReceiptListActivity::class.java)
                 intent.putExtra("docNum", "")
                 intent.putExtra("transferType", "")
                 startActivity(intent)

@@ -15,25 +15,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperp.R;
 import com.winapp.saperp.activity.SalesOrderListActivity;
-import com.winapp.saperp.activity.StockAdjustmentListActivity;
-import com.winapp.saperp.model.StockAdjustmentPreviewModel;
+import com.winapp.saperp.activity.GoodReceiptListActivity;
+import com.winapp.saperp.model.GoodReceiptPreviewModel;
 import com.winapp.saperp.utils.Utils;
 
 import java.util.ArrayList;
 
-public class StockAdjustPrintPreviewAdapter extends RecyclerView.Adapter<StockAdjustPrintPreviewAdapter.ViewHolder> {
+public class goodReceiptPrintPreviewAdapter extends RecyclerView.Adapter<goodReceiptPrintPreviewAdapter.ViewHolder> {
 
-    private ArrayList<StockAdjustmentPreviewModel.StockAdjustList> adjustLists;
+    private ArrayList<GoodReceiptPreviewModel.StockAdjustList> adjustLists;
     private Context context;
     View view;
-    public StockAdjustPrintPreviewAdapter(Context context, ArrayList<StockAdjustmentPreviewModel.StockAdjustList> adjustList) {
+    public goodReceiptPrintPreviewAdapter(Context context, ArrayList<GoodReceiptPreviewModel.StockAdjustList> adjustList) {
         this.context=context;
         this.adjustLists = adjustList;
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        if (context instanceof StockAdjustmentListActivity){
+        if (context instanceof GoodReceiptListActivity){
             view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.sales_details_view_items, viewGroup, false);
         }else {
             view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.sales_order_print_preview, viewGroup, false);
@@ -44,7 +44,7 @@ public class StockAdjustPrintPreviewAdapter extends RecyclerView.Adapter<StockAd
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        StockAdjustmentPreviewModel.StockAdjustList salesList = this.adjustLists.get(position);
+        GoodReceiptPreviewModel.StockAdjustList salesList = this.adjustLists.get(position);
         viewHolder.slNo.setText(String.valueOf(position+1));
         viewHolder.code.setText(salesList.getProductCode());
         if (salesList.getUomCode()!=null && !salesList.getUomCode().equals("null") && !salesList.getUomCode().isEmpty()){
