@@ -52,7 +52,7 @@ public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapte
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView pdtnametxt, pdtcodetxt, stocktxt;
+        public TextView pdtnametxt, pdtcodetxt, stocktxt , uom_takel;
         public CardView transferinlay;
         public TextWatcher textWatcher;
         public EditText qtytxt;
@@ -65,6 +65,7 @@ public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapte
             this.qtytxt = itemView.findViewById(R.id.qty_transfer_item);
             this.stocktxt = itemView.findViewById(R.id.stock_transfer_item);
             this.transferinlay = itemView.findViewById(R.id.transferin_lay);
+            this.uom_takel = itemView.findViewById(R.id.uom_take_item);
         }
 
 
@@ -74,6 +75,7 @@ public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapte
             pdtcodetxt.setText(transferInItem.getProductCode());
             qtytxt.setText(String.valueOf(transferInItem.getQty()));
             stocktxt.setText(String.valueOf(transferInItem.getStockInHand()));
+            uom_takel.setText(transferInItem.getInventoryUOM());
 
             qtytxt.removeTextChangedListener(textWatcher);
             qtytxt.setSelection(qtytxt.getText().length());

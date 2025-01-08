@@ -169,7 +169,7 @@
             android:ellipsize="end"
             android:textStyle="bold"
             android:singleLine="true"
-
+                android:visibility="gone"
             android:text="Default UOM : "
             android:textColor="@color/black"
             android:textSize="12dp"

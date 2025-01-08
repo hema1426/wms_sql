@@ -488,7 +488,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
                 itemsObject.put("qty",String.valueOf(model.getQty()));
                 itemsObject.put("price","");
                 itemsObject.put("WarehouseCode",fromWarehouseCode);
-                itemsObject.put("UomCode",settingUOMval);
+                itemsObject.put("UomCode",model.getInventoryUOM());
 
                 itemsArray.put(itemsObject);
                 index++;

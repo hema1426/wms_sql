@@ -486,6 +486,8 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
         settings = ArrayList()
         settings = dbHelper!!.settings
         Log.w("compcode..", "" + companyCode)
+        Log.w("activity_cg", javaClass.simpleName.toString() + " - SelectProductAdapter")
+
         Log.w(
             "salesmann..", "" + user!!.get(SessionManager.KEY_SALESMAN_NAME) + ".." +
                     user!!.get(SessionManager.KEY_NEGATIVE_STOCK))

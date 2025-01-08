@@ -596,12 +596,12 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                             .isEmpty()
                     ) {
                         if (priceText!!.getText().toString().toDouble() > 0) {
-                            Log.d("cg_batch_updt1:",
-                                batchListAdapter!!.getBatchDataList().size.toString())
+//                            Log.d("cg_batch_updt1:",
+//                                batchListAdapter!!.getBatchDataList().size.toString())
 
-                            for (item in batchListAdapter!!.getBatchDataList()){
-                                Log.d("cg_batchEditUpd:", item.batchNo +" "+item.batchQty)
-                            }
+//                            for (item in batchListAdapter!!.getBatchDataList()){
+//                                Log.d("cg_batchEditUpd:", item.batchNo +" "+item.batchQty)
+//                            }
 
 
                             insertProducts()
@@ -2192,10 +2192,30 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                 }
             }
             saveBtn.setOnClickListener {
-//            if(batchListAdapter != null) {
-//                dbHelper!!.insertBatchList(batchListAdapter!!.getBatchDataList(),productId,)
-//            }
-                dialog.dismiss()
+                if (batchListAdapter != null) {
+                    var isbatchNo = ""
+                    for ( s in batchListAdapter!!.getBatchDataList()) {
+                        if(s.batchNo!!.isNotEmpty()){
+                            isbatchNo = "true"
+                        }else{
+                            isbatchNo = "false"
+                        }
+                   }
+//                    var batchNoSave =
+//                        batchListAdapter!!.getBatchDataList().filter { it.batchNo!!.isNotEmpty()
+//                        } as ArrayList<BatchDetailModule>
+
+
+                    Log.w("isbatchNoBool",""+isbatchNo)
+                    // dbHelper!!.insertBatchList(batchListAdapter!!.getBatchDataList(),productId,)
+                    if (isbatchNo.equals("true")) {
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(this, "Enter Batch Qty or Batch No", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                }
             }
 
 
@@ -3733,7 +3753,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                                 errorMessage = error
                             }
                             if (statusCode == "1") {
-                                dbHelper!!.removeAllItems()
+                                dbHelper!!.removeAllInvoiceItems()
                                 dbHelper!!.removeCustomer()
                                 dbHelper!!.removeAllBAtch()
 
