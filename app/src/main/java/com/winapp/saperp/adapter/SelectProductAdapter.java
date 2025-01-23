@@ -98,7 +98,11 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
         }*/
         if (shortCodeStr.equalsIgnoreCase("FUXIN")) {
             if (isLastPrice.equalsIgnoreCase("True")) {
-                viewHolder.price.setText(String.valueOf("$ " + model.getLastPrice()));
+                if (model.getLastPrice() != null && !model.getLastPrice().isEmpty() && Double.parseDouble(model.getLastPrice()) > 0.00) {
+                    viewHolder.price.setText(String.valueOf("$ " + model.getLastPrice()));
+                } else {
+                    viewHolder.price.setText(String.valueOf("$ 0.0" ));
+                }
             }else {
                     viewHolder.price.setText(String.valueOf("$ " + model.getUnitCost()));
             }

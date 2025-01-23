@@ -17,6 +17,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.activity.result.ActivityResultLauncher
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
@@ -67,6 +68,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -127,7 +130,7 @@ import java.util.Locale
 import java.util.Objects
 
 
-class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
+class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
 
     private var returnLayout: LinearLayout? = null
     private var showHideButton: ImageView? = null
@@ -2331,6 +2334,7 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
 //                        setUOMCode(uomList!!)
                         uomTextView!!.text = model.uomText
                         qtyValue!!.setText("")
+                        focEditText!!.setText("")
                         val netqty = model.netQty.toDouble()
                         if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
                             minimumSellingPriceText!!.text = model.minimumSellingPrice
@@ -3544,7 +3548,7 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
                                 setUomList(uomList!!)
                             }else{
                                 setUomList(uomList!!)
-                              //  defaultUOMset(uomList!!)
+                              // defaultUOMset(uomList!!) // some uom bag only(inner ctn) -- hide
                             }
                         }
                     }
@@ -4190,9 +4194,10 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
         bill_disc_percent_ed!!.setText("0.00")
         bill_disc_amt_ed!!.setText("0.00")
         ischangeUOM = false
+        focEditText!!.setText("")
 
         setSummaryTotal()
-
+        Log.w("pdtSelect","")
         if(selectProductAdapter != null){
         selectProductAdapter!!.notifyDataSetChanged()}
         if (behavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -4323,9 +4328,13 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
                 }else{
                     focEditText!!.isEnabled = false
                 }
+                Log.w("focStrApSS11",""+isFOCStr+model.isItemFOC)
+
             }
             else{
                 focEditText!!.isEnabled = false
+                Log.w("focStrApSS22",""+isFOCStr+model.isItemFOC)
+
             }
             exchangeEditext!!.isEnabled = true
             discountEditext!!.isEnabled = true
@@ -4600,7 +4609,8 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
             val model = getProductData(barcode)
             if (model != null) {
                 if (productSummaryList != null && productSummaryList.size > 0) {
-                    if (!isAlreadyExist(barcode)) {
+                    if (
+                        !isAlreadyExist(barcode)) {
                         Toast.makeText(applicationContext, "Product Found...", Toast.LENGTH_SHORT)
                             .show()
                         Log.w("entypdt",""+model.barcode)
@@ -4982,9 +4992,13 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
                 true
             }
             R.id.action_scan_menu -> {
+
+                if (checkPermission()) {
+                    scanFromFragment()
+                }
                 scannedBarcode = ""
-                val intent = Intent(this@CreateNewInvoiceActivity, BarCodeScanner::class.java)
-                startActivityForResult(intent, RESULT_CODE)
+//                val intent = Intent(this@CreateNewInvoiceActivity, BarCodeScanner::class.java)
+//                startActivityForResult(intent, RESULT_CODE)
                 true
             }
             R.id.action_save -> {
@@ -5053,6 +5067,46 @@ class CreateNewInvoiceActivity : AppCompatActivity() , OnClickListener {
         //  return super.onOptionsItemSelected(item);
     }
 
+    private val fragmentLauncher: ActivityResultLauncher<ScanOptions> = registerForActivityResult(
+        ScanContract()
+    ) { result ->
+        if (result.contents == null) {
+            Toast.makeText(this@CreateNewInvoiceActivity, "No Product Found", Toast.LENGTH_LONG).show()
+        } else {
+            barCodeLayl!!.visibility = View.VISIBLE
+            val barcodeTxt = result.contents
+            barcodeText!!.setText(barcodeTxt)
+           // Log.w("BarcodeTextInv:", barcodeTxt!!)
+            val mp = MediaPlayer.create(this, R.raw.beep) // sound is inside res/raw/mysound
+            mp.start()
+            scannedBarcode = barcodeTxt
+            searchAndSendActivity(barcodeTxt)
+//            if (scanType == "number") {
+//                scanBarTxt(result.contents)
+//            } else if (scanType == "item") {
+//                itemCodeEd!!.removeTextChangedListener(itemTextWatcher)
+//
+//                scanItemCodeTxt(result.contents)
+//
+//            } else if (scanType == "bin") {
+//
+//                binEd!!.setText(result.contents)
+//            }
+//            binEd!!.clearFocus()
+//            itemCodeEd!!.clearFocus()
+//            poNumberEd!!.clearFocus()
+            Toast.makeText(this@CreateNewInvoiceActivity, "Product"+"${result.contents}", Toast.LENGTH_LONG).show()
+
+            Log.e("scan_barcode.. ", "${result.contents}")
+
+//            Toast.makeText(this@PoScanAddNewActivity, "Scanned from fragment: " + result.getContents(),
+//                Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun scanFromFragment() {
+        fragmentLauncher.launch(ScanOptions())
+    }
     fun billDischide(){
         if (bill_disc_layl!!.getVisibility() == View.VISIBLE) {
             bill_disc_layl!!.setVisibility(View.GONE)
