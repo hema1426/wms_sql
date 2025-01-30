@@ -201,7 +201,7 @@ public class CashCollectionActivity extends AppCompatActivity {
         signatureString = "";
         imageString = "";
 
-        Log.w("activity_cg",getClass().getSimpleName().toString());
+        Log.w("activity_cg",getClass().getSimpleName().toString()+" CashInvoiceFragment");
 
         netAmount=findViewById(R.id.net_amount);
         btnSplit=findViewById(R.id.btn_split);

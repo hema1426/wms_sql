@@ -922,16 +922,21 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             val return_amt = return_qty.toDouble() * price_value.toDouble()
             val total = net_qty * price_value.toDouble()
             val sub_total = total - return_amt - discount.toDouble()
+
             var timeStamp: String? = Calendar.getInstance().timeInMillis.toString()
+
             if (isEditItem) {
                 timeStamp = editTimeStamp
+                Log.w("timestamp_GR1",""+timeStamp)
             } else {
                 timeStamp = SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(Date())
+                Log.w("timestamp_GR2",""+timeStamp)
             }
+            Log.w("timestamp_GR",""+timeStamp)
             if (!uomText!!.text.toString().isEmpty()) {
                 uom = uomText!!.text.toString()
             }
-            Log.w("uomAdjust", "" + uom)
+            Log.w("uomAdjust", "" + uom+isItemBatchApi)
             val insertStatus = dbHelper!!.insertCreateInvoiceCart(
                 productId.toString().trim { it <= ' ' },
                 productName,
@@ -997,6 +1002,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                 qtyValue!!.clearFocus()
                 productAutoComplete!!.clearFocus()
                 editTimeStamp = ""
+                isEditItem = false
                 uomChangel!!.visibility = View.GONE
                 ed_uomTxtl!!.visibility = View.GONE
                 uomSpinnerLayl!!.visibility = View.VISIBLE
@@ -1005,8 +1011,9 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                 priceText!!.isEnabled = false
                 // qtyValue!!.isEnabled = false
                 qtyValue!!.isEnabled = false
+                addbatch!!.visibility = View.GONE
                 addProduct!!.text = "Add"
-
+                isItemBatchApi = "No"
                 setButtonView()
                 hideKeyboard()
                 getProducts()
@@ -1720,7 +1727,11 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                 qtyValue!!.isEnabled = true
                 addbatch!!.visibility = View.GONE
             }
+            Log.w("isbatchadd", "" + model.isBatch);
 
+            if (model.isBatch != null && model.isBatch.isNotEmpty()) {
+                isItemBatchApi = model.isBatch
+            }
 //            if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
 //                minimumSellingPriceText!!.text = model.minimumSellingPrice
 //            } else {
@@ -1883,7 +1894,6 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             if (model.isBatch != null && model.isBatch.isNotEmpty()) {
                 isItemBatchApi = model.isBatch
             }
-
             //stockLayout.setVisibility(View.VISIBLE);
             if (model.stockQty != null && model.stockQty != "null") {
                 pdtStockVal = model.stockQty
@@ -2205,6 +2215,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
 //                        batchListAdapter!!.getBatchDataList().filter { it.batchNo!!.isNotEmpty()
 //                        } as ArrayList<BatchDetailModule>
 
+                    Log.w("batchArraylist",""+ batchListAdapter!!.getBatchDataList().toString())
 
                     Log.w("isbatchNoBool",""+isbatchNo)
                     // dbHelper!!.insertBatchList(batchListAdapter!!.getBatchDataList(),productId,)
@@ -3694,9 +3705,10 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                             for (batchModel in batchProducts) {
 
                                 batchListSave =
-                                    batchProducts.filter { it.batchQty!!.toDouble() > 0.0 } as
+                                    batchProducts.filter {it.batchQty!!.isNotEmpty() && it.batchQty!!.toDouble() > 0.0} as
                                             ArrayList<BatchDetailModule>
                             }
+                            Log.w("batcarray1aa", "" + batchListSave!!.size)
                         }
                     }
                     model1 = GoodReceiptSaveDetail(

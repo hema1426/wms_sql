@@ -2497,7 +2497,7 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                 val taxType = customerDetails!!.get(0).taxType
                 Log.w("GivenEditTax:", net_tax.toString() + "")
                 Log.w("GivenNetTotalValues:", net_total.toString() + "")
-
+                Log.w("GivenSubTotal:", net_sub_total.toString() + "")
 
                 /*     if (customerDetails.get(0).getTaxType().equals("I")){
                     subTotal.setText(Utils.twoDecimalPoint(net_total));

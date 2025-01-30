@@ -1236,7 +1236,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.update(CREATE_INVOICE_TABLE, contentValues, "update_time = ?", new String[]{updateTime});
                 //db.update(CREATE_INVOICE_TABLE, contentValues, "product_code = ?", new String[]{productCode});
                 Log.w("Cart_updated", "Success");
-                Toast.makeText(context, "Product Updated Successfully", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Product Updated Successfully", Toast.LENGTH_SHORT).show();
                 Log.w("InsertProductValuesIn1:", contentValues.toString());
             } else {
 
