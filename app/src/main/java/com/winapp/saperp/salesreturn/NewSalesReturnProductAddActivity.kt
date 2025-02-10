@@ -254,6 +254,14 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
     private var salesPrintList: ArrayList<SalesList>? = null
     private var uomSpinnerLayl: LinearLayout? = null
     private var uomSpinner: Spinner? = null
+    private var custNameShared: String? = ""
+    private var custCodeShared: String? = ""
+    private var custHavetaxShared: String? = ""
+    private var custTaxCodeShared: String? = ""
+    private var custTaxTypeShared: String? = ""
+    private var custTaxPercentShared: String? = ""
+    private var saleable_editVal: String? = ""
+    private var damage_editVal: String? = ""
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -361,6 +369,14 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
         val df = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val formattedDate = df.format(c)
         invoiceDate!!.setText(formattedDate)
+
+        sharedPreferenceUtil!!.setStringPreference(sharedPreferenceUtil!!.KEY_CUSTOMER_NAME, "")
+        sharedPreferenceUtil!!.setStringPreference(sharedPreferenceUtil!!.KEY_CUSTOMER_CODE, "")
+        sharedPreferenceUtil!!.setStringPreference(sharedPreferenceUtil!!.KEY_CUSTOMER_TAXPERCENTAGE, "")
+        sharedPreferenceUtil!!.setStringPreference(sharedPreferenceUtil!!.KEY_CUSTOMER_HAVETAX, "")
+        sharedPreferenceUtil!!.setStringPreference(sharedPreferenceUtil!!.KEY_CUSTOMER_TAXCODE, "")
+        sharedPreferenceUtil!!.setStringPreference(sharedPreferenceUtil!!.KEY_CUSTOMER_TAXTYPE, "")
+
         if (intent != null) {
             customerNameText!!.setText(intent.getStringExtra("customerName"))
             customerCode = intent.getStringExtra("customerCode")
@@ -1118,6 +1134,15 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 foc = focEditText!!.text.toString()
             }
             val priceValue = 0.0
+            var saleable = "0"
+            var damaged = "0"
+            if (!expiryReturnQty!!.text.toString().isEmpty()) {
+                saleable = expiryReturnQty!!.text.toString()
+            }
+            if (!damageReturnQty!!.text.toString().isEmpty()) {
+                damaged = damageReturnQty!!.text.toString()
+            }
+
             val net_qty = qty_value.toDouble() - return_qty.toDouble()
             val return_amt = return_qty.toDouble() * price_value.toDouble()
             val total = net_qty * price_value.toDouble()
@@ -1146,8 +1171,8 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 taxValueText!!.text.toString(),
                 netTotalValue!!.text.toString(), "",
                 "",
-                "",
-                "",
+                saleable,
+                damaged,
                 "",
                 "","",timeStamp,"","")
 
@@ -1275,7 +1300,11 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                         stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
                         stockQtyValue!!.text = model.stockQty
                         stockCount!!.setText(model.stockQty)
+                        damage_editVal = model.damagedQty
+                        saleable_editVal = model.saleableQty
 
+                        expiryReturnQty!!.setText(saleable_editVal)
+                        damageReturnQty!!.setText(damage_editVal)
                         uomValueVisible(model.uomCode)
 
                         /* for (ProductsModel m:productList) {
@@ -1974,9 +2003,27 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
         //  "taxName":"Sales Standard Rated Supplier SR","taxPercentage":"7.000000","balance":"21.600000","outstandingAmount":"128.400000",
         //  "address":"","street":"","city":"","state":"","zipCode":"","country":"","createDate":"13\/07\/2021","updateDate":"30\/07\/2021",
         //  "active":"N","remark":""}]}
-        val detailsArray = customerResponse.optJSONArray("responseData")
-        val `object` = detailsArray.optJSONObject(0)
+
+//        val detailsArray = customerResponse.optJSONArray("responseData")
+//        val `object` = detailsArray.optJSONObject(0)
         try {
+            custNameShared = sharedPreferenceUtil!!.getStringPreference(
+                sharedPreferenceUtil!!.KEY_CUSTOMER_NAME, "")
+
+            custCodeShared = sharedPreferenceUtil!!.getStringPreference(
+                sharedPreferenceUtil!!.KEY_CUSTOMER_CODE, "")
+
+            custHavetaxShared = sharedPreferenceUtil!!.getStringPreference(
+                sharedPreferenceUtil!!.KEY_CUSTOMER_HAVETAX, "")
+
+            custTaxCodeShared = sharedPreferenceUtil!!.getStringPreference(
+                sharedPreferenceUtil!!.KEY_CUSTOMER_TAXCODE, "")
+
+            custTaxTypeShared = sharedPreferenceUtil!!.getStringPreference(
+                sharedPreferenceUtil!!.KEY_CUSTOMER_TAXTYPE, "")
+
+            custTaxPercentShared = sharedPreferenceUtil!!.getStringPreference(
+                sharedPreferenceUtil!!.KEY_CUSTOMER_TAXPERCENTAGE, "")
             // Sales Header Add values
             /*  if (activityFrom.equals("InvoiceEdit")){
                 rootJsonObject.put("invoiceNumber", AddInvoiceActivity.editInvoiceNumber);
@@ -2006,12 +2053,12 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
             }
             rootJsonObject.put("soDate", currentDate)
             rootJsonObject.put("currentDateTime", currentSaveDateTime)
-            rootJsonObject.put("customerCode", `object`["customerCode"])
-            rootJsonObject.put("customerName", `object`["customerName"])
-            rootJsonObject.put("address", `object`["address"])
-            rootJsonObject.put("street", `object`["street"])
-            rootJsonObject.put("city", `object`["city"])
-            rootJsonObject.put("creditLimit", `object`["creditLimit"])
+            rootJsonObject.put("customerCode", custCodeShared)
+            rootJsonObject.put("customerName", custNameShared)
+            rootJsonObject.put("address", "")
+            rootJsonObject.put("street", "")
+            rootJsonObject.put("city", "")
+            rootJsonObject.put("creditLimit", "")
             rootJsonObject.put("remark", remarkText!!.text.toString())
             rootJsonObject.put("currencyName", "Singapore Dollar")
             rootJsonObject.put("taxTotal", taxValueText!!.text.toString())
@@ -2024,19 +2071,19 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
             rootJsonObject.put("billDiscountPercentage", "0.00")
             rootJsonObject.put("deliveryCode", SettingUtils.getDeliveryAddressCode())
             rootJsonObject.put("delCustomerName", "")
-            rootJsonObject.put("delAddress1", `object`.optString("delAddress1"))
-            rootJsonObject.put("delAddress2 ", `object`.optString("delAddress2"))
-            rootJsonObject.put("delAddress3 ", `object`.optString("delAddress3"))
-            rootJsonObject.put("delPhoneNo", `object`.optString("contactNo"))
-            rootJsonObject.put("remark", `object`.optString("remark"))
-            rootJsonObject.put("haveTax", `object`.optString("haveTax"))
-            rootJsonObject.put("taxType", `object`.optString("taxType"))
-            rootJsonObject.put("taxPerc", `object`.optString("taxPercentage"))
-            rootJsonObject.put("taxCode", `object`.optString("taxCode"))
-            rootJsonObject.put("currencyCode", `object`.optString("currencyCode"))
+            rootJsonObject.put("delAddress1", "")
+            rootJsonObject.put("delAddress2 ", "")
+            rootJsonObject.put("delAddress3 ", "")
+            rootJsonObject.put("delPhoneNo", "")
+            rootJsonObject.put("remark", "")
+            rootJsonObject.put("haveTax", custHavetaxShared)
+            rootJsonObject.put("taxType", custTaxTypeShared)
+            rootJsonObject.put("taxPerc", custTaxPercentShared)
+            rootJsonObject.put("taxCode", custTaxCodeShared)
+            rootJsonObject.put("currencyCode", "")
             rootJsonObject.put("currencyValue", "")
             rootJsonObject.put("CurrencyRate", "1")
-            rootJsonObject.put("postalCode", `object`.optString("postalCode"))
+            rootJsonObject.put("postalCode", "")
             rootJsonObject.put("createUser", username)
             rootJsonObject.put("modifyUser", username)
             rootJsonObject.put("companyName", companyName)
@@ -2070,8 +2117,9 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 invoiceObject.put("totalTax", Utils.twoDecimalPoint(model.gstAmount.toDouble()))
                 invoiceObject.put("subTotal", Utils.twoDecimalPoint(model.subTotal.toDouble()))
                 invoiceObject.put("netTotal", Utils.twoDecimalPoint(model.netTotal.toDouble()))
-                invoiceObject.put("taxType", `object`.optString("taxType"))
-                invoiceObject.put("taxPerc", `object`.optString("taxPercentage"))
+                invoiceObject.put("taxType", custTaxTypeShared)
+                invoiceObject.put("taxPerc", custTaxPercentShared)
+                invoiceObject.put("taxCode", custTaxCodeShared)
                 var return_subtotal = 0.0
                 if (model.returnQty != null && !model.returnQty.isEmpty() && model.returnQty != "null") {
                     return_subtotal = model.returnQty.toDouble() * model.price.toDouble()
@@ -2091,7 +2139,6 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 }
                 invoiceObject.put("returnSubTotal", return_subtotal.toString() + "")
                 invoiceObject.put("returnNetTotal", return_subtotal.toString() + "")
-                invoiceObject.put("taxCode", `object`.optString("taxCode"))
                 invoiceObject.put("uomCode", model.uomCode)
                 invoiceObject.put("itemRemarks", "")
                 invoiceObject.put("locationCode", locationCode)

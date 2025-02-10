@@ -48,7 +48,7 @@ public class goodReceiptPrintPreviewAdapter extends RecyclerView.Adapter<goodRec
         viewHolder.slNo.setText(String.valueOf(position+1));
         viewHolder.code.setText(salesList.getProductCode());
         if (salesList.getUomCode()!=null && !salesList.getUomCode().equals("null") && !salesList.getUomCode().isEmpty()){
-            viewHolder.description.setText(salesList.getDescription()+"("+salesList.getUomCode()+")");
+            viewHolder.description.setText(salesList.getDescription()+" ("+salesList.getUomCode()+")");
         }else {
             viewHolder.description.setText(salesList.getDescription());
         }
@@ -77,7 +77,7 @@ public class goodReceiptPrintPreviewAdapter extends RecyclerView.Adapter<goodRec
                 }
             }
             else{
-                viewHolder.price.setText(salesList.getPricevalue());
+                viewHolder.price.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getPricevalue())));
                 viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getTotal())));
             }
         }

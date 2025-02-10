@@ -330,6 +330,8 @@ public class GoodReceiptAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     salesListModel.setNetQty(detailObject.optString("quantity"));
                                     salesListModel.setCartonPrice(detailObject.optString("cartonPrice"));
                                     salesListModel.setUnitPrice(detailObject.optString("price"));
+                                    salesListModel.setUomCode(detailObject.optString("uomCode"));
+
 //                                    salesListModel.setGrossPrice(detailObject.optString("grossPrice"));
 
                                     double qty=Double.parseDouble(detailObject.optString("quantity"));

@@ -14,12 +14,14 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,9 +41,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.winapp.saperp.R;
 import com.winapp.saperp.adapter.StockTakeAddAdapter;
+import com.winapp.saperp.adapter.StockTakeAddAdapter1;
+import com.winapp.saperp.model.AllCategories;
+import com.winapp.saperp.model.CustomerGroupModel;
 import com.winapp.saperp.model.ItemGroupList;
+import com.winapp.saperp.model.ProductsModel;
 import com.winapp.saperp.newtransfer.LocationModel;
-import com.winapp.saperp.newtransfer.TransferInModel;
 import com.winapp.saperp.utils.CaptureSignatureView;
 import com.winapp.saperp.utils.Constants;
 import com.winapp.saperp.utils.ImageUtil;
@@ -64,18 +69,18 @@ import java.util.Objects;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class StockTakeAddActivity extends AppCompatActivity {
+public class StockTakeAddActivity1 extends AppCompatActivity {
     SweetAlertDialog pDialog;
-    private ArrayList<TransferInModel> transferInModels;
-    private ArrayList<TransferInModel.TransferInDetails> transferInDetailsl;
+    private ArrayList<ProductsModel> productList;
     private ArrayList<LocationModel.LocationDetails> locationDetailsl;
-    public StockTakeAddAdapter stockTakeAddAdapter;
+    public StockTakeAddAdapter1 stockTakeAddAdapter;
     public RecyclerView rv_takeAddView;
     public TextView pdtsizel;
     public TextView toolbartxt;
     public LinearLayout toolbarImglay;
     public ImageView saveImg;
     int count=0;
+    public ArrayList<AllCategories> allCategoriesList;
 
     private ArrayList<ItemGroupList> itemGroup;
     private AppCompatSpinner groupspinner;
@@ -97,6 +102,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
     private ImageView cancelSheet;
     public static TextView selectedBank;
     private Button cancelButton;
+    private Spinner pdt_categories_spinnerl;
     private Button okButton;
     public static EditText amountText;
     private AlertDialog alert;
@@ -148,9 +154,9 @@ public class StockTakeAddActivity extends AppCompatActivity {
         saveImg= findViewById(R.id.save_image);
         toolbarImglay= findViewById(R.id.iv_customtoolbar_img);
         toolbartxt= findViewById(R.id.tv_customtoolbar_title);
+        pdt_categories_spinnerl= findViewById(R.id.pdt_categories_spinner);
 
         default_uom_transfl.setText(settingUOMval);
-        transferInDetailsl=new ArrayList<>();
 
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
@@ -171,9 +177,9 @@ public class StockTakeAddActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int count=0;
-                for(int i = 0; i<transferInDetailsl.size(); i++){
-                    if(!transferInDetailsl.get(i).getQty().isEmpty()){
-                        count+=Integer.parseInt(transferInDetailsl.get(i).getQty());
+                for(int i = 0; i< productList.size(); i++){
+                    if(!productList.get(i).getQty().isEmpty()){
+                        count+=Integer.parseInt(productList.get(i).getQty());
                     }
                 }
                 if (count>0){
@@ -187,9 +193,9 @@ public class StockTakeAddActivity extends AppCompatActivity {
         saveImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i = 0; i<transferInDetailsl.size(); i++){
-                    if(!transferInDetailsl.get(i).getQty().isEmpty()){
-                        count+=Integer.parseInt(transferInDetailsl.get(i).getQty());
+                for(int i = 0; i< productList.size(); i++){
+                    if(!productList.get(i).getQty().isEmpty()){
+                        count+=Integer.parseInt(productList.get(i).getQty());
                     }
                 }
                 Log.e("qqty",""+count);
@@ -217,7 +223,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
             }
         });
 
-        if(transferInDetailsl == null ){
+        if(productList == null ){
             emptytxt.setVisibility(View.VISIBLE);
             pdtsizel.setVisibility(View.GONE);
             search_ed.setEnabled(false);
@@ -226,6 +232,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
 
         try {
            // getGrouplist();
+            getCategories();
             getLocationlist();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -245,8 +252,8 @@ public class StockTakeAddActivity extends AppCompatActivity {
                   //  Log.w("transFiltSize",""+transferInDetailsl.size());
 
                 }else{
-                    Log.w("transFiltSizeaa",""+transferInDetailsl.size());
-                    setStockTakeAddAdapter(transferInDetailsl);
+                    Log.w("transFiltSizeaa",""+ productList.size());
+                    setStockTakeAddAdapter(productList);
                 }
             }
 
@@ -261,9 +268,9 @@ public class StockTakeAddActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             int count=0;
-            for(int i = 0; i<transferInDetailsl.size(); i++){
-                if(!transferInDetailsl.get(i).getQty().isEmpty()){
-                    count+=Integer.parseInt(transferInDetailsl.get(i).getQty());
+            for(int i = 0; i< productList.size(); i++){
+                if( productList.get(i).getQty()!= null && !productList.get(i).getQty().isEmpty()){
+                    count+=Integer.parseInt(productList.get(i).getQty());
                 }
             }
             if (count>0){
@@ -280,7 +287,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
     }
 
     public void showDeleteAlert(){
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(StockTakeAddActivity.this);
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(StockTakeAddActivity1.this);
         builder1.setMessage("Data Will be Cleared are you sure want to back?");
         builder1.setCancelable(false);
         builder1.setPositiveButton("Yes",
@@ -303,14 +310,14 @@ public class StockTakeAddActivity extends AppCompatActivity {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setStockTakeAddAdapter(ArrayList<TransferInModel.TransferInDetails> transferInList){
+    public void setStockTakeAddAdapter(ArrayList<ProductsModel> transferInList){
         try {
             rv_takeAddView.setVisibility(View.VISIBLE);
             pdtsizel.setVisibility(View.VISIBLE);
             search_ed.setEnabled(true);
             emptytxt.setVisibility(View.GONE);
             pdtsizel.setText(transferInList.size()+" Products");
-            stockTakeAddAdapter = new StockTakeAddAdapter(getApplicationContext(), transferInList);
+            stockTakeAddAdapter = new StockTakeAddAdapter1(getApplicationContext(), transferInList);
             rv_takeAddView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
             rv_takeAddView.setItemAnimator(new DefaultItemAnimator());
             rv_takeAddView.setAdapter(stockTakeAddAdapter);
@@ -421,7 +428,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
         LinearLayout mContent = customLayout.findViewById(R.id.signature_layout);
         acceptButton.setEnabled(false);
         acceptButton.setAlpha(0.4f);
-        CaptureSignatureView mSig = new CaptureSignatureView(StockTakeAddActivity.this, null, new CaptureSignatureView.OnSignatureDraw() {
+        CaptureSignatureView mSig = new CaptureSignatureView(StockTakeAddActivity1.this, null, new CaptureSignatureView.OnSignatureDraw() {
             @Override
             public void onSignatureCreated() {
                 acceptButton.setEnabled(true);
@@ -481,7 +488,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
 
         // Sales Details Add to the Objects
         int index=1;
-        for (TransferInModel.TransferInDetails model:transferInDetailsl){
+        for (ProductsModel model: productList){
             if(model.getQty()!=null && !model.getQty().isEmpty() && Integer.parseInt(model.getQty())> 0){
                 Log.w("takeQtyaa",""+model.getQty());
 
@@ -491,7 +498,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
                 itemsObject.put("qty",String.valueOf(model.getQty()));
                 itemsObject.put("price","");
                 itemsObject.put("WarehouseCode",fromWarehouseCode);
-                itemsObject.put("UomCode",model.getInventoryUOM());
+                itemsObject.put("UomCode",model.getUomCode());
 
                 itemsArray.put(itemsObject);
                 index++;
@@ -507,7 +514,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
 
     public  void saveTransferOrRequest(JSONObject jsonBody, int copy){
         try {
-            pDialog = new SweetAlertDialog(StockTakeAddActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog = new SweetAlertDialog(StockTakeAddActivity1.this, SweetAlertDialog.PROGRESS_TYPE);
             pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
             pDialog.setCancelable(false);
             RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -593,12 +600,12 @@ public class StockTakeAddActivity extends AppCompatActivity {
     private void filter(String text) {
         try {
             //new array list that will hold the filtered data
-            ArrayList<TransferInModel.TransferInDetails> filterProducts = new ArrayList<>();
+            ArrayList<ProductsModel> filterProducts = new ArrayList<>();
             //looping through existing elements
             //   for (ProductsModel s : selectProductAdapter.getProductsList()) {
             emptytxt.setVisibility(View.GONE);
 
-            for (TransferInModel.TransferInDetails s : transferInDetailsl) {
+            for (ProductsModel s : productList) {
                 //if the existing elements contains the search input
                 if (s.getProductName().toLowerCase().contains(text.toLowerCase()) ||
                         s.getProductCode().toLowerCase().contains(text.toLowerCase())) {
@@ -637,124 +644,374 @@ public class StockTakeAddActivity extends AppCompatActivity {
 //        transferInAdapter.updateList(temp);
 //    }
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void getTakeAdd(String warehouseCode,String itemGroupCode) {
-        String url;
-        try {
+//    private void getTakeAdd(String warehouseCode,String itemGroupCode) {
+//        String url;
+//        try {
+//
+//            JSONObject jsonObj = new JSONObject();
+//            jsonObj.put("WarehouseCode", warehouseCode);
+//            jsonObj.put("ItemGroupCode", itemGroupCode);
+//
+//            RequestQueue requestQueue = Volley.newRequestQueue(this);
+//            url= Utils.getBaseUrl(this) +"ProductList";
+//            Log.w("pdtlist_urlTransAdd:", url+jsonObj);
+//            pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+//            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+//            pDialog.setTitleText("Loading...");
+//            pDialog.setCancelable(false);
+//            pDialog.show();
+//
+//            transferInModels = new ArrayList<>();
+//            stockTakeList = new ArrayList<>();
+//
+//            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+//                    Request.Method.POST,
+//                    url,
+//                    jsonObj,
+//                    response -> {
+//                        try {
+//                            pDialog.dismiss();
+//
+//                            Log.w("pdtlistTransAdd:", response.toString());
+//
+//                            //pDialog.dismiss();
+//                            String statusCode = response.optString("statusCode");
+//                            String statusMessage = response.optString("statusMessage");
+//                            if (statusCode.equals("1")) {
+//                                TransferInModel transferInModel = new TransferInModel();
+//
+//                                JSONArray pdtArray = response.optJSONArray("responseData");
+//
+//                                for (int i = 0; i < pdtArray.length(); i++) {
+//                                    JSONObject jsonObject = pdtArray.getJSONObject(i);
+//
+////                                    if (transferType.equals("Transfer In")) {
+////                                        if (jsonObject.optInt("stockInHand") > 0){
+////                                            TransferInModel.TransferInDetails transferInDetails = new TransferInModel.TransferInDetails();
+////                                            transferInDetails.setProductName(jsonObject.optString("productName"));
+////                                            transferInDetails.setProductCode(jsonObject.optString("productCode"));
+////                                            transferInDetails.setStockInHand((jsonObject.optInt("stockInHand")));
+////                                            transferInDetails.setQty("");
+////                                            transferInDetails.setInventoryUOM(jsonObject.optString("defaultInventoryUOM"));
+////                                            transferInDetailsl.add(transferInDetails);
+////                                        }
+////                                    } else {
+//                                        TransferInModel.TransferInDetails transferInDetails = new TransferInModel.TransferInDetails();
+//                                        transferInDetails.setProductName(jsonObject.optString("productName"));
+//                                        transferInDetails.setProductCode(jsonObject.optString("productCode"));
+//                                        transferInDetails.setStockInHand((jsonObject.optInt("stockInHand")));
+//                                        transferInDetails.setQty("");
+//                                        transferInDetails.setInventoryUOM(jsonObject.optString("defaultInventoryUOM"));
+//                                        stockTakeList.add(transferInDetails);
+//                                  //  }
+//                                }
+//                                Log.w("entrTake_ddd",""+ stockTakeList.size());
+//
+//                                if (stockTakeList.size() > 0) {
+//                                    transferInModel.setTransferInDetails(stockTakeList);
+//                                    setStockTakeAddAdapter(stockTakeList);
+//                                    Log.w("entrTake",""+ stockTakeList.size());
+//                                }
+//                            } else{
+//                                stockTakeAddAdapter.notifyDataSetChanged();
+//                                stockTakeList.clear();
+//                                rv_takeAddView.setAdapter(null);
+//                                pdtsizel.setText("0 Products");
+//                                Toast.makeText(getApplicationContext(),statusMessage,Toast.LENGTH_SHORT).show();
+//                                Log.w("entrTake","");
+//
+//                            }
+//
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                    }, error -> {
+//                // Do something when error occurred
+//                // pDialog.dismiss();
+//                Log.w("Error_throwing:", error.toString());
+//            }) {
+//                @Override
+//                public Map<String, String> getHeaders() {
+//                    HashMap<String, String> params = new HashMap<>();
+//                    String creds = String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD);
+//                    String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+//                    params.put("Authorization", auth);
+//                    return params;
+//                }
+//            };
+//
+//            jsonObjectRequest.setRetryPolicy(new RetryPolicy() {
+//                @Override
+//                public int getCurrentTimeout() {
+//                    return 50000;
+//                }
+//
+//                @Override
+//                public int getCurrentRetryCount() {
+//                    return 50000;
+//                }
+//
+//                @Override
+//                public void retry(VolleyError error) throws VolleyError {
+//
+//                }
+//            });
+//            // Add JsonArrayRequest to the RequestQueue
+//            requestQueue.add(jsonObjectRequest);
+//
+//        } catch (Exception e) {
+//        }
+//    }
 
-            JSONObject jsonObj = new JSONObject();
-            jsonObj.put("WarehouseCode", warehouseCode);
-            jsonObj.put("ItemGroupCode", itemGroupCode);
+    public void getCategories() {
+        // Initialize a new RequestQueue instance
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = Utils.getBaseUrl(this) + "CategoryList";
+        // Initialize a new JsonArrayRequest instance
 
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            url= Utils.getBaseUrl(this) +"ProductList";
-            Log.w("pdtlist_urlTransAdd:", url+jsonObj);
-            pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-            pDialog.setTitleText("Loading...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-            transferInModels = new ArrayList<>();
-            transferInDetailsl = new ArrayList<>();
-
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    Request.Method.POST,
-                    url,
-                    jsonObj,
-                    response -> {
-                        try {
-                            pDialog.dismiss();
-
-                            Log.w("pdtlistTransAdd:", response.toString());
-
-                            //pDialog.dismiss();
-                            String statusCode = response.optString("statusCode");
-                            String statusMessage = response.optString("statusMessage");
-                            if (statusCode.equals("1")) {
-                                TransferInModel transferInModel = new TransferInModel();
-
-                                JSONArray pdtArray = response.optJSONArray("responseData");
-
-                                for (int i = 0; i < pdtArray.length(); i++) {
-                                    JSONObject jsonObject = pdtArray.getJSONObject(i);
-
-//                                    if (transferType.equals("Transfer In")) {
-//                                        if (jsonObject.optInt("stockInHand") > 0){
-//                                            TransferInModel.TransferInDetails transferInDetails = new TransferInModel.TransferInDetails();
-//                                            transferInDetails.setProductName(jsonObject.optString("productName"));
-//                                            transferInDetails.setProductCode(jsonObject.optString("productCode"));
-//                                            transferInDetails.setStockInHand((jsonObject.optInt("stockInHand")));
-//                                            transferInDetails.setQty("");
-//                                            transferInDetails.setInventoryUOM(jsonObject.optString("defaultInventoryUOM"));
-//                                            transferInDetailsl.add(transferInDetails);
-//                                        }
-//                                    } else {
-                                        TransferInModel.TransferInDetails transferInDetails = new TransferInModel.TransferInDetails();
-                                        transferInDetails.setProductName(jsonObject.optString("productName"));
-                                        transferInDetails.setProductCode(jsonObject.optString("productCode"));
-                                        transferInDetails.setStockInHand((jsonObject.optInt("stockInHand")));
-                                        transferInDetails.setQty("");
-                                        transferInDetails.setInventoryUOM(jsonObject.optString("defaultInventoryUOM"));
-                                        transferInDetailsl.add(transferInDetails);
-                                  //  }
-                                }
-                                Log.w("entrTake_ddd",""+transferInDetailsl.size());
-
-                                if (transferInDetailsl.size() > 0) {
-                                    transferInModel.setTransferInDetails(transferInDetailsl);
-                                    setStockTakeAddAdapter(transferInDetailsl);
-                                    Log.w("entrTake",""+transferInDetailsl.size());
-                                }
-                            } else{
-                                stockTakeAddAdapter.notifyDataSetChanged();
-                                transferInDetailsl.clear();
-                                rv_takeAddView.setAdapter(null);
-                                pdtsizel.setText("0 Products");
-                                Toast.makeText(getApplicationContext(),statusMessage,Toast.LENGTH_SHORT).show();
-                                Log.w("entrTake","");
-
+        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Categories Loading...");
+        pDialog.setCancelable(false);
+      //  pDialog.show();
+        Log.w("Given_url_catal:",url);
+        allCategoriesList = new ArrayList<>();
+        JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        Log.w("Response_Category:", response.toString());
+                        // Loop through the array elements
+                        String statusCode = response.optString("statusCode");
+                        JSONArray detailArray = response.optJSONArray("responseData");
+                        pDialog.dismiss();
+                        if (statusCode.equals("1")) {
+                            for (int i = 0; i < detailArray.length(); i++) {
+                                // Get current json object
+                                JSONObject categoryObject = detailArray.getJSONObject(i);
+                                // if (categoryObject.optBoolean("IsActive")){
+                                AllCategories categories = new AllCategories();
+                                //  categories.setCompanyCode(categoryObject.optString("CompanyCode"));
+                                categories.setCategoryCode(categoryObject.optString("categoryCode"));
+                                categories.setCateGoryGroupName(categoryObject.optString("categoryName"));
+                                categories.setDescription(categoryObject.optString("categoryName"));
+                                // categories.setDisplayOrder(categoryObject.optString("DisplayOrder"));
+                                // categories.setShowOnPos(categoryObject.optBoolean("ShowOnPOS"));
+                                // categories.setActive(categoryObject.optBoolean("IsActive"));
+                                // categories.setCategoryImage(categoryObject.getString("CategoryImagePath"));
+                                allCategoriesList.add(categories);
+                                //}
                             }
+                            pDialog.dismiss();
+                            if (allCategoriesList.size() > 0) {
+                                setPdtCategoriesSpinner(allCategoriesList);
+                                JSONObject jsonObject=new JSONObject();
+//                                try {
+//                                    jsonObject.put("CategoryCode",allCategoriesList.get(0).categoryCode);
+//                                    jsonObject.put("LocationCode",locationCode);
+//                                    getAllProducts(jsonObject);
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                                // viewPager.setVisibility(View.VISIBLE);
+                               // emptyLayout.setVisibility(View.GONE);
+                            } else {
+                              //  emptyLayout.setVisibility(View.VISIBLE);
+                              //  viewPager.setVisibility(View.GONE);
+                            }
+                        } else {
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    // Do something when error occurred
+                    pDialog.dismiss();
+                    Log.w("Error_throwing:", error.toString());
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> params = new HashMap<>();
+                String creds = String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD);
+                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+                params.put("Authorization", auth);
+                return params;
+            }
+        };
+
+        jsonArrayRequest.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 50000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
+        // Add JsonArrayRequest to the RequestQueue
+        requestQueue.add(jsonArrayRequest);
+    }
+    public void setPdtCategoriesSpinner(ArrayList<AllCategories> allCategoriesList) {
+        ArrayAdapter<CustomerGroupModel> adapter = new ArrayAdapter(getApplicationContext(),
+                android.R.layout.simple_list_item_1, allCategoriesList);
+        pdt_categories_spinnerl.setAdapter(adapter);
+        pdt_categories_spinnerl.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String categCode = allCategoriesList.get(position).getCategoryCode();
+                String categName = allCategoriesList.get(position).getCategoryName();
+                JSONObject jsonObject=new JSONObject();
+                try {
+                    jsonObject.put("CompanyCode",companyCode);
+                    jsonObject.put("LocationCode",fromWarehouseCode);
+                    jsonObject.put("CategoryCode",categCode);
+                    jsonObject.put("PageSize",50);
+                    jsonObject.put("PageNo",1);
+                    getAllProducts(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    public void getAllProducts(JSONObject jsonObject){
+        // Initialize a new RequestQueue instance
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url=Utils.getBaseUrl(this) +"CategoryDetails";
+        // Initialize a new JsonArrayRequest instance
+        Log.w("Given_categ_pdt_url:",url+"--"+jsonObject.toString());
+        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Product Loading...");
+        pDialog.setCancelable(false);
+      //  pDialog.show();
+        productList = new ArrayList<>();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
+                jsonObject,
+                response -> {
+                    try{
+                        Log.w("ResCateg_pdt:",response.toString());
+                        // Loop through the array elements
+                        String statusCode=response.optString("statusCode");
+                        String statusMessage = response.optString("statusMessage");
+                        if (statusCode.equals("1")){
+                            JSONArray responseData=response.optJSONArray("responseData");
+                            JSONObject responseObject=responseData.getJSONObject(0);
+                            JSONArray detailsArray=responseObject.optJSONArray("productDetails");
+                            for(int i=0;i<detailsArray.length();i++){
+                                // Get current json object
+                                JSONObject productObject = detailsArray.getJSONObject(i);
+                                ProductsModel product =new ProductsModel();
+                                // if (productObject.optBoolean("IsActive")) {
+                                product.setCompanyCode(productObject.optString("CompanyCode"));
+                                product.setProductName(productObject.optString("productName"));
+                                product.setProductCode(productObject.optString("productCode"));
+                                product.setWeight("0.00");
+                                product.setProductImage(productObject.optString("imageURL"));
+                                product.setWholeSalePrice(productObject.optString("price"));
+                                product.setRetailPrice(productObject.optDouble("price"));
+                                product.setCartonPrice(productObject.optString("price"));
+                                product.setUnitCost(productObject.optString("price"));
+                                product.setLastPrice( productObject.optString("lastSalesPrice"));
+                                product.setPcsPerCarton(productObject.optString("pcsPerCarton"));
+                                product.setDefaultUom(productObject.optString("defaultSalesUOM"));
+                                if(!productObject.optString("uomCode").isEmpty() || productObject.optString("uomCode")!= null){
+                                    product.setUomCode(productObject.optString("uomCode"));
+                                }
+                                else{
+                                    product.setUomCode("PCS");
+                                }
+                                product.setStockQty(productObject.optString("stockInHand"));
+                                // newProductList.add(product);
+                                productList.add(product);
+//                                pDialog.dismiss();
+//
+                                // }
+                            }
+                            if (productList.size() > 0) {
+                                Log.w("pdtsizeCatgry",""+ productList.size());
+                                if(stockTakeAddAdapter != null){
+                                    stockTakeAddAdapter.updateList(productList);
+                                    rv_takeAddView.setVisibility(View.VISIBLE);
+                                    pdtsizel.setVisibility(View.VISIBLE);
+                                    search_ed.setEnabled(true);
+                                    emptytxt.setVisibility(View.GONE);
+                                    pdtsizel.setText(productList.size()+" Products");
+                                    Log.w("entrTake1","");
+                                }else {
+                                    setStockTakeAddAdapter(productList);
+                                    Log.w("entrTake2","");
+                                }
+
+                            }else {
+                                Log.w("entrTake","");
+                                 stockTakeAddAdapter.notifyDataSetChanged();
+                                productList.clear();
+                                rv_takeAddView.setAdapter(null);
+                                emptytxt.setVisibility(View.VISIBLE);
+                                pdtsizel.setText("0 Products");
+                            }
+                        }else {
+                            stockTakeAddAdapter.notifyDataSetChanged();
+                            productList.clear();
+                            rv_takeAddView.setAdapter(null);
+                            emptytxt.setVisibility(View.VISIBLE);
+                            pdtsizel.setText("0 Products");
+                            Toast.makeText(getApplicationContext(),statusMessage,Toast.LENGTH_SHORT).show();
+                            Log.w("entrTake","");
+
                         }
 
-                    }, error -> {
-                // Do something when error occurred
-                // pDialog.dismiss();
-                Log.w("Error_throwing:", error.toString());
-            }) {
-                @Override
-                public Map<String, String> getHeaders() {
-                    HashMap<String, String> params = new HashMap<>();
-                    String creds = String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD);
-                    String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
-                    params.put("Authorization", auth);
-                    return params;
-                }
-            };
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    pDialog.dismiss();
+                },
+                error -> {
+                   // emptyLayout.setVisibility(View.GONE);
+                    // Do something when error occurred
+                     pDialog.dismiss();
+                    Log.w("Error_throwing:",error.toString());
+                }){
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> params = new HashMap<>();
+                String creds = String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD);
+                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+                params.put("Authorization", auth);
+                return params;
+            }
+        };
+        jsonObjectRequest.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 50000;
+            }
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
 
-            jsonObjectRequest.setRetryPolicy(new RetryPolicy() {
-                @Override
-                public int getCurrentTimeout() {
-                    return 50000;
-                }
-
-                @Override
-                public int getCurrentRetryCount() {
-                    return 50000;
-                }
-
-                @Override
-                public void retry(VolleyError error) throws VolleyError {
-
-                }
-            });
-            // Add JsonArrayRequest to the RequestQueue
-            requestQueue.add(jsonObjectRequest);
-
-        } catch (Exception e) {
-        }
+            }
+        });
+        // Add JsonArrayRequest to the RequestQueue
+        requestQueue.add(jsonObjectRequest);
     }
 
     private void getLocationlist() throws JSONException {
@@ -858,7 +1115,7 @@ public class StockTakeAddActivity extends AppCompatActivity {
                          fromWarehouseName = locationDetailsArrayList.get(i).getLocationName();
                      }
                  }
-                     getTakeAdd(fromWarehouseCode,"All");
+                  //   getTakeAdd(fromWarehouseCode,"All");
                      dialog.dismiss();
              }
          });

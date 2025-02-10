@@ -102,4 +102,8 @@ public class AllCategories {
     public void setShowOnPos(boolean showOnPos) {
         this.showOnPos = showOnPos;
     }
+
+    public String toString() {
+        return  description;
+    }
 }

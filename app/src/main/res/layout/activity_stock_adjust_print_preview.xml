@@ -401,7 +401,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Code"
+                    android:text="Item Name/Code"
                     android:textColor="#042B97"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -613,30 +613,59 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/remark_gReceip_lay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:padding="5dp"
+                    android:text="Remarks : "
+                    android:textColor="@color/pink_clr1"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/remark_gRceip_preview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="normal" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
+                android:layout_marginRight="5dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
                     android:padding="5dp"
-                    android:text="Net Total  :"
+                    android:text="Net Total : "
                     android:textColor="#042B97"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/net_total"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="5dp"
+                    android:text="0.00"
                     android:textColor="#042B97"
                     android:textSize="12sp"
                     android:textStyle="bold" />

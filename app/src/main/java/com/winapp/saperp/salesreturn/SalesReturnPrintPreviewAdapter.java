@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperp.R;
+import com.winapp.saperp.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,7 @@ public class SalesReturnPrintPreviewAdapter extends RecyclerView.Adapter<SalesRe
             viewHolder.code.setText(salesReturnList.getProductCode());
             viewHolder.description.setText(salesReturnList.getDescription());
             viewHolder.qtyValue.setText(salesReturnList.getNetqty());
-            viewHolder.price.setText(salesReturnList.getPrice());
+            viewHolder.price.setText(Utils.twoDecimalPoint(Double.parseDouble(salesReturnList.getPrice())));
             viewHolder.total.setText(salesReturnList.getTotal());
         }catch (Exception e){}
     }

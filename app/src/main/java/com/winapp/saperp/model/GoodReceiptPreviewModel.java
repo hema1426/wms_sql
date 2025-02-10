@@ -24,10 +24,19 @@ public class GoodReceiptPreviewModel {
     private String address3;
 
     private String addressstate;
+    private String remark;
     private String addresssZipcode;
     private ArrayList<StockAdjustList> salesList;
 
     private String allowDeliveryAddress;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public String getAllowDeliveryAddress() {
         return allowDeliveryAddress;

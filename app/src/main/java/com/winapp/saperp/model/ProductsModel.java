@@ -33,7 +33,6 @@ public class ProductsModel {
     private String isItemFOC;
     private String isBatch;
 
-
     public String getIsBatch() {
         return isBatch;
     }

@@ -128,7 +128,6 @@ public class CategoriesActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Catalog");
 
         Log.w("activity_cg",getClass().getSimpleName().toString()+" - ProductAdapterLoadMore");
-
         // product loading apis
 //        https://c21326-EasySales-Test.cloudiax.com/api/CategoryDetails {"CategoryCode": "102", "LocationCode": "01"}
 //        https://c21326-EasySales-Test.cloudiax.com/api/CategoryList

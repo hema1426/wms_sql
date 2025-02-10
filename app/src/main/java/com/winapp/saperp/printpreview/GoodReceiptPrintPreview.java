@@ -73,7 +73,7 @@ import java.util.Objects;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class StockAdjustPrintPreview extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener {
+public class GoodReceiptPrintPreview extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener {
 
     private String companyId;
     private SweetAlertDialog pDialog;
@@ -128,8 +128,8 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
     LinearLayout address1Layout;
     LinearLayout address2Layout;
     LinearLayout address3Layout;
-    LinearLayout address4Layout;
-
+    LinearLayout address4Layout , remark_gReceip_layl;
+    public TextView remark_gRceip_txt ;
     TextView customerAddress1;
     TextView customerAddress2;
     TextView customerAddress3;
@@ -177,6 +177,8 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
         addressLayout=findViewById(R.id.adressLayout);
         rootLayout=findViewById(R.id.rootLayout);
         pdfView= (PDFView)findViewById(R.id.pdfView);
+        remark_gReceip_layl=findViewById(R.id.remark_gReceip_lay);
+        remark_gRceip_txt=findViewById(R.id.remark_gRceip_preview);
 
         companyAddress3Text=findViewById(R.id.address3);
         companyGstText=findViewById(R.id.gst_no);
@@ -321,6 +323,7 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
                             model.setSoNumber(object.optString("goodsReceiptNo"));
                             model.setSoDate(object.optString("docDate"));
                             model.setNetTotal(object.optString("docTotal"));
+                            model.setRemark(object.optString("remark"));
 //
                             JSONArray detailsArray = object.optJSONArray("goodsReceiptDetails");
 
@@ -337,6 +340,7 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
                                 salesListModel.setNetQty(detailObject.optString("quantity"));
                                 salesListModel.setCartonPrice(detailObject.optString("cartonPrice"));
                                 salesListModel.setUnitPrice(detailObject.optString("price"));
+                                salesListModel.setUomCode(detailObject.optString("uomCode"));
 //                                    salesListModel.setGrossPrice(detailObject.optString("grossPrice"));
 
                                 double qty=Double.parseDouble(detailObject.optString("quantity"));
@@ -406,13 +410,20 @@ public class StockAdjustPrintPreview extends AppCompatActivity implements OnPage
         for (GoodReceiptPreviewModel model: stockadjustHeaderDetails){
             soNumberText.setText(model.getSoNumber());
             soDateText.setText(model.getSoDate());
-            netTotalText.setText(Utils.twoDecimalPoint(Double.parseDouble(model.getNetTotal())));
 
+            if(model.getRemark() != null && !model.getRemark().isEmpty()){
+                remark_gReceip_layl.setVisibility(View.VISIBLE);
+                remark_gRceip_txt.setText(model.getRemark());
+            }else{
+                remark_gReceip_layl.setVisibility(View.GONE);
+            }
+
+            netTotalText.setText(Utils.twoDecimalPoint(Double.parseDouble(model.getNetTotal())));
             salesListView.setHasFixedSize(true);
             // RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-            salesListView.setLayoutManager(new LinearLayoutManager(StockAdjustPrintPreview.this,
+            salesListView.setLayoutManager(new LinearLayoutManager(GoodReceiptPrintPreview.this,
                     LinearLayoutManager.VERTICAL, false));
-            adapter = new goodReceiptPrintPreviewAdapter(StockAdjustPrintPreview.this, stockadjustList);
+            adapter = new goodReceiptPrintPreviewAdapter(GoodReceiptPrintPreview.this, stockadjustList);
             salesListView.setAdapter(adapter);
             rootLayout.setVisibility(View.VISIBLE);
         }

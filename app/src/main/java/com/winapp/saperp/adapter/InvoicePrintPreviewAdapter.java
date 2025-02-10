@@ -78,7 +78,7 @@ public class InvoicePrintPreviewAdapter extends RecyclerView.Adapter<InvoicePrin
                 viewHolder.price.setText(Utils.fourDecimalPoint(Double.parseDouble((invoiceList.getPricevalue()))));
                 viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getTotal())));
             }else{
-                viewHolder.price.setText(invoiceList.getPricevalue());
+                viewHolder.price.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getPricevalue())));
                 viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getTotal())));
             }
         }

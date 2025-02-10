@@ -10,23 +10,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperp.R;
-import com.winapp.saperp.newtransfer.TransferInModel;
+import com.winapp.saperp.model.ProductsModel;
 
 import java.util.ArrayList;
 
 
-public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapter.MyViewHolder> {
+public class StockTakeAddAdapter1 extends RecyclerView.Adapter<StockTakeAddAdapter1.MyViewHolder> {
     private Context context;
-    private ArrayList<TransferInModel.TransferInDetails> dataList;
+    private ArrayList<ProductsModel> dataList;
 
-    public StockTakeAddAdapter(Context context, ArrayList<TransferInModel.TransferInDetails> transferInDetailsList) {
+    public StockTakeAddAdapter1(Context context, ArrayList<ProductsModel> transferInDetailsList) {
         this.context = context;
         this.dataList = transferInDetailsList;
     }
@@ -36,7 +35,7 @@ public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapte
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MyViewHolder(LayoutInflater.from(context).inflate(R.layout.stock_take_add_item, parent, false));
     }
-    public ArrayList<TransferInModel.TransferInDetails> getTransferInlist(){
+    public ArrayList<ProductsModel> getTransferInlist(){
         return  dataList;
     }
 
@@ -70,14 +69,16 @@ public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapte
 
 
         @SuppressLint("ClickableViewAccessibility")
-        public void setData(TransferInModel.TransferInDetails transferInItem) {
+        public void setData(ProductsModel transferInItem) {
             pdtnametxt.setText(transferInItem.getProductName());
             pdtcodetxt.setText(transferInItem.getProductCode());
             if(transferInItem.getQty() != null) {
-                qtytxt.setText(String.valueOf(transferInItem.getQty()));
+               // if(transferInItem.getProductCode().equals(transferInItem.getProductCodeCopy())) {
+                    qtytxt.setText(String.valueOf(transferInItem.getQty()));
+               // }
             }
-            stocktxt.setText(String.valueOf(transferInItem.getStockInHand()));
-            uom_takel.setText(transferInItem.getInventoryUOM());
+            stocktxt.setText(String.valueOf(transferInItem.getStockQty()));
+            uom_takel.setText(transferInItem.getUomText());
 
             qtytxt.removeTextChangedListener(textWatcher);
             qtytxt.setSelection(qtytxt.getText().length());
@@ -120,7 +121,7 @@ public class StockTakeAddAdapter extends RecyclerView.Adapter<StockTakeAddAdapte
         }
     }
 
-    public void updateList(ArrayList<TransferInModel.TransferInDetails> list){
+    public void updateList(ArrayList<ProductsModel> list){
         dataList = list;
         notifyDataSetChanged();
     }

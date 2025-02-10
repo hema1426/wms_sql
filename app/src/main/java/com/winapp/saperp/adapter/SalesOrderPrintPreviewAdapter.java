@@ -77,7 +77,7 @@ public class SalesOrderPrintPreviewAdapter extends RecyclerView.Adapter<SalesOrd
                 }
             }
             else{
-                viewHolder.price.setText(salesList.getPricevalue());
+                viewHolder.price.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getPricevalue())));
                 viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getTotal())));
             }
         }

@@ -338,7 +338,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
         salesReturnText = findViewById(R.id.sales_return_text)
         barcodeText = findViewById(R.id.barcode_text)
         customerNameText = findViewById(R.id.customer_name_text)
-        remarkText = findViewById(R.id.remarks)
+        remarkText = findViewById(R.id.remarks_GReceip)
         returnAdj = findViewById(R.id.return_adj)
         returnLayoutView = findViewById(R.id.return_layout_view)
         cancelReturn = findViewById(R.id.cancel_return)
@@ -516,7 +516,12 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable) {
-                setCalculationView()
+                if(!priceText!!.text.toString().equals(".")) {
+                    setCalculationView()
+                }else{
+
+                    priceText!!.setText("")
+                }
             }
         }
         priceText!!.addTextChangedListener(loosePriceTextWatcher)
@@ -527,6 +532,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                 val qty = qtyValue!!.getText().toString()
                 var stock = 0.0
                 lowStockSetting
+
                 if (!qty.matches("".toRegex())) {
                     if (!stockQtyValue!!.getText().toString().isEmpty()) {
                         stock = stockQtyValue!!.getText().toString().toDouble()
@@ -1050,15 +1056,15 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                         editTimeStamp = model.updateTime
                         productName = model.productName
                         //  qtyValue!!.setText("")
-                        val netqty = model.netQty.toDouble()
 
                         /*  if (model.getMinimumSellingPrice()!=null && !model.getMinimumSellingPrice().isEmpty()){
                         minimumSellingPriceText.setText(model.getMinimumSellingPrice());
                     }else {
                         minimumSellingPriceText.setText("0.00");
                     }*/qtyValue!!.removeTextChangedListener(qtyTW)
-//                        qtyValue!!.setText(Utils.getQtyValue(netqty.toString()))
-                        qtyValue!!.setText(model.netQty)
+
+                        val netqty = model.netQty.toDouble()
+                        qtyValue!!.setText(Utils.getQtyValue(netqty.toString()))
                         qtyValue!!.addTextChangedListener(qtyTW)
                         productAutoComplete!!.setText(model.productName + "-" + model.productCode)
                         priceText!!.setText(model.price)
@@ -1960,11 +1966,11 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             R.id.action_save -> {
                 val localCart = dbHelper!!.allInvoiceProducts
                 if (localCart.size > 0) {
-                    if (!fromWarehouseName.equals("")) {
+                   // if (!fromWarehouseName.equals("")) {
                         showSaveAlert()
-                    } else {
-                        toast("Select Location !")
-                    }
+//                    } else {
+//                        toast("Select Location !")
+//                    }
 
                 } else {
                     Toast.makeText(
@@ -3512,6 +3518,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
         fun searchAndSendActivity(barcode: String?) {
             try {
                 val model = getProductData(barcode)
+              //  Log.w("entypdta", "" + getProductData(barcode))
                 if (model != null) {
                     if (productSummaryList != null && productSummaryList.size > 0) {
                         if (!isAlreadyExist(barcode)) {
@@ -3543,14 +3550,48 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             }
         }
 
-        private fun setProductDetails(model: ProductsModel) {
-            productsModel = model
-            productId = productsModel!!.productCode
-            Log.w("pdtsInv1", "" + model.productName + "  .. " + model.barcode)
-            Log.w("pdtsInvCode", "" + model.productCode)
-            // setUomList(model.getProductUOMList());
-            // uomTextView!!.text = model.uomText
-//        if (isUomSetting) {
+//        private fun setProductDetails(model: ProductsModel) {
+//            productsModel = model
+//            productId = productsModel!!.productCode
+//            Log.w("pdtsInv1", "" + model.productName + "  .. " + model.barcode)
+//            Log.w("pdtsInvCode", "" + model.productCode)
+//            // setUomList(model.getProductUOMList());
+//            // uomTextView!!.text = model.uomText
+////        if (isUomSetting) {
+////            val jsonObject = JSONObject()
+////            try {
+////                jsonObject.put("CustomerCode", selectCustomerId)
+////                jsonObject.put("ItemCode", model.productCode)
+////                getUOM(jsonObject)
+////            } catch (e: JSONException) {
+////                e.printStackTrace()
+////                Log.w("Errord:", Objects.requireNonNull(e.message!!))
+////            }
+////        }
+//
+//            // Need to implement the product price concept in SAP
+//            /*  try {
+//                        getProductPrice(productId);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }*/
+////        if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
+////            minimumSellingPriceText!!.text = model.minimumSellingPrice
+////        } else {
+////            minimumSellingPriceText!!.text = "0.00"
+////        }
+//            productName = productsModel!!.productName
+//            productAutoComplete!!.setText(model.productName + " - " + model.productCode)
+//            //  cartonPrice.setText(model.getUnitCost()+"");
+//            //  loosePrice.setText(model.getUnitCost());
+//
+//            //todo old code price
+////        if (model.lastPrice != null && !model.lastPrice.isEmpty() && model.lastPrice.toDouble() > 0.00) {
+////            priceText!!.setText(model.lastPrice)
+////        } else {
+////            priceText!!.setText(model.unitCost)
+////        }
+//            //todo new price set
 //            val jsonObject = JSONObject()
 //            try {
 //                jsonObject.put("CustomerCode", selectCustomerId)
@@ -3558,88 +3599,128 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
 //                getUOM(jsonObject)
 //            } catch (e: JSONException) {
 //                e.printStackTrace()
-//                Log.w("Errord:", Objects.requireNonNull(e.message!!))
+//                Log.w("Errors:", Objects.requireNonNull(e.message!!))
+//            }
+//
+//            // uomText.setText(model.getUomCode());
+//            //stockCount!!.setText(model.stockQty)
+//           // pcsPerCarton!!.setText(model.pcsPerCarton)
+////        qtyValue!!.isEnabled = true
+//            qtyValue!!.requestFocus()
+//            priceText!!.visibility = View.VISIBLE
+//            priceText!!.isEnabled = true
+//            stockCount!!.visibility = View.GONE
+//
+//            if (model.isBatch != null && model.isBatch.isNotEmpty()) {
+//                isItemBatchApi = model.isBatch
+//            }
+//            //  behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//            openKeyborard(qtyValue)
+//
+//            // looseQtyValue.setEnabled(true);
+//            cartonPrice!!.isEnabled = true
+////        if(isFOCStr.equals("Yes")){
+////            focEditText!!.isEnabled = true
+////        }
+////        else{
+//            //}
+//
+//            if (model.isBatch.equals("Yes", true)) {
+//                qtyValue!!.isEnabled = false
+//                addbatch!!.visibility = View.VISIBLE
+//            } else {
+//                qtyValue!!.isEnabled = true
+//                addbatch!!.visibility = View.GONE
+//            }
+//
+//            //stockLayout!!.visibility = View.VISIBLE
+//            if (model.stockQty != null && model.stockQty != "null") {
+//                pdtStockVal = model.stockQty
+//                if (model.stockQty.toDouble() == 0.0 || model.stockQty.toDouble() < 0) {
+//                    stockQtyValue!!.text = model.stockQty
+//                    stockQtyValue!!.setTextColor(Color.parseColor("#D24848"))
+//                } else if (model.stockQty.toDouble() > 0) {
+//                    stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
+//                    stockQtyValue!!.text = model.stockQty
+//                }
 //            }
 //        }
 
-            // Need to implement the product price concept in SAP
-            /*  try {
-                        getProductPrice(productId);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }*/
-//        if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
+    private fun setProductDetails(model: ProductsModel) {
+        productsModel = model
+        productId = productsModel!!.productCode
+//            qtyValue!!.isEnabled = true
+        // Need to implement the product price concept in SAP
+        /*  try {
+                    getProductPrice(productId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }*/
+//            if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
 //            minimumSellingPriceText!!.text = model.minimumSellingPrice
 //        } else {
 //            minimumSellingPriceText!!.text = "0.00"
 //        }
-            productName = productsModel!!.productName
-            productAutoComplete!!.setText(model.productName + " - " + model.productCode)
-            //  cartonPrice.setText(model.getUnitCost()+"");
-            //  loosePrice.setText(model.getUnitCost());
+        productName = productsModel!!.productName
+        productAutoComplete!!.setText(model.productName + " - " + model.productCode)
+        //  cartonPrice.setText(model.getUnitCost()+"");
+        //  loosePrice.setText(model.getUnitCost());
+        priceText!!.setText(model.unitCost)
+        priceText!!.isEnabled = true
+        uomText!!.setText(model.uomCode)
+        stockCount!!.setText(model.stockQty)
+        pcsPerCarton!!.setText(model.pcsPerCarton)
+//            qtyValue!!.isEnabled = true
+        qtyValue!!.requestFocus()
+        //  behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        openKeyborard(qtyValue)
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("CustomerCode", selectCustomerId)
+            jsonObject.put("ItemCode", model.productCode)
+            getUOM(jsonObject)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            Log.w("Errors:", Objects.requireNonNull(e.message!!))
+        }
+        // looseQtyValue.setEnabled(true);
+        cartonPrice!!.isEnabled = true //
 
-            //todo old code price
-//        if (model.lastPrice != null && !model.lastPrice.isEmpty() && model.lastPrice.toDouble() > 0.00) {
-//            priceText!!.setText(model.lastPrice)
-//        } else {
-//            priceText!!.setText(model.unitCost)
-//        }
-            //todo new price set
-            val jsonObject = JSONObject()
-            try {
-                jsonObject.put("CustomerCode", selectCustomerId)
-                jsonObject.put("ItemCode", model.productCode)
-                getUOM(jsonObject)
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                Log.w("Errors:", Objects.requireNonNull(e.message!!))
-            }
-
-            // uomText.setText(model.getUomCode());
-            stockCount!!.setText(model.stockQty)
-            pcsPerCarton!!.setText(model.pcsPerCarton)
-//        qtyValue!!.isEnabled = true
-            qtyValue!!.requestFocus()
-            priceText!!.visibility = View.VISIBLE
-            priceText!!.isEnabled = true
-            stockCount!!.visibility = View.GONE
-
-            if (model.isBatch != null && model.isBatch.isNotEmpty()) {
-                isItemBatchApi = model.isBatch
-            }
-            //  behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            openKeyborard(qtyValue)
-
-            // looseQtyValue.setEnabled(true);
-            cartonPrice!!.isEnabled = true
-//        if(isFOCStr.equals("Yes")){
-//            focEditText!!.isEnabled = true
-//        }
-//        else{
-            //}
-
-            if (model.isBatch.equals("Yes", true)) {
-                qtyValue!!.isEnabled = false
-                addbatch!!.visibility = View.VISIBLE
-            } else {
-                qtyValue!!.isEnabled = true
-                addbatch!!.visibility = View.GONE
-            }
-
-            stockLayout!!.visibility = View.VISIBLE
-            if (model.stockQty != null && model.stockQty != "null") {
-                pdtStockVal = model.stockQty
-                if (model.stockQty.toDouble() == 0.0 || model.stockQty.toDouble() < 0) {
-                    stockQtyValue!!.text = model.stockQty
-                    stockQtyValue!!.setTextColor(Color.parseColor("#D24848"))
-                } else if (model.stockQty.toDouble() > 0) {
-                    stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
-                    stockQtyValue!!.text = model.stockQty
-                }
-            }
+        if (model.isBatch.equals("Yes", true)) {
+            qtyValue!!.isEnabled = false
+            addbatch!!.visibility = View.VISIBLE
+        } else {
+            qtyValue!!.isEnabled = true
+            addbatch!!.visibility = View.GONE
+//                batchList!!.clear()
+//                val batchmodel1 = BatchDetailModule("", "", "","")
+//                batchList!!.add(batchmodel1)
+//                if(batchListAdapter != null) {
+//                    batchListAdapter!!.listAdd(false, batchList!!)
+//                    // setBatchAdapter(batchList!!)
+//                }
         }
 
-        fun getProductData(keyId: String?): ProductsModel? {
+        if (model.isBatch != null && model.isBatch.isNotEmpty()) {
+            isItemBatchApi = model.isBatch
+        }
+        //stockLayout.setVisibility(View.VISIBLE);
+        if (model.stockQty != null && model.stockQty != "null") {
+            pdtStockVal = model.stockQty
+
+            if (model.stockQty.toDouble().equals("0") || model.stockQty.toDouble() < 0) {
+                stockQtyValue!!.text = model.stockQty
+                stockQtyValue!!.setTextColor(Color.parseColor("#D24848"))
+            } else if (model.stockQty.toDouble() > 0) {
+                stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
+                stockQtyValue!!.text = model.stockQty
+            }
+        }
+        viewCloseBottomSheet()
+    }
+
+
+    fun getProductData(keyId: String?): ProductsModel? {
             var index = 0
             if (AppUtils.getProductsList() != null && AppUtils.getProductsList().size > 0) {
                 for (model in AppUtils.getProductsList()) {
@@ -3660,7 +3741,8 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             var check = false
             try {
                 for (pdt in productSummaryAdapter!!.getList()) {
-                    if (pdt.productBarCode.trim { it <= ' ' } == scannedBarcode!!.trim { it <= ' ' }) {
+                    if (pdt.productBarCode.trim { it <= ' ' } == scannedBarcode!!.trim { it <= ' ' } ||
+                        pdt.productCode.trim { it <= ' ' } == scannedBarcode!!.trim { it <= ' ' }) {
                         Toast.makeText(
                             applicationContext,
                             "This Products Already Added..",
@@ -3687,6 +3769,10 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
 
             val df5 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
             var currentDate1: String = df5.format(c)
+            var remarkStr = ""
+            if(remarkText!!.text.toString().isNotEmpty()) {
+               remarkStr =  remarkText!!.text.toString()
+            }
 
             val localCart = dbHelper!!.allInvoiceProducts
             Log.w("Given_local_cart_size:", localCart.size.toString())
@@ -3717,7 +3803,8 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                         model.productCode,
                         Utils.twoDecimalPoint(model.price.toDouble()),
                         model.uomCode,
-                        fromWarehouseCode!!,
+                        locationCode!!,
+//                        fromWarehouseCode!!,
                         Utils.twoDecimalPoint(model.netQty.toDouble())
                     )
                     stockAdjustDetailList!!.add(model1!!)
@@ -3726,6 +3813,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
 
             val reqModel = GoodReceiptSaveModel(
                 currentDate1,
+                remarkStr,
                 stockAdjustDetailList!!
             )
             savetockAdjust(reqModel, 1)
@@ -3782,6 +3870,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                                     intent.putExtra("noOfCopy", noofCopyPrint.toString())
                                     startActivity(intent)
                                     finish()
+                                  //  "responseData":{"docNum":"2500032","error":null}}
                                 } else {
                                     val intent = Intent(
                                         applicationContext,
@@ -3790,13 +3879,10 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                                     startActivity(intent)
                                     finish()
                                 }
+                                Toast.makeText(applicationContext,"Good Receipt "+ salesReturnNumber +" Created Successfully" ,Toast.LENGTH_LONG).show()
                             } else {
                                 pDialog!!.dismiss()
-                                Toast.makeText(
-                                    applicationContext,
-                                    "$statusMessage : $errorMessage",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(applicationContext, "$statusMessage : $errorMessage", Toast.LENGTH_LONG).show()
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()

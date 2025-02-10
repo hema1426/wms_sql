@@ -32,8 +32,8 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:textSize="10sp"
-            android:text="CODE"
+            android:textSize="9sp"
+            android:text="ITEM NAME/CODE"
             android:gravity="left"
             android:textStyle="bold"
             android:id="@+id/code"

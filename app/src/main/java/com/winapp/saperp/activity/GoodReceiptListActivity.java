@@ -44,7 +44,7 @@ import com.winapp.saperp.model.CustomerDetails;
 import com.winapp.saperp.model.SalesOrderModel;
 import com.winapp.saperp.model.SalesOrderPrintPreviewModel;
 import com.winapp.saperp.model.GoodReceiptModuleModel;
-import com.winapp.saperp.printpreview.StockAdjustPrintPreview;
+import com.winapp.saperp.printpreview.GoodReceiptPrintPreview;
 import com.winapp.saperp.utils.Constants;
 import com.winapp.saperp.utils.SessionManager;
 import com.winapp.saperp.utils.Utils;
@@ -118,7 +118,6 @@ public class GoodReceiptListActivity extends NavigationActivity implements GoodR
     public static LinearLayout emptyLayout;
     public String printSoNumber;
     public String noOfCopy;
-
     private ArrayList<SalesOrderPrintPreviewModel> salesOrderHeaderDetails;
     private ArrayList<SalesOrderPrintPreviewModel.SalesList> salesPrintList;
     private String printerMacId;
@@ -313,7 +312,7 @@ public class GoodReceiptListActivity extends NavigationActivity implements GoodR
             @Override
             public void onClick(View view) {
                 viewCloseBottomSheet();
-                Intent intent=new Intent(GoodReceiptListActivity.this, StockAdjustPrintPreview.class);
+                Intent intent=new Intent(GoodReceiptListActivity.this, GoodReceiptPrintPreview.class);
                 intent.putExtra("adjustNumber", number.getText().toString());
                 startActivity(intent);
             }
@@ -323,7 +322,7 @@ public class GoodReceiptListActivity extends NavigationActivity implements GoodR
             @Override
             public void onClick(View view) {
                 viewCloseBottomSheet();
-                Intent intent=new Intent(GoodReceiptListActivity.this, StockAdjustPrintPreview.class);
+                Intent intent=new Intent(GoodReceiptListActivity.this, GoodReceiptPrintPreview.class);
                 intent.putExtra("adjustNumber", number.getText().toString());
                 startActivity(intent);
             }
