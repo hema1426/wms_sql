@@ -5094,7 +5094,7 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
         //  return super.onOptionsItemSelected(item);
     }
 
-    // scanning option new
+    // scanning option new 10.2.25
     private val fragmentLauncher: ActivityResultLauncher<ScanOptions> = registerForActivityResult(
         ScanContract()
     ) { result ->
