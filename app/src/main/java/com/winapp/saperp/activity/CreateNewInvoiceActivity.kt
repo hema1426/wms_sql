@@ -969,13 +969,35 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                 showSignatureAlert();
             }
         });*/btnCancel!!.setOnClickListener(View.OnClickListener { viewCloseBottomSheet() })
+
         searchProduct!!.setOnClickListener(View.OnClickListener {
-            if (addProduct!!.text.contains("Update")) {
-                Toast.makeText(this, "Update previous product", Toast.LENGTH_SHORT).show()
-            } else {
-                viewCloseBottomSheet()
+            val detailsArr = customerResponse.optJSONArray("responseData")
+            Log.w("customerRes1",""+customerResponse.optJSONArray("responseData"))
+            if (detailsArr != null) {
+                if (!customerResponse.optJSONArray("responseData")!!.equals("null") &&
+                    detailsArr.length() > 0) {
+//                    custCode = sharedPreferenceUtil!!.getStringPreference(
+//                        sharedPreferenceUtil!!.KEY_CUSTOMER_CODE, "")
+//                    Log.w("customerResCode","$custCode");
+                    // if(selectCustomerId.equals(custCode)) {
+                    if (addProduct!!.text.contains("Update")) {
+                        Toast.makeText(this, "Update previous product", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        viewCloseBottomSheet()
+                    }
+//                        }else{
+//                        Toast.makeText(this, "different customer!" + selectCustomerId + ".." + custCode, Toast.LENGTH_SHORT).show()
+//                    }
+
+                }else{
+                    Toast.makeText(this, "Customer detail is empty!"+selectCustomerId, Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                Toast.makeText(this, "Customer detail is empty!"+selectCustomerId, Toast.LENGTH_SHORT).show()
             }
         })
+
 
         downarrow_billLayl!!.setOnClickListener {
 //            bill_disc_amt_ed!!.setText(pref_bill_disc_amt)
@@ -1004,8 +1026,7 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
 
 
         billDiscAmountTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-            }
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun afterTextChanged(editable: Editable) {
@@ -1641,43 +1662,65 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                 View.GONE
             )
         })
-        uomChangel!!.setOnClickListener(){
+        uomChangel!!.setOnClickListener() {
             if (isUomSetting) {
-                ischangeUOM = true
                 uomChangel!!.visibility = View.VISIBLE
                 ed_uomTxtl!!.visibility = View.GONE
                 uomSpinnerLayl!!.visibility = View.VISIBLE
 
                 val jsonObject = JSONObject()
-                if(isEditItem){
-                    try {
-                        Log.w("pdtediyyy",""+productEditId);
-                        jsonObject.put("CustomerCode", selectCustomerId)
-                        jsonObject.put("ItemCode",productEditId)
-                        getUOM(jsonObject)
+                try {
+                    jsonObject.put("CustomerCode", selectCustomerId)
+                    jsonObject.put("ItemCode", productEditId)
+                    getUOM(jsonObject)
 
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                        Log.w("Errort:", Objects.requireNonNull(e.message!!))
-                    }
-                }else{
-                    try {
-                        jsonObject.put("CustomerCode", selectCustomerId)
-                        jsonObject.put("ItemCode",productId)
-                        getUOM(jsonObject)
-
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                        Log.w("Errort:", Objects.requireNonNull(e.message!!))
-                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Log.w("Errort:", Objects.requireNonNull(e.message!!))
                 }
-
-                        }
-            else{
+            } else {
                 Toast.makeText(this, "UOM settings not enabled", Toast.LENGTH_LONG).show()
 
             }
         }
+
+//        uomChangel!!.setOnClickListener(){
+//            if (isUomSetting) {
+//                ischangeUOM = true
+//                uomChangel!!.visibility = View.VISIBLE
+//                ed_uomTxtl!!.visibility = View.GONE
+//                uomSpinnerLayl!!.visibility = View.VISIBLE
+//
+//                val jsonObject = JSONObject()
+//                if(isEditItem){
+//                    try {
+//                        Log.w("pdtediyyy",""+productEditId);
+//                        jsonObject.put("CustomerCode", selectCustomerId)
+//                        jsonObject.put("ItemCode",productEditId)
+//                        getUOM(jsonObject)
+//
+//                    } catch (e: JSONException) {
+//                        e.printStackTrace()
+//                        Log.w("Errort:", Objects.requireNonNull(e.message!!))
+//                    }
+//                }else{
+//                    try {
+//                        jsonObject.put("CustomerCode", selectCustomerId)
+//                        jsonObject.put("ItemCode",productId)
+//                        getUOM(jsonObject)
+//
+//                    } catch (e: JSONException) {
+//                        e.printStackTrace()
+//                        Log.w("Errort:", Objects.requireNonNull(e.message!!))
+//                    }
+//                }
+//
+//                        }
+//            else{
+//                Toast.makeText(this, "UOM settings not enabled", Toast.LENGTH_LONG).show()
+//
+//            }
+//        }
 
 
         saveReturn!!.setOnClickListener(View.OnClickListener {
@@ -2105,6 +2148,9 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
             var damaged = "0"
             var price_value = "0"
             var exchange = "0"
+           var return_qtyStr = "0"
+           var saleableStr = "0"
+           var damagedStr = "0"
 
 //            var summaryList: ArrayList<CreateInvoiceModel>? = ArrayList()
 //
@@ -2133,9 +2179,6 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
             if (!item_discount_ed!!.text.toString().isEmpty()) {
                 itemdiscc = item_discount_ed!!.text.toString()
             }
-            if (!returnQtyText!!.text.toString().isEmpty()) {
-                return_qty = returnQtyText!!.text.toString()
-            }
             if (!priceText!!.text.toString().isEmpty()) {
                 price_value = priceText!!.text.toString()
             }
@@ -2148,12 +2191,18 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
             if (!exchange_inv!!.text.toString().isEmpty()) {
                 exchange = exchange_inv!!.text.toString()
             }
-            if (!expiryReturnQty!!.text.toString().isEmpty()) {
-                saleable = expiryReturnQty!!.text.toString()
-            }
-            if (!damageReturnQty!!.text.toString().isEmpty()) {
-                damaged = damageReturnQty!!.text.toString()
-            }
+           if (!returnQtyText!!.text.toString().isEmpty()) {
+               return_qtyStr = returnQtyText!!.text.toString()
+               return_qty = return_qtyStr.toDouble().toInt().toString()
+           }
+           if (!expiryReturnQty!!.text.toString().isEmpty()) {
+               saleableStr = expiryReturnQty!!.text.toString()
+               saleable = saleableStr.toDouble().toInt().toString()
+           }
+           if (!damageReturnQty!!.text.toString().isEmpty()) {
+               damagedStr = damageReturnQty!!.text.toString()
+               damaged = damagedStr.toDouble().toInt().toString()
+           }
             if (!bill_disc_amt_ed!!.text.toString().isEmpty()) {
                 billdiscc = bill_disc_amt_ed!!.text.toString()
             }
@@ -2208,13 +2257,13 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                 dbHelper!!.insertReturnProduct(
                     productId,
                     productName,
-                    expiryReturnQty!!.text.toString(),
+                    saleableStr,
                     "Saleable Return"
                 )
                 dbHelper!!.insertReturnProduct(
                     productId,
                     productName,
-                    damageReturnQty!!.text.toString(),
+                    damagedStr,
                     "Damaged/Expired"
                 )
             }
@@ -2317,10 +2366,14 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                         var pdtStock = 0.0;
                         productEditId = model.productCode
 
-                        val jsonObject = JSONObject()
-                        jsonObject.put("CustomerCode", selectCustomerId)
-                        jsonObject.put("ItemCode",productEditId)
-                        getUOMEdit(jsonObject,model.uomCode,model.stockProductQty)
+                        Log.w("EditUomText:", model.uomCode)
+                        uomTextView!!.text = model.uomText
+                        qtyValue!!.setText("")
+                        priceText!!.setText(model.price)
+//                        val jsonObject = JSONObject()
+//                        jsonObject.put("CustomerCode", selectCustomerId)
+//                        jsonObject.put("ItemCode",productEditId)
+//                        getUOMEdit(jsonObject,model.uomCode,model.stockProductQty)
 
 
                         Log.w("pdtuomentryy", "" + model.stockProductQty)
@@ -2343,7 +2396,6 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                         Log.w("EditUomText:", model.uomCode)
 //                        setUOMCode(uomList!!)
                         uomTextView!!.text = model.uomText
-                        qtyValue!!.setText("")
                         focEditText!!.setText("")
                         val netqty = model.netQty.toDouble()
                         if (model.minimumSellingPrice != null && !model.minimumSellingPrice.isEmpty()) {
@@ -2357,7 +2409,7 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                         Log.w("editqty11",""+model.netQty+"..mm"+Utils.getQtyValue(netqty.toString()))
                         qtyValue!!.addTextChangedListener(qtyTW)
                         productAutoComplete!!.setText(model.productName + "-" + model.productCode)
-                        priceText!!.setText(model.price)
+                    //    priceText!!.setText(model.price)
                         item_discount_ed!!.setText(model.itemDisc)
                         expiryReturnQty!!.setText(model.saleableQty)
                         damageReturnQty!!.setText(model.damagedQty)
@@ -2396,7 +2448,17 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                         if(model.isItemFOC != null) {
                             isItemFOCApi = model.isItemFOC
                         }
-                        uomValueVisible(model.uomCode)
+                       // uomValueVisible(model.uomCode)
+                        uomChangel!!.visibility = View.VISIBLE
+                        ed_uomTxtl!!.visibility = View.VISIBLE
+                        uomSpinnerLayl!!.visibility = View.GONE
+
+                        ed_uomTxtl!!.setText(model.uomCode)
+
+                        //uomValueVisible(model.uomCode)
+                        stockLayout!!.visibility = View.VISIBLE
+                        stockQtyValue!!.setTextColor(Color.parseColor("#2ECC71"))
+                        stockQtyValue!!.text = model.stockQty
 
                         stockCount!!.setText(model.stockQty)
                         minimumSellingPriceText!!.setText(model.minimumSellingPrice)
@@ -3554,14 +3616,19 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                     pDialog.dismiss()
                     if (uomList!!.size > 0) {
                         runOnUiThread {
-                            if(ischangeUOM) {
-                                setUomList(uomList!!)
-                            }else{
-                                setUomList(uomList!!)
-                              // defaultUOMset(uomList!!) // some uom bag only(inner ctn) -- hide
-                            }
+                            setUomList(uomList!!)
                         }
                     }
+//                    if (uomList!!.size > 0) {
+//                        runOnUiThread {
+//                            if(ischangeUOM) {
+//                                setUomList(uomList!!)
+//                            }else{
+//                                setUomList(uomList!!)
+//                              // defaultUOMset(uomList!!) // some uom bag only(inner ctn) -- hide
+//                            }
+//                        }
+//                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Log.w("Errory:", Objects.requireNonNull(e.message!!))
@@ -4467,28 +4534,25 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
         }
     }
 
-    private fun setUomList(uomList: ArrayList<UomModel>) {
+    fun setUomList(uomList: java.util.ArrayList<UomModel>) {
         Log.w("UOMList:", uomList.toString())
         val adapter = ArrayAdapter(this, R.layout.cust_spinner_item, uomList)
         uomSpinner!!.adapter = adapter
         setUOMCode(uomList)
-
-//        if (productsModel != null) {
-//            //setuom
-//            Log.d("cg_uomsiz1", uomList.size.toString() + "")
-//                Log.w("cg_uomsiz", uomList.size.toString() + "")
-//                if (activityFrom == "iv" || activityFrom == "ConvertInvoice" ||
-//                    activityFrom == "Duplicate" || activityFrom == "ConvertInvoiceFromDO"
-//                    || activityFrom == "ReOrderInvoice"
-//                ) {
-//                    UOMdetail(settingUOMInvval!!,uomList)
-//                }
-//            if (activityFrom == "so" || activityFrom == "SalesEdit" || activityFrom == "ReOrderSales" ) {
-//                UOMdetail(settingUOMSOval!!,uomList)
-//            }
-//
-//            }
-
+        if (productsModel != null) {
+            //setuom todo
+          //  Log.d("cg_uomsiz1", uomList.size.toString() + "")
+            for (i in uomList.indices) {
+                Log.w("cg_uomsiz", uomList.size.toString() + "")
+                if (uomList[i].uomCode == productsModel!!.defaultUom) {
+                    Log.w("cg_defaultUOM_", productsModel!!.defaultUom)
+                    uomSpinner!!.setSelection(i)
+                    uomText!!.setText(uomList[i].uomCode)
+                    priceText!!.setText(uomList[i].price)
+                    break
+                }
+            }
+        }
     }
     fun uomValueVisible(uomcode:String){
         ed_uomTxtl!!.setText(uomcode)
@@ -4501,34 +4565,49 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
 //        ed_uomTxtl!!.visibility = View.GONE
 //        uomSpinnerLayl!!.visibility = View.VISIBLE
 //    }
-    fun UOMdetail1(settingUOMval:String, uomList: ArrayList<UomModel>){
-        for (i in uomList.indices) {
-            if (settingUOMval!!.isNotEmpty()) {
-                if (uomList[i].uomCode == settingUOMval) {
-                    Log.w("cg_uoomcode_", settingUOMval)
-//                    uomSpinner!!.setSelection(i)
-                    uomText!!.setText(uomList[i].uomCode)
-                    priceText!!.setText(uomList[i].price)
-                        if (settingUOMval.equals("CTN", true)) {
-                            var ctnStockVal = 0.00
-                            var baseCtnQty = uomList[i].baseQty.toDouble()
-                            var pdtStock = pdtStockVal!!.toDouble()
+fun UOMdetail1(settingUOMval: String, uomList: ArrayList<UomModel>) {
+    for (i in uomList.indices) {
+        if (settingUOMval!!.isNotEmpty()) {
+            if (uomList[i].uomCode == settingUOMval) {
+                Log.w("cg_uoomcode1a_", settingUOMval)
+                if (uomName.equals("CTN", true)) {
+                    var ctnStockVal = 0.00
+                    var baseCtnQty = uomList[i].baseQty.toDouble()
+                    var pdtStock = pdtStockVal!!.toDouble()
 
-                            ctnStockVal = pdtStock / baseCtnQty
-                            stockQtyValue!!.setText(twoDecimalPoint(ctnStockVal).toString())
-                            Log.w(
-                                "ctnStockkk",
-                                "" + ctnStockVal + ".." + twoDecimalPoint(ctnStockVal).toString()
-                            )
-                            Log.w("ctnStock11", "" + baseCtnQty)
-                        } else {
-                            stockQtyValue!!.setText(pdtStockVal.toString())
-                        }
+                    ctnStockVal = pdtStock / baseCtnQty
+                    stockQtyValue!!.setText(twoDecimalPoint(ctnStockVal).toString())
+                    Log.w(
+                        "ctnStockaa",
+                        "" + ctnStockVal + ".." + twoDecimalPoint(ctnStockVal).toString()
+                    )
+                    Log.w("ctnStock22", "" + baseCtnQty)
+                } else {
+                    stockQtyValue!!.setText(pdtStockVal.toString())
                 }
-                uomText!!.setText(settingUOMval)
+//                uomText!!.setText(uomList[position].uomCode)
+                priceText!!.setText(uomList[i].price)
+                Log.w("uomentyy1:", uomName)
+
+                Log.w("UOMQtyValue:", uomList[i].uomEntry)
+                Log.w("SelectedUOM:", uomName + "")
+                // }
+//                    qtyValue!!.setText("")
+                uomValueVisible(settingUOMInvval!!)
+
+                break
+//                    uomSpinner!!.setSelection(i)
+//                    uomValueVisible(settingUOMInvval!!)
+            } else {
+                Log.w("uoment4", "")
+//                    differentUOM(uomList)
             }
         }
+//            else{
+//                differentUOM(uomList)  // getting bottom nettotal 0 so hide
+//            }
     }
+}
 
 //    fun UOMdetail(settingUOMval:String, uomList: ArrayList<UomModel>){
 //        for (i in uomList.indices) {
@@ -4608,8 +4687,6 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-
-
                 /* Glide.with(MainActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions().centerCrop()
@@ -6966,8 +7043,8 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                     return_subtotal = model.returnQty.toDouble() * model.price.toDouble()
                 }
                 if (!model.returnQty.isEmpty() && model.returnQty.toString() != "null") {
-                    invoiceObject.put("returnLQty", model.returnQty)
-                    invoiceObject.put("returnQty", model.returnQty)
+                    invoiceObject.put("returnLQty", model.returnQty.toDouble().toInt())
+                    invoiceObject.put("returnQty", model.returnQty.toDouble().toInt())
                     invoiceObject.put("qty", model.actualQty.toString())
                 } else {
                     invoiceObject.put("returnLQty", "0")
@@ -7009,8 +7086,13 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                                 "ReturnReason",
                                 returnProductsModel.returnReason
                             )
-                            returnProductObject.put("ReturnQty", returnProductsModel.returnQty)
+
+                            returnProductObject.put(
+                                "ReturnQty",
+                                returnProductsModel.returnQty.toDouble().toInt()
+                            )
                             returnProductArray.put(returnProductObject)
+                            Log.w("cg_ret_prod",returnProductArray.length().toString())
                         }
                     }
                 }
@@ -7235,8 +7317,8 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                         return_subtotal = model.returnQty.toDouble() * model.price.toDouble()
                     }
                     if (!model.returnQty.isEmpty() && model.returnQty.toString() != "null") {
-                        invoiceObject.put("returnLQty", model.returnQty)
-                        invoiceObject.put("returnQty", model.returnQty)
+                        invoiceObject.put("returnLQty", model.returnQty.toDouble().toInt())
+                        invoiceObject.put("returnQty", model.returnQty.toDouble().toInt())
                         invoiceObject.put("qty", model.actualQty.toString())
                     } else {
                         invoiceObject.put("returnLQty", "0")
@@ -7275,8 +7357,12 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                                     "ReturnReason",
                                     returnProductsModel.returnReason
                                 )
-                                returnProductObject.put("ReturnQty", returnProductsModel.returnQty)
+                                returnProductObject.put(
+                                    "ReturnQty",
+                                    returnProductsModel.returnQty.toDouble().toInt()
+                                )
                                 returnProductArray.put(returnProductObject)
+                                Log.w("cg_ret_prod1",returnProductArray.length().toString())
                             }
                         }
                     }

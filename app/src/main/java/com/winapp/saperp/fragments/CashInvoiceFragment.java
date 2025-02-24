@@ -753,9 +753,11 @@ public class CashInvoiceFragment extends Fragment {
     public static void splitInvoices(){
         try {
             CashCollectionActivity.netAmount.clearFocus();
+//            CashCollectionActivity.netAmount.setText("");
             InputMethodManager imm = (InputMethodManager) myContext.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(CashCollectionActivity.netAmount.getWindowToken(), 0);
             double paidAmount = Double.parseDouble(CashCollectionActivity.netAmount.getText().toString());
+            Log.w("dplit22 ", " ");
             if(cashInvoices.size() >0) {
                 double tempPaidAmount = paidAmount;
                 for (int i = cashInvoices.size() - 1; i >= 0; i--) {
@@ -764,7 +766,7 @@ public class CashInvoiceFragment extends Fragment {
                     cashmodel.setBalance(cashmodel.getNetBalance());
                     cashmodel.setIsbackground(false);
                     cashmodel.setIseditable(false);
-                    Log.d("dplit ", " "+cashmodel.isPreSelect() +" "+cashmodel.getNetTotal());
+                    Log.w("dplit ", " "+cashmodel.isPreSelect() +" "+cashmodel.getNetTotal());
                     if (tempPaidAmount > 0) {
                         if(cashmodel.isPreSelect()){
                             if (tempPaidAmount > Double.parseDouble(cashmodel.getNetBalance()) ) {

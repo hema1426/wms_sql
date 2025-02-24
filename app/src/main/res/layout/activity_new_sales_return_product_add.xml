@@ -1029,8 +1029,6 @@
                                     android:padding="5dp"
                                     android:enabled="false"
                                     android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:maxLength="4"
                                     android:textColor="#212121"
                                     android:textSize="10sp"
                                     android:id="@+id/uom"

@@ -156,6 +156,7 @@ public class CashCollectionActivity extends AppCompatActivity {
     private static String companyId;
     public static TextView bankCode;
     LinearLayout bankLayout;
+    Boolean netAmountFocus = false ;
     ImageView salesReturn;
     public static EditText returnAmountEditText;
     private LinearLayout bottomLayout;
@@ -511,15 +512,20 @@ public class CashCollectionActivity extends AppCompatActivity {
         btnSplit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ( !netAmount.getText().toString().equals(".")) {
-                    if (!netAmount.getText().toString().isEmpty() &&
-                            (Double.parseDouble(netAmount.getText().toString()) > 0.00)) {
-                        CashInvoiceFragment.splitInvoices();
+                if(netAmountFocus) {
+                    if (!netAmount.getText().toString().equals(".")) {
+                        if (!netAmount.getText().toString().isEmpty() &&
+                                (Double.parseDouble(netAmount.getText().toString()) > 0.00)) {
+                            Log.w("dsplit11", "");
+                            CashInvoiceFragment.splitInvoices();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Value Should not be empty", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(), "Value Should not be empty", Toast.LENGTH_LONG).show();
                     }
-                }else {
-                    Toast.makeText(getApplicationContext(), "Value Should not be empty", Toast.LENGTH_LONG).show();
+                }else{
+                    Log.w("dsplit11aa", "");
                 }
 
             }
@@ -532,7 +538,16 @@ public class CashCollectionActivity extends AppCompatActivity {
             }
         });
 
-
+        netAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    netAmountFocus = true ;
+                } else {
+                    netAmountFocus = false ;
+                }
+            }
+        });
 
         // Define the Textwatcher of the Total Paid Amount
 
@@ -800,6 +815,7 @@ public class CashCollectionActivity extends AppCompatActivity {
                     }else {
 //                        Intent intent=new Intent(CashCollectionActivity.this,NewInvoiceListActivity.class);
 //                        startActivity(intent);
+                        onBackPressed();
                         finish();
                     }
                     }
@@ -1335,15 +1351,13 @@ public class CashCollectionActivity extends AppCompatActivity {
         alert.show();
     }
 
-
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         dbHelper.removeAllInvoices();
       //  Intent intent=new Intent(CashCollectionActivity.this,NewInvoiceListActivity.class);
        // startActivity(intent);
-       // finish();
+       finish();
     }
 
     public void showCashCollectionClearAlert(){

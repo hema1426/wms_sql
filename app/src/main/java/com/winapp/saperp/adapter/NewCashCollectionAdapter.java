@@ -111,9 +111,9 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
         viewHolder.netBalanceText.setText(Utils.twoDecimalPoint(Double.parseDouble(model.getNetBalance())));
 
         if (model.getNetBalance()!=null && !model.getNetBalance().isEmpty()){
-            Log.w("NetBalanceValues:",model.getNetBalance());
+            Log.w("NetBalanceValues1:",model.getNetBalance());
             if (Double.parseDouble(model.getNetBalance()) < 0){
-                Log.w("GivenValues:",Double.parseDouble(model.getNetBalance())+"");
+                Log.w("GivenValues1:",Double.parseDouble(model.getNetBalance())+"");
                 viewHolder.discountText.setEnabled(false);
                 viewHolder.discountText.setFocusable(false);
                 viewHolder.discountText.setBackgroundColor(Color.parseColor("#f3f3f3"));
@@ -147,6 +147,7 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
         viewHolder.tranType.setText(model.getTranType());
         viewHolder.payableText.setSelectAllOnFocus(true);
         viewHolder.discountText.setSelectAllOnFocus(true);
+
         payableTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -161,8 +162,9 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
             @Override
             public void afterTextChanged(Editable editable) {
 
-                try {
+                if (viewHolder.payableText.hasFocus()) {
 
+                try {
                     double discount=0.0;
                     double payable=0.0;
                     double balance=0.0;
@@ -181,8 +183,10 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
                                 //Toast.makeText(context,"Amount exceed",Toast.LENGTH_SHORT).show();
                                 model.setPayable("");
                                 model.setBalance(netbalance+"");
+
+                                viewHolder.payableText.removeTextChangedListener(payableTextWatcher);
                                 viewHolder.payableText.setText("");
-                                //setCalculation(model,viewHolder,editable.toString());
+                                viewHolder.payableText.addTextChangedListener(payableTextWatcher);                                //setCalculation(model,viewHolder,editable.toString());
                                 setNetTotal();
                             }else {
                                // model.setPayable(editable.toString());
@@ -190,7 +194,7 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
                                // setNetTotal();
                             }
                         }else {
-                            Log.w("GivenBalanceAmount:",viewHolder.balanceAmount.getText().toString());
+                            Log.w("GivenBalanceAmount1:",viewHolder.balanceAmount.getText().toString());
                             double net_balance=Double.parseDouble(viewHolder.netBalanceText.getText().toString());
                             double pay_amount=Double.parseDouble(editable.toString());
                             double bal=net_balance+pay_amount;
@@ -198,7 +202,11 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
                                 Toast.makeText(context,"Transaction value exceed",Toast.LENGTH_SHORT).show();
                                 model.setPayable("");
                                 model.setBalance(netbalance+"");
+
+                                viewHolder.payableText.removeTextChangedListener(payableTextWatcher);
                                 viewHolder.payableText.setText("");
+                                viewHolder.payableText.addTextChangedListener(payableTextWatcher);
+
                                 //setCalculation(model,viewHolder,editable.toString());
                                 setNetTotal();
                             }else {
@@ -223,12 +231,14 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
 
                     }
                 }catch (Exception ec){}
+                }else{
+                    Log.w("receiptentr11:","");
+                }
             }
         };
         if (viewHolder.payableText.isFocusable()){
             viewHolder.payableText.addTextChangedListener(payableTextWatcher);
         }
-
 
         discountTextWatcher=new TextWatcher() {
             @Override
@@ -452,8 +462,8 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
 
             net_paid_amount_value=paid_amount-debit_amout;
 
-            Log.w("SalesReturnValue:",SalesReturnAdapter.net_return_value);
-            Log.w("NetOutStanding:", String.valueOf(net_outstanding));
+            Log.w("SalesReturnValue1:",SalesReturnAdapter.net_return_value);
+            Log.w("NetOutStanding1:", String.valueOf(net_outstanding));
 
             if (paid_amount < Double.parseDouble(SalesReturnAdapter.net_return_value) ){
                 CashInvoiceFragment.refreshReturn();
@@ -563,8 +573,8 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
                 // }
             }
 
-            Log.w("SalesReturnValue:",SalesReturnAdapter.net_return_value);
-            Log.w("NetOutStanding:", String.valueOf(net_outstanding));
+            Log.w("SalesReturnValuea:",SalesReturnAdapter.net_return_value);
+            Log.w("NetOutStandinga:", String.valueOf(net_outstanding));
 
             if (paid_amount < Double.parseDouble(SalesReturnAdapter.net_return_value) ){
                 CashInvoiceFragment.refreshReturn();
@@ -572,6 +582,7 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
 
             if (SalesReturnAdapter.net_return_value!=null && Double.parseDouble(SalesReturnAdapter.net_return_value) > 0){
                 double net_paid_amount=paid_amount - Double.parseDouble(SalesReturnAdapter.net_return_value);
+
                 if (net_paid_amount < 0) {
                     CashCollectionActivity.totalPaid.setText("0.00");
                     CashCollectionActivity.amountText.setText("0.00");
@@ -656,7 +667,7 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
             if (model.getDiscountAmount().isEmpty()){
                 discount_amt=Double.parseDouble(model.getDiscountAmount());
             }
-            Log.w("NeTTotal:",net_total+"");
+            Log.w("NeTTotal1:",net_total+"");
             if (model.getTranType().equals("INV")){
                balance=net_total-payable-discount;
             }else {
@@ -714,7 +725,7 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
                 net_balance=Double.parseDouble(viewHolder.netBalanceText.getText().toString());
             }
 
-            Log.w("Discountvalues:",discount+"");
+            Log.w("Discountvalues1:",discount+"");
 
             double balance=net_balance-discount-payable;
 
@@ -725,7 +736,7 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
                 if (!value.isEmpty()) {
                     disc = Double.parseDouble(value);
                     main_bal=Double.parseDouble(viewHolder.netBalanceText.getText().toString());
-                    Log.w("Main_Balance:",String.valueOf(main_bal));
+                    Log.w("Main_Balance1:",String.valueOf(main_bal));
                     net_pay=main_bal-disc;
                     viewHolder.balanceAmount.setText("0.0");
                     viewHolder.payableText.removeTextChangedListener(payableTextWatcher);
@@ -817,6 +828,10 @@ public class NewCashCollectionAdapter extends RecyclerView.Adapter<NewCashCollec
             payableText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
 
         }
+    }
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override

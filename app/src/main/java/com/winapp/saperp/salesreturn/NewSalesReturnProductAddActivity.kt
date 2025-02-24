@@ -1105,7 +1105,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
             var return_qty = "0"
             val lPriceCalc = "0"
             var foc = "0"
-            var uom = "PCS"
+            var uom = ""
             var price_value = "0"
             if (focSwitch!!.isChecked) {
                 focType = "ctn"
@@ -1175,6 +1175,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 damaged,
                 "",
                 "","",timeStamp,"","")
+            Log.w("timeupdatRetur", "" + timeStamp)
 
             // Adding Return Qty Table values
             if (qty_value.toInt() > 0) {
@@ -1210,6 +1211,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                 discountEditext!!.setText("")
                 returnQtyText!!.setText("")
                 editTimeStamp = ""
+                isEditItem = false
                 uomChangel!!.visibility = View.GONE
                 ed_uomTxtl!!.visibility = View.GONE
                 uomSpinnerLayl!!.visibility = View.VISIBLE
@@ -1259,6 +1261,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
                         productName = model.productName
                         qtyValue!!.setText("")
                         val netqty = model.netQty.toDouble()
+                        uomText!!.setText(model.uomCode)
 
                         /*  if (model.getMinimumSellingPrice()!=null && !model.getMinimumSellingPrice().isEmpty()){
                         minimumSellingPriceText.setText(model.getMinimumSellingPrice());
@@ -1425,6 +1428,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
         productAutoComplete!!.clearFocus()
         focEditText!!.setText("")
         returnQtyText!!.setText("")
+        isEditItem = false
         stockLayout!!.visibility = View.GONE
         uomChangel!!.visibility = View.GONE
         ed_uomTxtl!!.visibility = View.GONE
