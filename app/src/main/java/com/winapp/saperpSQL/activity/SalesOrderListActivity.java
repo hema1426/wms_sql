@@ -162,6 +162,7 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
     private String selectedUser="";
     public static String shortCodeStr = "" ;
     public String userPermission = "";
+    public String usernamel = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,9 +286,14 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
         SimpleDateFormat df1 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         currentDate = df1.format(c1);
 
+        if (userPermission.equalsIgnoreCase("True")) {
+            usernamel = "All" ;
+        }else {
+            usernamel  = userName;
+        }
         salesOrderList=new ArrayList<>();
         try {
-            getSalesOrderList(companyId,"1",currentDate,currentDate);
+            getSalesOrderList(companyId,usernamel,"1",currentDate,currentDate);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1795,16 +1801,17 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
     }
 
 
-    public void getSalesOrderList(String companyCode,String pageNo,String fromdate,String todate) throws JSONException {
+    public void getSalesOrderList(String companyCode,String username,String pageNo,String fromdate,String todate) throws JSONException {
         // Initialize a new RequestQueue instance
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         // Initialize a new JsonArrayRequest instance
         JSONObject jsonObject=new JSONObject();
-        if (selectedUser!=null && !selectedUser.isEmpty()){
-            jsonObject.put("User",selectedUser);
-        }else {
-            jsonObject.put("User",userName);
-        }
+//        if (selectedUser!=null && !selectedUser.isEmpty()){
+//            jsonObject.put("User",selectedUser);
+//        }else {
+//            jsonObject.put("User",userName);
+//        }
+        jsonObject.put("User",username);
         jsonObject.put("CustomerCode","");
         jsonObject.put("FromDate",fromdate);
         jsonObject.put("ToDate", todate);

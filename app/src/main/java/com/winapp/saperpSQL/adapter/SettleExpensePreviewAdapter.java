@@ -40,10 +40,10 @@ public class SettleExpensePreviewAdapter extends RecyclerView.Adapter<SettleExpe
             if (Double.parseDouble(model.getExpenseTotal()) > 0){
                 viewHolder.amount.setText(model.getExpenseTotal());
             }else {
-                viewHolder.amount.setText("");
+                viewHolder.amount.setText("0.00");
             }
         }else {
-            viewHolder.amount.setText("");
+            viewHolder.amount.setText("0.00");
         }
         viewHolder.amount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

@@ -385,9 +385,11 @@ public class ReportsActivity extends NavigationActivity implements View.OnClickL
             }
             invoiceSummary.setChecked(false);
             invoiceByProduct.setChecked(false);
-            customerStatement.setChecked(false);
             receiptDetails.setChecked(false);
-            receiptSummary.setChecked(false);
+            customerStatement.setChecked(false);
+            settlementReport.setChecked(false);
+            settle_receiptReport.setChecked(false);
+            customerStatementDatel.setChecked(false);
         }catch (Exception exception){}
     }
 
@@ -1092,7 +1094,7 @@ public class ReportsActivity extends NavigationActivity implements View.OnClickL
 
                         JSONArray expenseArray = detailObject.optJSONArray("reportSettlementWithReceiptExpenses");
                         assert expenseArray != null;
-                        if (denominationArray.length() > 0) {
+                        if (expenseArray.length() > 0) {
                             for (int i = 0; i < expenseArray.length(); i++) {
                                 JSONObject expenseObject = expenseArray.optJSONObject(i);
                                 SettlementReceiptModel.Expense expense = new SettlementReceiptModel.Expense();
