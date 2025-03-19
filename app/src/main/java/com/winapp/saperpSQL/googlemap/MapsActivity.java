@@ -142,13 +142,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnTrack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(MapsActivity.this, MapBoxActivity.class);
-                intent.putExtra("customerName","232424");
-                intent.putExtra("outstanding","1355.600");
-                intent.putExtra("address","13,North Street , T.Nagar, Chennai..");
-                intent.putExtra("latitude","9.939093");
-                intent.putExtra("longitude","78.121719");
-                startActivity(intent);
+//                Intent intent=new Intent(MapsActivity.this, MapBoxActivity.class);
+//                intent.putExtra("customerName","232424");
+//                intent.putExtra("outstanding","1355.600");
+//                intent.putExtra("address","13,North Street , T.Nagar, Chennai..");
+//                intent.putExtra("latitude","9.939093");
+//                intent.putExtra("longitude","78.121719");
+//                startActivity(intent);
             }
         });
 
