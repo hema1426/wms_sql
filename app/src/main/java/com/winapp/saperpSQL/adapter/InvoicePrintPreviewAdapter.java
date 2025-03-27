@@ -3,6 +3,7 @@ package com.winapp.saperpSQL.adapter;
 import static com.winapp.saperpSQL.activity.NewInvoiceListActivity.shortCodeStr;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.saperpSQL.R;
+import com.winapp.saperpSQL.activity.NewInvoiceListActivity;
+import com.winapp.saperpSQL.activity.SalesOrderListActivity;
 import com.winapp.saperpSQL.model.InvoicePrintPreviewModel;
 import com.winapp.saperpSQL.utils.Utils;
 
@@ -73,8 +76,14 @@ public class InvoicePrintPreviewAdapter extends RecyclerView.Adapter<InvoicePrin
             viewHolder.total.setText(Utils.fourDecimalPoint(Double.parseDouble(invoiceList.getTotal())));
         }else{
             if(shortCodeStr.equalsIgnoreCase("SUPERSTAR")) {
-                viewHolder.price.setText(Utils.fourDecimalPoint(Double.parseDouble((invoiceList.getPricevalue()))));
-                viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getTotal())));
+                if (context instanceof NewInvoiceListActivity){
+                    Log.w("inv_grosspr",""+invoiceList.getGrossPrice()+".."+invoiceList.getGrossTotal());
+                viewHolder.price.setText(Utils.fourDecimalPoint(Double.parseDouble((invoiceList.getGrossPrice()))));
+                viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getGrossTotal())));
+                }else{
+                    viewHolder.price.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getPricevalue())));
+                    viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getTotal())));
+                }
             }else{
                 viewHolder.price.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getPricevalue())));
                 viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(invoiceList.getTotal())));

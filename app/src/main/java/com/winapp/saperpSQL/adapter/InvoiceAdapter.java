@@ -461,12 +461,18 @@ public class InvoiceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     invoiceListModel.setReturnQty(detailObject.optString("returnQty"));
                                     invoiceListModel.setCartonPrice(detailObject.optString("cartonPrice"));
                                     invoiceListModel.setUnitPrice(detailObject.optString("price"));
+
                                     double qty = Double.parseDouble(detailObject.optString("quantity"));
                                     double price = Double.parseDouble(detailObject.optString("price"));
 
                                     double nettotal = qty * price;
                                     invoiceListModel.setTotal(String.valueOf(nettotal));
                                     invoiceListModel.setPricevalue(String.valueOf(price));
+
+                                    invoiceListModel.setGrossPrice(detailObject.optString("grossPrice"));
+                                    double grossprice=Double.parseDouble(detailObject.optString("grossPrice"));
+                                    double grosstotal = qty * grossprice;
+                                    invoiceListModel.setGrossTotal(String.valueOf(grosstotal));
 
                                     invoiceListModel.setPcsperCarton(detailObject.optString("pcsPerCarton"));
                                     invoiceListModel.setItemtax(detailObject.optString("totalTax"));
@@ -499,6 +505,11 @@ public class InvoiceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     double nettotal = qty * price;
                                     invoiceListModel.setTotal("0.00");
                                     invoiceListModel.setPricevalue("0.00");
+
+                                    invoiceListModel.setGrossPrice(detailObject.optString("grossPrice"));
+                                    double grossprice1=Double.parseDouble(detailObject.optString("grossPrice"));
+                                    double grosstotal1 = qty * grossprice1;
+                                    invoiceListModel.setGrossTotal("0.00");
 
                                     invoiceListModel.setPcsperCarton(detailObject.optString("pcsPerCarton"));
                                     invoiceListModel.setItemtax(detailObject.optString("totalTax"));
@@ -533,6 +544,11 @@ public class InvoiceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     invoiceListModel.setTotal("0.00");
                                     invoiceListModel.setPricevalue("0.00");
 
+                                    invoiceListModel.setGrossPrice(detailObject.optString("grossPrice"));
+                                    double grossprice=Double.parseDouble(detailObject.optString("grossPrice"));
+                                    double grosstotal = qty * grossprice;
+                                    invoiceListModel.setGrossTotal("0.00");
+
                                     invoiceListModel.setPcsperCarton(detailObject.optString("pcsPerCarton"));
                                     invoiceListModel.setItemtax(detailObject.optString("totalTax"));
                                     invoiceListModel.setSubTotal(detailObject.optString("subTotal"));
@@ -566,18 +582,18 @@ public class InvoiceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     invoiceListModel.setTotal("0.00");
                                     invoiceListModel.setPricevalue("0.00");
 
+                                    invoiceListModel.setGrossPrice(detailObject.optString("grossPrice"));
+                                    double grossprice=Double.parseDouble(detailObject.optString("grossPrice"));
+                                    double grosstotal = qty * grossprice;
+                                    invoiceListModel.setGrossTotal("0.00");
+
                                     invoiceListModel.setPcsperCarton(detailObject.optString("pcsPerCarton"));
                                     invoiceListModel.setItemtax(detailObject.optString("totalTax"));
                                     invoiceListModel.setSubTotal(detailObject.optString("subTotal"));
                                     invoiceshowList.add(invoiceListModel);
                                     Log.w("invoicSizeEntr4","");
-
                                 }
-
-
                             }
-
-
                             model.setInvoiceList(invoiceshowList);
                             pdfInvoiceList.add(model);
                         }

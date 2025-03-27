@@ -331,7 +331,24 @@ public class InvoicePrintPreviewModel {
         private String accountName;
         private String excQty;
         private String stockQty;
+        private String grossPrice;
+        private String grossTotal;
 
+        public String getGrossPrice() {
+            return grossPrice;
+        }
+
+        public void setGrossPrice(String grossPrice) {
+            this.grossPrice = grossPrice;
+        }
+
+        public String getGrossTotal() {
+            return grossTotal;
+        }
+
+        public void setGrossTotal(String grossTotal) {
+            this.grossTotal = grossTotal;
+        }
 
         public String getStockQty() {
             return stockQty;

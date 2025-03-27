@@ -395,6 +395,10 @@ public class SalesOrderAdapterNew extends RecyclerView.Adapter<RecyclerView.View
                                     double qty=Double.parseDouble(detailObject.optString("quantity"));
                                     double price=Double.parseDouble(detailObject.optString("price"));
 
+                                    double grossprice=Double.parseDouble(detailObject.optString("grossPrice"));
+                                    double grosstotal = qty * grossprice;
+                                    salesListModel.setGrossTotal(String.valueOf(grosstotal));
+
                                     double nettotal=qty * price;
                                     salesListModel.setTotal(String.valueOf(nettotal));
                                     salesListModel.setPricevalue(String.valueOf(price));
@@ -434,13 +438,18 @@ public class SalesOrderAdapterNew extends RecyclerView.Adapter<RecyclerView.View
                                         salesListModel.setLqty(detailObject.optString("LQty"));
                                         salesListModel.setCqty(detailObject.optString("CQty"));
                                         salesListModel.setNetQty(detailObject.optString("ReturnQty"));
-                                        salesListModel.setGrossPrice(detailObject.optString("grossPrice"));
 
                                         double qty1 = Double.parseDouble(detailObject.optString("ReturnQty"));
                                         double price1 = Double.parseDouble(detailObject.optString("Price"));
                                         double nettotal1 = qty1 * price1;
                                         salesListModel.setTotal(String.valueOf(nettotal1));
                                         salesListModel.setPricevalue(String.valueOf(price1));
+
+                                        salesListModel.setGrossPrice(detailObject.optString("grossPrice"));
+
+                                        double grossprice1=Double.parseDouble(detailObject.optString("grossPrice"));
+                                        double grosstotal1 = qty * grossprice1;
+                                        salesListModel.setGrossTotal(String.valueOf(grosstotal1));
 
                                         salesListModel.setUomCode(detailObject.optString("uomCode"));
                                         salesListModel.setCartonPrice(detailObject.optString("CartonPrice"));

@@ -6026,7 +6026,7 @@ public class TSCPrinter {
                 // Define the Box
                 //TscDll.sendcommand("BOX 0,"+y+",570,0,2\n");
                 TscDll.sendcommand("TEXT 0," + y + ",\"Poppins.TTF\",0,8,8,\"" + "FROM DATE: " + fromDate + "\"\n");
-                TscDll.sendcommand("TEXT 0," + y + ",\"Poppins.TTF\",0,8,8,\"" + "TO DATE: " + toDate + "\"\n");
+                TscDll.sendcommand("TEXT 330," + y + ",\"Poppins.TTF\",0,8,8,\"" + "TO DATE: " + toDate + "\"\n");
 
                 y += 40;
                 if (customerStateModels.get(0).getCustomerName().length() <= 45) {

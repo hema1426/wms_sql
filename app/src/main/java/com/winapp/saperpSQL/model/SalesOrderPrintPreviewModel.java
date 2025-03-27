@@ -212,8 +212,18 @@ public class SalesOrderPrintPreviewModel {
         private String pcsperCarton;
         private String itemtax;
         private String subTotal;
+        private String grossTotal;
+
         private String pricevalue;
         private String uomCode;
+
+        public String getGrossTotal() {
+            return grossTotal;
+        }
+
+        public void setGrossTotal(String grossTotal) {
+            this.grossTotal = grossTotal;
+        }
 
         public String getGrossPrice() {
             return grossPrice;

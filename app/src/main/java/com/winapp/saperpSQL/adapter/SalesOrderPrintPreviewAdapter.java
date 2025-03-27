@@ -67,10 +67,11 @@ public class SalesOrderPrintPreviewAdapter extends RecyclerView.Adapter<SalesOrd
             viewHolder.price.setText(Utils.fourDecimalPoint(Double.parseDouble(salesList.getPricevalue())));
             viewHolder.total.setText(Utils.fourDecimalPoint(Double.parseDouble(salesList.getTotal())));
         }else{
-            if(shortCodeStr.equalsIgnoreCase("SUPERSTAR")) {
+            if(shortCodeStr.equalsIgnoreCase("SUPERSTAR")) { // mahudoom said grossprice set superStar 27.03
                 if (context instanceof SalesOrderListActivity){
+                    Log.w("so_grosspr",""+salesList.getGrossPrice()+".."+salesList.getGrossTotal());
                     viewHolder.price.setText(Utils.fourDecimalPoint(Double.parseDouble(salesList.getGrossPrice())));
-                    viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getTotal())));
+                    viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getGrossTotal())));
                 }else{
                     viewHolder.price.setText(Utils.fourDecimalPoint(Double.parseDouble(salesList.getPricevalue())));
                     viewHolder.total.setText(Utils.twoDecimalPoint(Double.parseDouble(salesList.getTotal())));
