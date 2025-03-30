@@ -2,8 +2,13 @@ package com.winapp.saperpSQL.thermalprinter;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.RemoteException;
+import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
+import com.imin.printer.INeoPrinterCallback;
+import com.imin.printer.InitPrinterCallback;
+import com.imin.printer.PrinterHelper;
 
 /**
  * Created by yechao on 2020/3/26/026.
@@ -13,14 +18,40 @@ public class App extends Application {
 
     private static Context mContext;
 
-    @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
 
-       // FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
+        PrinterHelper.getInstance().initPrinterService(this, new InitPrinterCallback() {
+            @Override
+            public void onConnected() {
+                Toast.makeText(App.this, "Printer connected IMIN Test", Toast.LENGTH_SHORT).show();
+   PrinterHelper.getInstance().printerSelfChecking(new INeoPrinterCallback() {
+                    @Override
+                    public void onRunResult(boolean isSuccess) throws RemoteException {
+                    }
+                    @Override
+                    public void onReturnString(String result) throws RemoteException {
+                    }
+                    @Override
+                    public void onRaiseException(int code, String msg) throws RemoteException {
+                    }
+                    @Override
+                    public void onPrintResult(int code, String msg) throws RemoteException {
+                    }
+                });
+
+            }
+            @Override
+            public void onDisconnected() {
+
+            }
+        });
+
+        // FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
     }
+
 
     public static Context getContext() {
         return mContext;

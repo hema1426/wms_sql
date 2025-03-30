@@ -125,6 +125,8 @@ dependencies {
     implementation files('libs/DynamicPDF.jar')
     implementation files('libs/com.datecs.api.jar')
 
+    implementation 'com.github.iminsoftware:IminPrinterLibrary:V1.0.0.15'
+
     // for Alert Dialog
 //    implementation 'com.github.d-max:spots-dialog:1.1@aar'
 
