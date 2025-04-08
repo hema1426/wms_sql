@@ -7720,50 +7720,71 @@ fun UOMdetail1(settingUOMval: String, uomList: ArrayList<UomModel>) {
 //        return true
 //    }
     var barcode = ""
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        try {
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                val pressedKey = event.unicodeChar.toChar()
-                barcode += pressedKey
-            }
-            if (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
-                Toast.makeText(this, barcode.toString(), Toast.LENGTH_SHORT).show()
-                barcodeText!!.text = barcode
-                barCodeLayl!!.visibility = View.VISIBLE
-                searchAndSendActivity(barcode)
-                barcode = ""
-            }
-
-//            if (event.keyCode === KeyEvent.KEYCODE_ENTER) {
-//                if (event.action === KeyEvent.ACTION_UP) {
-//                   // setEnter()
-//                   // searchAndSendActivity(barcodeText)
+//    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+//        try {
+//            if (event.action == KeyEvent.ACTION_DOWN) {
+//                val pressedKey = event.unicodeChar.toChar()
+//                barcode += pressedKey
+//            }
+//            if (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
+//                Toast.makeText(this, barcode.toString(), Toast.LENGTH_SHORT).show()
+//                barcodeText!!.text = barcode
+//                barCodeLayl!!.visibility = View.VISIBLE
+//                searchAndSendActivity(barcode)
+//                barcode = ""
+//            }
+//            Toast.makeText(this, "Scanning..", Toast.LENGTH_SHORT).show()
 //
-//                    return true
-//                }
-//            }
-//            if (event.keyCode == KeyEvent.KEYCODE_BACK) {
-//                false
-//            }
-//            val keyaction: Int = event.getAction()
-//            if (keyaction == KeyEvent.ACTION_DOWN) {
-//                val keycode: Int = event.getKeyCode()
-//                val keyunicode: Int = event.getUnicodeChar(event.getMetaState())
-//                val character = keyunicode.toChar()
-//                if (keycode==66){
-//                    keyEnterFunction()
-//                }
-//                if (keycode==4){
-//                    hideKeyboard()
-//                }
-//                println("DEBUG MESSAGE KEY=$character KEYCODE=$keycode")
-//            }
-        }catch (ex:Exception){
-            Log.w("DispatchKeyEventError:",ex.localizedMessage.toString())
-        }
-        return super.dispatchKeyEvent(event)
-    }
+////            if (event.keyCode === KeyEvent.KEYCODE_ENTER) {
+////                if (event.action === KeyEvent.ACTION_UP) {
+////                   // setEnter()
+////                   // searchAndSendActivity(barcodeText)
+////
+////                    return true
+////                }
+////            }
+////            if (event.keyCode == KeyEvent.KEYCODE_BACK) {
+////                false
+////            }
+////            val keyaction: Int = event.getAction()
+////            if (keyaction == KeyEvent.ACTION_DOWN) {
+////                val keycode: Int = event.getKeyCode()
+////                val keyunicode: Int = event.getUnicodeChar(event.getMetaState())
+////                val character = keyunicode.toChar()
+////                if (keycode==66){
+////                    keyEnterFunction()
+////                }
+////                if (keycode==4){
+////                    hideKeyboard()
+////                }
+////                println("DEBUG MESSAGE KEY=$character KEYCODE=$keycode")
+////            }
+//        }catch (ex:Exception){
+//            Log.w("DispatchKeyEventError:",ex.localizedMessage.toString())
+//        }
+//        return super.dispatchKeyEvent(event)
+//    }
 
+
+    @SuppressLint("RestrictedApi")
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+
+            val pressedKey = event.unicodeChar.toChar()
+           // barcode.append(pressedKey)
+
+            if (event.keyCode == KeyEvent.KEYCODE_ENTER) {
+
+                Toast.makeText(this, "Barcode; $pressedKey", Toast.LENGTH_LONG).show()
+                Log.d("scannerBarcoe", "$barcode")
+               // barcode.delete(0, barcode.length)
+
+                return true
+
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
 
     override fun onDestroy() {
         super.onDestroy()

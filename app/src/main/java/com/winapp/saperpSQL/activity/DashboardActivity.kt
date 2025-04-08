@@ -10,6 +10,7 @@ import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.util.Base64
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -925,6 +926,44 @@ class DashboardActivity : NavigationActivity() {
         dbHelper!!.removeAllItems()
         Utils.clearCustomerSession(this)
         super.onResume()
+    }
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode === KeyEvent.KEYCODE_ENTER) {
+            if (event.action === KeyEvent.ACTION_UP) {
+              //  setEnter()
+                Toast.makeText(this, "barcode value 2 ", Toast.LENGTH_LONG).show()
+
+                return true
+            }
+        }
+        if (event.keyCode == KeyEvent.KEYCODE_BACK) {
+            false
+        }
+        val keyaction: Int = event.action
+        if (keyaction == KeyEvent.ACTION_DOWN) {
+            val keycode: Int = event.keyCode
+            val keyunicode: Int = event.getUnicodeChar(event.metaState)
+            val character = keyunicode.toChar()
+            if (keycode == 66) {
+                Toast.makeText(this, "barcode value 1 "+keycode, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "barcode char 1 "+character, Toast.LENGTH_LONG).show()
+
+                // getBarcodeProduct(editSKU?.text.toString())
+              //  keyEnterFunction()
+            }
+//            if (keycode == 4) {
+//                loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE)
+//                loginPrefsEditor = loginPreferences!!.edit()
+//                /*  var ordermode=loginPreferences?.getString("orderMode","")
+//                  if (ordermode=="true"){
+//                      var intent=Intent(applicationContext,AllOrdersActivity::class.java)
+//                      intent.putExtra("activityFrom","Main")
+//                      startActivityForResult(intent,allOrdersActivityCode)
+//                  }*/
+//            }
+            println("DEBUG MESSAGE KEY=$character KEYCODE=$keycode")
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     companion object {
