@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.winapp.saperpSQL">
+    package="com.winapp.wmsSQL">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -68,7 +68,7 @@
         android:required="false" />
 
     <application
-        android:name="com.winapp.saperpSQL.thermalprinter.App"
+        android:name=".thermalprinter.App"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:fullBackupOnly="false"
@@ -83,45 +83,45 @@
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="allowBackup,supportsRtl">
         <activity
-            android:name="com.winapp.saperpSQL.activity.StockProductsActivity"
+            android:name=".activity.StockProductsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="false" />
         <activity
-            android:name="com.winapp.saperpSQL.salesreturn.NewSalesReturnProductAddActivity"
+            android:name=".salesreturn.NewSalesReturnProductAddActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.salesreturn.NewSalesReturnListActivity"
+            android:name=".salesreturn.NewSalesReturnListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.ReceiptDetailPreviewActivity"
+            android:name=".ReportPreview.ReceiptDetailPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.CustomerLisrOutstandPreviewActivity"
+            android:name=".ReportPreview.CustomerLisrOutstandPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.ReceiptSummaryPreviewActivity"
+            android:name=".ReportPreview.ReceiptSummaryPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoCustomerOutstandPreviewActivity"
+            android:name=".ReportPreview.RoCustomerOutstandPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.SapStockSummaryOpenPreviewActivity"
+            android:name=".ReportPreview.SapStockSummaryOpenPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoCustomerOutstandDatePreviewActivity"
+            android:name=".ReportPreview.RoCustomerOutstandDatePreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.printpreview.GoodReceiptPrintPreview"
+            android:name=".printpreview.GoodReceiptPrintPreview"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -129,163 +129,163 @@
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.StockTakePreviewPrintActivity"
+            android:name=".activity.StockTakePreviewPrintActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.StockTakeAddActivity"
+            android:name=".activity.StockTakeAddActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.SapStockSummaryPreviewActivity"
+            android:name=".ReportPreview.SapStockSummaryPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.SapStockReturnPreviewActivity"
+            android:name=".ReportPreview.SapStockReturnPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoInvoicebyProductPreviewActivity"
+            android:name=".ReportPreview.RoInvoicebyProductPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoReceiptSettlePreviewActivity"
+            android:name=".ReportPreview.RoReceiptSettlePreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoInvoicebySummaryPreviewActivity"
+            android:name=".ReportPreview.RoInvoicebySummaryPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoSettlementPreviewActivity"
+            android:name=".ReportPreview.RoSettlementPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.NewExpensePrintPreviewActivity"
+            android:name=".activity.NewExpensePrintPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.GoodReceiptListActivity"
+            android:name=".activity.GoodReceiptListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.GoodReceiptProductAddActivity"
+            android:name=".activity.GoodReceiptProductAddActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name="com.winapp.saperpSQL.activity.StockTakeListActivity"
+            android:name=".activity.StockTakeListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.PurchaseInvoiceListActivity"
+            android:name=".activity.PurchaseInvoiceListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.SapSalesSummaryPreviewActivity"
+            android:name=".ReportPreview.SapSalesSummaryPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.ReportPreview.RoProductStockPreviewActivity"
+            android:name=".ReportPreview.RoProductStockPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.printpreview.NewInvoicePrintPreviewActivity"
+            android:name=".printpreview.NewInvoicePrintPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.PurchasePrintPreviewActivity"
+            android:name=".activity.PurchasePrintPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.TransferPreviewPrintActivity"
+            android:name=".activity.TransferPreviewPrintActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.FilterCustomerListActivity"
+            android:name=".activity.FilterCustomerListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.StockRequestListActivity"
+            android:name=".activity.StockRequestListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.TransferProductAddActivity"
+            android:name=".activity.TransferProductAddActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.NewExpenseModuleListActivity"
+            android:name=".activity.NewExpenseModuleListActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.NewExpenseModuleAddActivity"
+            android:name=".activity.NewExpenseModuleAddActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.CreateNewInvoiceActivity"
+            android:name=".activity.CreateNewInvoiceActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.newtransfer.TransferInActivity"
+            android:name=".newtransfer.TransferInActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.TransferListProductActivity"
+            android:name=".activity.TransferListProductActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.TransferActivity"
+            android:name=".activity.TransferActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.GRAActivity"
+            android:name=".activity.GRAActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.GRAListActivity"
+            android:name=".activity.GRAListActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.printpreview.SettlementPrintPreview"
+            android:name=".printpreview.SettlementPrintPreview"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.ReportsActivity"
+            android:name=".activity.ReportsActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SettlementListActivity"
+            android:name=".activity.SettlementListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SettlementActivity"
+            android:name=".activity.SettlementActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.DeliveryOrderListActivity"
+            android:name=".activity.DeliveryOrderListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.printpreview.DOPrintPreview"
+            android:name=".printpreview.DOPrintPreview"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.NewCashCollectionActivity"
+            android:name=".activity.NewCashCollectionActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.dashboard.GraphDashboardActivity"
+            android:name=".dashboard.GraphDashboardActivity"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.ProductStockAnalysisActivity"
+            android:name=".activity.ProductStockAnalysisActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -304,32 +304,32 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.winapp.saperpSQL.googlemap.MapsActivity"
+            android:name=".googlemap.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.NewCompanySwitchActivity"
+            android:name=".activity.NewCompanySwitchActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.ProductAnalyzeActivity"
+            android:name=".activity.ProductAnalyzeActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.ReOrderCartActivity"
+            android:name=".activity.ReOrderCartActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.OrderDetailsHistoryActivity"
+            android:name=".activity.OrderDetailsHistoryActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.OrderHistoryActivity"
+            android:name=".activity.OrderHistoryActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.receipts.ReceiptsPrintPreview"
+            android:name=".receipts.ReceiptsPrintPreview"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.salesreturn.SalesReturnPrintPreview"
+            android:name=".salesreturn.SalesReturnPrintPreview"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.salesreturn.SalesReturnActivity"
+            android:name=".salesreturn.SalesReturnActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
@@ -337,61 +337,61 @@
             android:windowTranslucentNavigation="true"
             android:windowTranslucentStatus="true" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.NewInvoiceListActivity"
+            android:name=".activity.NewInvoiceListActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.printer.zqprinter.printingutils.DeviceListActivity"
+            android:name=".printer.zqprinter.printingutils.DeviceListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.printpreview.SalesOrderPrintPreview"
+            android:name=".printpreview.SalesOrderPrintPreview"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.printpreview.InvoicePrintPreviewActivity"
+            android:name=".printpreview.InvoicePrintPreviewActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.printer.PrinterActivity"
+            android:name=".printer.PrinterActivity"
             android:screenOrientation="portrait" />
-        <activity android:name="com.winapp.saperpSQL.activity.ShowCatagoryActivity" />
+        <activity android:name=".activity.ShowCatagoryActivity" />
         <activity
-            android:name="com.winapp.saperpSQL.receipts.ReceiptsListActivity"
+            android:name=".receipts.ReceiptsListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.winapp.saperpSQL.activity.CategoriesActivity" />
+        <activity android:name=".activity.CategoriesActivity" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SettingActivity"
+            android:name=".activity.SettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.PrinterActivity"
+            android:name=".activity.PrinterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.utils.DeviceListActivity"
+            android:name=".utils.DeviceListActivity"
             android:screenOrientation="portrait" /> <!-- android:theme="@android:style/Theme.DeviceDefault.Dialog" -->
         <!-- /> -->
         <activity
-            android:name="com.winapp.saperpSQL.activity.CashCollectionActivity"
+            android:name=".activity.CashCollectionActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.AddCustomerActivity"
+            android:name=".activity.AddCustomerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.CustomerListActivity"
+            android:name=".activity.CustomerListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.winapp.saperpSQL.utils.BarCodeScanner" />
-        <activity android:name="com.winapp.saperpSQL.activity.NavigationActivity" />
+        <activity android:name=".utils.BarCodeScanner" />
+        <activity android:name=".activity.NavigationActivity" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.MainHomeActivity"
+            android:name=".activity.MainHomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.AddInvoiceActivityOld"
+            android:name=".activity.AddInvoiceActivityOld"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
@@ -399,49 +399,49 @@
             android:windowTranslucentNavigation="true"
             android:windowTranslucentStatus="true" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.CustomerSelectActivity"
+            android:name=".activity.CustomerSelectActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.DashboardActivity"
+            android:name=".activity.DashboardActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.MainDashboardActivity"
+            android:name=".activity.MainDashboardActivity"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.InvoiceListActivityCopy"
+            android:name=".activity.InvoiceListActivityCopy"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SalesOrderListActivity"
+            android:name=".activity.SalesOrderListActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.CartActivity"
+            android:name=".activity.CartActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.OTPVerification"
+            android:name=".activity.OTPVerification"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.ValidateUrlActivity"
+            android:name=".activity.ValidateUrlActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.InvoiceTableActivity"
+            android:name=".activity.InvoiceTableActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.DescriptionActivity"
+            android:name=".activity.DescriptionActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SchedulingActivity"
+            android:name=".activity.SchedulingActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SplashActivity"
+            android:name=".activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
@@ -452,16 +452,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.winapp.saperpSQL.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.SearchProductActivity"
+            android:name=".activity.SearchProductActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.winapp.saperpSQL.activity.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -477,7 +477,7 @@
         </provider>
 
         <receiver
-            android:name="com.winapp.saperpSQL.utils.NetworkChangeReceiver"
+            android:name=".utils.NetworkChangeReceiver"
             android:label="NetworkChangeReceiver"
             android:exported="true">
             <intent-filter>
@@ -485,7 +485,7 @@
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver> <!-- Firebase Notifications -->
-        <service android:name="com.winapp.saperpSQL.firebase.MyFirebaseMessagingService"
+        <service android:name=".firebase.MyFirebaseMessagingService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

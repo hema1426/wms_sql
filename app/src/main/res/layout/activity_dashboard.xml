@@ -208,6 +208,7 @@
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:padding="5dp"
+            android:visibility="gone"
             android:layout_height="wrap_content">
 
             <LinearLayout
@@ -399,6 +400,7 @@
                 android:layout_width="match_parent"
                 android:id="@+id/receipt_layout"
                 android:layout_weight="1"
+                android:visibility="gone"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">
 
