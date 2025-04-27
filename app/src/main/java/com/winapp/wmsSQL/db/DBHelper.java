@@ -292,7 +292,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex("batchno")),
                         cursor.getString(cursor.getColumnIndex("batchqty")),
                         cursor.getString(cursor.getColumnIndex("productcode")),
-                        cursor.getString(cursor.getColumnIndex("updatetime"))
+                        cursor.getString(cursor.getColumnIndex("updatetime")),
+                        cursor.getString(cursor.getColumnIndex("availableqty"))
                 );
                 batchDetailList.add(model);
                 cursor.moveToNext();

@@ -156,7 +156,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
     var batchList: ArrayList<BatchDetailModule>? = ArrayList()
     var batchListSave: ArrayList<BatchDetailModule>? = ArrayList()
     var batchListAdapter: BatchListAdapter? = null
-
+    var totalBatchVal = 0.0
     //    var taxValueText: TextView? = null
 //    var netTotalValue: TextView? = null
 //    var customerDetails: ArrayList<CustomerDetails>? = null
@@ -175,7 +175,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
     var productId: String? = null
     var editTimeStamp: String? = null
     var productName: String? = null
-    var batch_btnl: Button? = null
+    var wmsSQLl: Button? = null
     var uomChangel: TextView? = null
     var ed_uomTxtl: TextView? = null
     var uomTxtTitl: TextView? = null
@@ -286,7 +286,6 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
         uomSpinner = findViewById(R.id.uom_spinner)
         uomChangel = findViewById(R.id.uomChange)
         ed_uomTxtl = findViewById(R.id.ed_uomTxt)
-        batch_btnl = findViewById(R.id.batch_btn)
 
         uomTxtTitl = findViewById(R.id.uomTxtTitle)
         location_adjustl = findViewById(R.id.location_adjust)
@@ -600,7 +599,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                     if (priceText!!.getText() != null && !priceText!!.getText().toString()
                             .isEmpty()
                     ) {
-                        if (priceText!!.getText().toString().toDouble() > 0) {
+                       // if (priceText!!.getText().toString().toDouble() > 0) {
 //                            Log.d("cg_batch_updt1:",
 //                                batchListAdapter!!.getBatchDataList().size.toString())
 
@@ -619,13 +618,13 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
 //                                    minimumSellingPriceText!!.getText().toString()
 //                                )
 //                            }
-                        } else {
-                            Toast.makeText(
-                                applicationContext,
-                                "Price should not be zero",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+//                        } else {
+//                            Toast.makeText(
+//                                applicationContext,
+//                                "Price should not be zero",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
                     } else {
                         Toast.makeText(applicationContext, "Enter the price", Toast.LENGTH_SHORT)
                             .show()
@@ -635,21 +634,12 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                             .toString()
                             .isEmpty()
                     ) {
-                        if (priceText!!.getText().toString().toDouble() > 0) {
-                            // val minimumsellingprice = minimumSellingPriceText!!.getText().toString().toDouble()
-                            addProduct("Add")
+                        addProduct("Add")
 
-//                            if (minimumsellingprice <= priceText!!.getText().toString().toDouble()) {
-//                                Log.w("saleReturn..","")
-//                                addProduct("Add")
-//                            } else {
-//                                showMinimumSellingpriceAlert(
-//                                    minimumSellingPriceText!!.getText().toString()
-//                                )
-//                            }
-                        } else {
-
-                        }
+//                        if (priceText!!.getText().toString().toDouble() > 0) {
+//                            // val minimumsellingprice = minimumSellingPriceText!!.getText().toString().toDouble()
+//                            addProduct("Add")
+//                        }
                     } else {
                         Toast.makeText(applicationContext, "Enter the price", Toast.LENGTH_SHORT)
                             .show()
@@ -1501,8 +1491,8 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
         if( (qtyValue!!.text != null && !qtyValue!!.text.toString()
                 .isEmpty() && qtyValue!!.text.toString().toDouble() > 0
         )  &&  (priceText!!.text != null && !priceText!!.text.toString()
-                .isEmpty() && priceText!!.text.toString().toDouble() > 0
-                    ) ) {
+                .isEmpty()) ) {
+          //  && priceText!!.text.toString().toDouble() > 0   // faisal and nagaraj said allow 0 price
             addProduct!!.alpha = 0.9f
             addProduct!!.isEnabled = true
         } else {
@@ -2177,7 +2167,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             if (batchList!!.size > 0) {
                 setBatchAdapter(batchList!!)
             } else {
-                val batchmodel1 = BatchDetailModule("", "", "", "")
+                val batchmodel1 = BatchDetailModule("", "", "", "","")
                 batchList!!.add(batchmodel1)
                 setBatchAdapter(batchList!!)
             }
@@ -2187,7 +2177,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
                 batchList = batchListAdapter!!.getBatchDataList()
                 setBatchAdapter(batchList!!)
             } else {
-                val batchmodel1 = BatchDetailModule("", "", "", "")
+                val batchmodel1 = BatchDetailModule("", "", "", "","")
                 batchList!!.add(batchmodel1)
                 setBatchAdapter(batchList!!)
             }
@@ -2199,7 +2189,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             }
 
             batchAdd.setOnClickListener {
-                val batchmodel1 = BatchDetailModule("", "", "", "")
+                val batchmodel1 = BatchDetailModule("", "", "", "","")
                 batchList!!.add(batchmodel1)
                 if (batchListAdapter != null) {
                     batchListAdapter!!.listAdd(false, batchList!!)
@@ -2209,32 +2199,37 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
             saveBtn.setOnClickListener {
                 if (batchListAdapter != null) {
                     var isbatchNo = ""
-                    for ( s in batchListAdapter!!.getBatchDataList()) {
-                        if(s.batchNo!!.isNotEmpty()){
-                            isbatchNo = "true"
-                        }else{
-                            isbatchNo = "false"
-                        }
-                   }
-//                    var batchNoSave =
+                    //todo old
+//                    for ( s in batchListAdapter!!.getBatchDataList()) {
+//                        if(s.batchNo!!.isNotEmpty()){
+//                            isbatchNo = "true"
+//                        }else{
+//                            isbatchNo = "false"
+//                        }
+//                   }
+//                    if (isbatchNo.equals("true")) {
+//                        dialog.dismiss()
+//                    } else {
+//                        Toast.makeText(this, "Enter Batch Qty or Batch No", Toast.LENGTH_SHORT)
+//                            .show()
+//                    }
+/*//                    var batchNoSave =
 //                        batchListAdapter!!.getBatchDataList().filter { it.batchNo!!.isNotEmpty()
-//                        } as ArrayList<BatchDetailModule>
+//                        } as ArrayList<BatchDetailModule>*/
 
                     Log.w("batchArraylist",""+ batchListAdapter!!.getBatchDataList().toString())
 
                     Log.w("isbatchNoBool",""+isbatchNo)
                     // dbHelper!!.insertBatchList(batchListAdapter!!.getBatchDataList(),productId,)
-                    if (isbatchNo.equals("true")) {
+
+                    if(totalBatchVal > 0.0 ){
                         dialog.dismiss()
-                    } else {
+                    }else {
                         Toast.makeText(this, "Enter Batch Qty or Batch No", Toast.LENGTH_SHORT)
                             .show()
                     }
-
                 }
             }
-
-
         }
         fun setBatchAdapter(batchDetailModule: ArrayList<BatchDetailModule>) {
 
@@ -4000,7 +3995,7 @@ class GoodReceiptProductAddActivity : AppCompatActivity(),
 
         override fun batchQtySelected(arrayList: ArrayList<BatchDetailModule>) {
 
-            val totalBatchVal = arrayList.sumOf {
+            totalBatchVal = arrayList.sumOf {
                 if (it.batchQty != null && it.batchQty!!.isNotEmpty()) {
                     it.batchQty!!.toDouble()
                 } else 0.0

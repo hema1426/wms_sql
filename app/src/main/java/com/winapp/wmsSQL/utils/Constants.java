@@ -28,9 +28,16 @@ public class Constants {
 
     public static String NEW_LICENCE_CHECK_URL="http://3.85.9.22/Licence/api/LicenceApi/CheckDevice";
 
+
     public static String PART_URL="/api/";
-
-
+    public static String DAY_FORMAT = "dd" ;
+    public static String DEFAULT_STRING = "";
+    public static String KEY_ADDRESS_ZONE_CODE = "addressZoneCode" ;
+    public static String KEY_ADDRESS_ZONE_NAME = "addressZoneName";
+    public static String KEY_SELECT_FROMDATE_DISPLAY = "selectFromDateDisplay";
+    public static String KEY_SELECTDATE_TODISPLAY = "selectToDateDisplay" ;
+    public static String KEY_SELECT_TODATE = "selectToDate" ;
+    public static String KEY_SELECT_FROMDATE = "selectFromDate";
     // Clients API Urls
     public static String SM_LIVE="http://122.11.163.201:86/es/data/api/";
     public static String  SM_DEMO="http://94.237.70.51:301/es/data/api/";

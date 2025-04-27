@@ -82,6 +82,7 @@ class DashboardActivity : NavigationActivity() {
     private var deliveryLayout: LinearLayout? = null
     private var salesReturnLayout: LinearLayout? = null
     private var productsLayout: LinearLayout? = null
+    private var picklist_layoutl: LinearLayout? = null
     private var customerLayout: LinearLayout? = null
     private var settingsLayout: LinearLayout? = null
     private var catalogCard: CardView? = null
@@ -148,6 +149,8 @@ class DashboardActivity : NavigationActivity() {
         creditLimit_Img = findViewById(R.id.creditLimit_dial)
         timeText = findViewById(R.id.time)
         companyLogo = findViewById(R.id.company_logo)
+        picklist_layoutl = findViewById(R.id.picklist_layout)
+
         val c = Calendar.getInstance().time
         println("Current time => $c")
         var myThread: Thread? = null
@@ -494,6 +497,10 @@ class DashboardActivity : NavigationActivity() {
         })
         productsLayout!!.setOnClickListener(View.OnClickListener {
             val intent = Intent(this@DashboardActivity, StockProductsActivity::class.java)
+            startActivity(intent)
+        })
+        picklist_layoutl!!.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this@DashboardActivity, PickListActivity::class.java)
             startActivity(intent)
         })
         customerLayout!!.setOnClickListener(View.OnClickListener { // need to implement

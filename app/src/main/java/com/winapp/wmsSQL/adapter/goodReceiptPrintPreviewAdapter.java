@@ -14,8 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winapp.wmsSQL.R;
-import com.winapp.wmsSQL.activity.SalesOrderListActivity;
 import com.winapp.wmsSQL.activity.GoodReceiptListActivity;
+import com.winapp.wmsSQL.activity.SalesOrderListActivity;
 import com.winapp.wmsSQL.model.GoodReceiptPreviewModel;
 import com.winapp.wmsSQL.utils.Utils;
 

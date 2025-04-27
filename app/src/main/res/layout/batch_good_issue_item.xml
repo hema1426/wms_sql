@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/batchLaylist"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:background="@drawable/layout_border_radious_hash"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="3dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/batchNo_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/white"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="0"
+                android:selectAllOnFocus="true"
+                android:textColor="@color/black"
+                android:textSize="12dp" />
+        </LinearLayout>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="35dp"
+            android:background="@color/lit_grey_new" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/avaiableQty_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center"
+            android:inputType="numberDecimal"
+            android:padding="5dp"
+            android:text="0"
+            android:selectAllOnFocus="true"
+            android:textColor="@color/black"
+            android:textSize="12dp" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="35dp"
+            android:background="@color/lit_grey_new" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/batchQty_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2"
+                android:background="@color/white"
+                android:gravity="center"
+                android:inputType="number"
+                android:padding="5dp"
+                android:text="0"
+                android:selectAllOnFocus="true"
+                android:textColor="@color/black"
+                android:textSize="12dp" />
+
+            <ImageView
+                android:id="@+id/removeBatch"
+                android:layout_width="18dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:padding="5dp"
+                android:visibility="gone"
+                android:src="@drawable/ic_remove_circle_outline"
+                app:tint="@color/red_btn_bg_color" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

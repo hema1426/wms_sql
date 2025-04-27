@@ -209,11 +209,12 @@ public class StockTakeAddActivity extends AppCompatActivity {
                 }
             }
         });
+        getTakeAdd(locationCode,"All");
 
         locationTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getfromlocationDialog(locationDetailsl);
+//                getfromlocationDialog(locationDetailsl);
             }
         });
 
@@ -830,48 +831,48 @@ public class StockTakeAddActivity extends AppCompatActivity {
     }
 
 
-     private void getfromlocationDialog(ArrayList<LocationModel.LocationDetails> locationDetailsArrayList){
-
-         AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
-         builderSingle.setTitle("Select From Warehouse");
-
-         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.selection_single_dialog);
-         for(int i = 0 ; i < locationDetailsArrayList.size() ; i++) {
-             arrayAdapter.add(locationDetailsArrayList.get(i).getLocationName());
-         }
-
-         int checkedItem = -1;
-
-         builderSingle.setSingleChoiceItems(arrayAdapter, checkedItem, new DialogInterface.OnClickListener() {
-             @RequiresApi(api = Build.VERSION_CODES.M)
-             @Override
-             public void onClick(DialogInterface dialog, int which) {
-                 // user checked an item
-                 String strName = arrayAdapter.getItem(which);
-                 locationTxt.setText(strName);
-
-                 for(int i = 0 ; i < locationDetailsArrayList.size() ; i++) {
-
-                     if(Objects.equals(strName,  locationDetailsArrayList.get(i).getLocationName())){
-                         Log.e("fromlocatcode",""+locationDetailsArrayList.get(i).getLocationCode());
-                         fromWarehouseCode = locationDetailsArrayList.get(i).getLocationCode();
-                         fromWarehouseName = locationDetailsArrayList.get(i).getLocationName();
-                     }
-                 }
-                     getTakeAdd(fromWarehouseCode,"All");
-                     dialog.dismiss();
-             }
-         });
-         builderSingle.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-             @Override
-             public void onClick(DialogInterface dialog, int which) {
-                 dialog.dismiss();
-             }
-         });
-
-         builderSingle.setCancelable(false);
-         builderSingle.show();
-     }
+//     private void getfromlocationDialog(ArrayList<LocationModel.LocationDetails> locationDetailsArrayList){
+//
+//         AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+//         builderSingle.setTitle("Select From Warehouse");
+//
+//         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.selection_single_dialog);
+//         for(int i = 0 ; i < locationDetailsArrayList.size() ; i++) {
+//             arrayAdapter.add(locationDetailsArrayList.get(i).getLocationName());
+//         }
+//
+//         int checkedItem = -1;
+//
+//         builderSingle.setSingleChoiceItems(arrayAdapter, checkedItem, new DialogInterface.OnClickListener() {
+//             @RequiresApi(api = Build.VERSION_CODES.M)
+//             @Override
+//             public void onClick(DialogInterface dialog, int which) {
+//                 // user checked an item
+//                 String strName = arrayAdapter.getItem(which);
+//                 locationTxt.setText(strName);
+//
+//                 for(int i = 0 ; i < locationDetailsArrayList.size() ; i++) {
+//
+//                     if(Objects.equals(strName,  locationDetailsArrayList.get(i).getLocationName())){
+//                         Log.e("fromlocatcode",""+locationDetailsArrayList.get(i).getLocationCode());
+//                         fromWarehouseCode = locationDetailsArrayList.get(i).getLocationCode();
+//                         fromWarehouseName = locationDetailsArrayList.get(i).getLocationName();
+//                     }
+//                 }
+//                     getTakeAdd(fromWarehouseCode,"All");
+//                     dialog.dismiss();
+//             }
+//         });
+//         builderSingle.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//             @Override
+//             public void onClick(DialogInterface dialog, int which) {
+//                 dialog.dismiss();
+//             }
+//         });
+//
+//         builderSingle.setCancelable(false);
+//         builderSingle.show();
+//     }
 
     @Override
     public boolean onSupportNavigateUp() {

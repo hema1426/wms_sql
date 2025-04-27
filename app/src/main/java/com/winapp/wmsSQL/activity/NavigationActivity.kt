@@ -137,17 +137,18 @@ open class NavigationActivity : AppCompatActivity() {
                        } else {
                            false
                        }
-                   }else if (model.settingName == "showAPInvoice") {
-                       Log.w("SettingNameApiInv:", model.settingName)
-                       Log.w("SettingValueApiInv:", model.settingValue)
-                       isAPIInvoice = if (model.settingValue == "True") {
-                           purchase_invoice.setVisible(true)
-                           true
-                       } else {
-                           purchase_invoice.setVisible(false)
-                           false
-                       }
                    }
+//                   else if (model.settingName == "showAPInvoice") {
+//                       Log.w("SettingNameApiInv:", model.settingName)
+//                       Log.w("SettingValueApiInv:", model.settingValue)
+//                       isAPIInvoice = if (model.settingValue == "True") {
+//                           purchase_invoice.setVisible(true)
+//                           true
+//                       } else {
+//                           purchase_invoice.setVisible(false)
+//                           false
+//                       }
+//                   }
                 }
             }
         }
@@ -204,11 +205,11 @@ open class NavigationActivity : AppCompatActivity() {
                         salesreturn.setVisible(false)
                     }
 
-                    "Sales Return" -> if (roll.havePermission == "true") {
-                        purchase_invoice.setVisible(true)
-                    } else {
-                        purchase_invoice.setVisible(false)
-                    }
+//                    "Purchase Invoice" -> if (roll.havePermission == "true") {
+//                        purchase_invoice.setVisible(true)
+//                    } else {
+//                        purchase_invoice.setVisible(false)
+//                    }
                 }
             }
         }
@@ -372,6 +373,14 @@ open class NavigationActivity : AppCompatActivity() {
             }else if (itemId == R.id.navigation_stock_adjust) {
                 val intent: Intent
                 intent = Intent(this@NavigationActivity, GoodReceiptListActivity::class.java)
+                intent.putExtra("docNum", "")
+                intent.putExtra("transferType", "")
+                startActivity(intent)
+                drawerLayout!!.closeDrawers()
+                return@OnNavigationItemSelectedListener true
+            }else if (itemId == R.id.navigation_good_issue) {
+                val intent: Intent
+                intent = Intent(this@NavigationActivity, GoodIssueListActivity::class.java)
                 intent.putExtra("docNum", "")
                 intent.putExtra("transferType", "")
                 startActivity(intent)

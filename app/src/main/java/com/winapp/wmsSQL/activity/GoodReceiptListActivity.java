@@ -37,6 +37,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.winapp.wmsSQL.R;
+import com.winapp.wmsSQL.activity.GoodReceiptProductAddActivity;
 import com.winapp.wmsSQL.adapter.GoodReceiptAdapter;
 import com.winapp.wmsSQL.db.DBHelper;
 import com.winapp.wmsSQL.fragments.CustomerFragment;

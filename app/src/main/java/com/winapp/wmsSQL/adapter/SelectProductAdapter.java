@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.winapp.wmsSQL.R;
 import com.winapp.wmsSQL.activity.AddInvoiceActivityOld;
 import com.winapp.wmsSQL.activity.CreateNewInvoiceActivity;
+import com.winapp.wmsSQL.activity.GoodIssueProductAddActivity;
 import com.winapp.wmsSQL.activity.GoodReceiptProductAddActivity;
 import com.winapp.wmsSQL.activity.ProductAnalyzeActivity;
 import com.winapp.wmsSQL.activity.SearchProductActivity;
@@ -131,6 +132,8 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
                     if (context instanceof SalesReturnActivity ||
                             context instanceof NewSalesReturnProductAddActivity ||
                             context instanceof GoodReceiptProductAddActivity ||
+                            context instanceof GoodReceiptProductAddActivity ||
+                            context instanceof GoodIssueProductAddActivity ||
                             context instanceof TransferProductAddActivity){
                         callBack.searchProduct(model);
                     }else {
@@ -180,6 +183,7 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
                 || context instanceof CreateNewInvoiceActivity || context instanceof StockProductsActivity
                 || context instanceof SearchProductActivity || context instanceof SalesReturnActivity ||
                 context instanceof GoodReceiptProductAddActivity ||
+                context instanceof GoodIssueProductAddActivity ||
                 AddInvoiceActivityOld.activityFrom.equals("SalesOrder") ||
                 AddInvoiceActivityOld.activityFrom.equals("SalesEdit") ||
                 AddInvoiceActivityOld.activityFrom.equals("ReOrderSales") ){
@@ -210,6 +214,7 @@ public class SelectProductAdapter extends RecyclerView.Adapter<SelectProductAdap
                         if (context instanceof SalesReturnActivity
                                 || context instanceof NewSalesReturnProductAddActivity
                                 || context instanceof TransferProductAddActivity ||
+                                context instanceof GoodIssueProductAddActivity ||
                                 context instanceof GoodReceiptProductAddActivity){
                             Log.w("stokpdtqty",""+model.getStockQty());
 

@@ -166,15 +166,30 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activity.GoodReceiptProductAddActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".activity.GoodIssueProductAddActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".activity.GoodIssueListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activity.GoodReceiptListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.GoodReceiptProductAddActivity"
+            android:name=".printpreview.GoodIssuePrintPreview"
             android:exported="false"
             android:screenOrientation="portrait"
-            />
+       />
         <activity
             android:name=".activity.StockTakeListActivity"
             android:exported="false"
@@ -239,6 +254,16 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.TransferListProductActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.PickListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.PickListDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />

@@ -83,6 +83,7 @@
         <item
             android:id="@+id/navigation_item_purchase"
             android:icon="@drawable/ic_invoice_menu"
+            android:visible="false"
             android:title="Purchase Invoice" />
 
     </group>
@@ -154,32 +155,36 @@
     <group
         android:id="@+id/drawermenu_group_60">
         <item
-            android:icon="@drawable/ic_baseline_transform_24"
+            android:icon="@drawable/stock_req_blue_24"
             android:id="@+id/navigation_stock_request"
             android:title="Stock Request" />
-
-    </group>
-    <group
-        android:id="@+id/drawermenu_group_20">
-        <item
-            android:icon="@drawable/ic_baseline_transform_24"
-            android:id="@+id/navigation_stock_adjust"
-            android:visible="true"
-            android:title="Good Receipt" />
-
-
     </group>
     <group
         android:id="@+id/drawermenu_group_21">
         <item
-            android:icon="@drawable/ic_baseline_transform_24"
+            android:icon="@drawable/stock_blue_24"
             android:id="@+id/navigation_stock_take"
             android:visible="true"
             android:title="Stock Take" />
 
     </group>
 
-
+    <group
+        android:id="@+id/drawermenu_group_20">
+        <item
+            android:icon="@drawable/receipt_blue_24"
+            android:id="@+id/navigation_stock_adjust"
+            android:visible="true"
+            android:title="Good Receipt" />
+    </group>
+    <group
+        android:id="@+id/drawermenu_group_20a">
+        <item
+            android:icon="@drawable/ic_baseline_transform_24"
+            android:id="@+id/navigation_good_issue"
+            android:visible="true"
+            android:title="Good Issue" />
+    </group>
     <group
         android:id="@+id/drawermenu_group_61">
         <item

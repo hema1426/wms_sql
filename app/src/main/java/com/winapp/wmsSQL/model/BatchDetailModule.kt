@@ -10,6 +10,7 @@ data class BatchDetailModule(
     @SerializedName("ItemCode")
     var itemCode: String?,
     var updateTime: String = "",
-){
+    var avlQty: String? = "0",
+    ){
     var isRemove : Boolean = false
 }

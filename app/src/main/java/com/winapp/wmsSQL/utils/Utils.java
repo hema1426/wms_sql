@@ -24,8 +24,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.winapp.wmsSQL.db.DBHelper;
+import com.winapp.wmsSQL.model.AddressZoneModel;
 import com.winapp.wmsSQL.model.NewLocationModel;
 import com.winapp.wmsSQL.model.ProductsModel;
+import com.winapp.wmsSQL.model.SupplierModel1;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -64,6 +66,9 @@ public class Utils {
     public static String orderDate="";
     public static String orderNo="";
     public static ArrayList<NewLocationModel.LocationDetails> locationDetails;
+    public static ArrayList<AddressZoneModel> addressZoneList = new ArrayList<>();
+    public static ArrayList<SupplierModel1> supplierItemArrayList = new ArrayList<>();
+
 
     public static String getOrderDate() {
         return orderDate;
@@ -182,6 +187,12 @@ public class Utils {
 //            Utils.setReceiptMode("");
 //        }
     }
+    public static String oneDecimalPoint(double val) {
+        DecimalFormat df = new DecimalFormat("#");
+        String tot = df.format(val);
+        return tot;
+    }
+
     public static String getNextInvoiceDate(String date) throws ParseException {
         String dt = date;  // Start date
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -236,11 +247,30 @@ public class Utils {
         }
 
     }
+    public static ArrayList<AddressZoneModel> getAddressZonelist() {
+        return addressZoneList;
+    }
+
+    public static void setAddressZonelist(ArrayList<AddressZoneModel> addressZoneList) {
+        Utils.addressZoneList = addressZoneList;
+    }
+    public static ArrayList<SupplierModel1> getSupplierList() {
+        return supplierItemArrayList;
+    }
+
+    public static void setSupplierList(ArrayList<SupplierModel1> supplierItemArrayList) {
+        Utils.supplierItemArrayList = supplierItemArrayList;
+    }
 
     public static void hideLoader() {
         if (pDialog != null && pDialog.isShowing()) {
             pDialog.dismiss();
         }
+    }
+    public static void hideKeyBoard(Context context, View view){
+        // Then just use the following:
+        InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public static int calculateNoOfColumns(Context context, float columnWidthDp) { // For example columnWidthdp=180

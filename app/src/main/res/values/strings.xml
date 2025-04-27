@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SAP-ERP</string>
+    <string name="app_name">SAP-WMS</string>
 
     <string name="tools_text_account_information_username">User Name</string>
     <string name="tools_text_account_information_email">Test@yahoo.com</string>
@@ -13,6 +13,7 @@
     <string name="all_prodcuts">All Products</string>
     <string name="title_activity_profile">Profile</string>
     <string name="is_not_valid_mac_address"> is not a valid MAC Address</string>
+    <string name="release">Release</string>
 
     <string name="sales_orders">Sales Orders</string>
     <string name="invoices">Invoices</string>
@@ -32,6 +33,11 @@
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
+
+    <style name="spinnerDropDownItemStyle" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+        <item name="android:textSize">13sp</item>
+        <item name="android:padding">5dp</item>
+    </style>
 
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>
