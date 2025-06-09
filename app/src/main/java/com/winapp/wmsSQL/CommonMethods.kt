@@ -108,6 +108,11 @@ object CommonMethods {
         val date = Date()
         return dateFormat.format(date)
     }
+    fun getCurrentTime1(): String? {
+        val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+        val date = Date()
+        return dateFormat.format(date)
+    }
 
     fun getCurrentdateapi(): String? {
         val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM_dd")

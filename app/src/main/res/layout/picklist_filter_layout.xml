@@ -118,13 +118,15 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginBottom="10dp"
                 android:padding="5dp"
-                android:background="@drawable/spinner_bg"
+                android:visibility="gone"
+                android:background="@drawable/layout_border_radious5_hash"
                 android:orientation="horizontal">
 
                 <com.winapp.wmsSQL.multiselectspinner.MultiSelectSpinnerView
                     android:id="@+id/zoneSpinnerl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/spinner_bg"
                     />
 
 

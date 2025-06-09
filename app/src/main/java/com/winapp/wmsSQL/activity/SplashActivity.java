@@ -154,7 +154,8 @@ public class SplashActivity extends AppCompatActivity {
                 );
                 finish();
             }else {
-      //String apiUrl=Constants.test_URL_OCT24;
+    //  String apiUrl=Constants.FUXIN;
+    //  String apiUrl=Constants.test_URL_OCT24;
         //  String apiUrl=Constants.AADHI_DEMO;
     String apiUrl=Constants.SUPER_STAR_DEMO;
 

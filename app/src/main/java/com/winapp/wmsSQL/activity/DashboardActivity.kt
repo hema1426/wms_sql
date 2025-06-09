@@ -226,15 +226,15 @@ class DashboardActivity : NavigationActivity() {
 //                            false
 //                        }
 //                    }
-                    else if (model.settingName == "showDeliveryOrder") {
-                        Log.w("SettingNameDO:", model.settingName)
-                        Log.w("SettingValueDO:", model.settingValue)
-                        isCheckedDO = if (model.settingValue == "True") {
-                            true
-                        } else {
-                            false
-                        }
-                    }
+//                    else if (model.settingName == "showDeliveryOrder") {
+//                        Log.w("SettingNameDO:", model.settingName)
+//                        Log.w("SettingValueDO:", model.settingValue)
+//                        isCheckedDO = if (model.settingValue == "True") {
+//                            true
+//                        } else {
+//                            false
+//                        }
+//                    }
 //                    else if (model.settingName == "showInvoice") {
 //                        Log.w("SettingNameInv:", model.settingName)
 //                        Log.w("SettingValueInv:", model.settingValue)
@@ -244,15 +244,15 @@ class DashboardActivity : NavigationActivity() {
 //                            false
 //                        }
 //                    }
-                    else if (model.settingName == "showSalesReturn") {
-                        Log.w("SettingNameSaleRet:", model.settingName)
-                        Log.w("SettingValueSaleRet:", model.settingValue)
-                        isCheckedSalesReturn = if (model.settingValue == "True") {
-                            true
-                        } else {
-                            false
-                        }
-                    }
+//                    else if (model.settingName == "showSalesReturn") {
+//                        Log.w("SettingNameSaleRet:", model.settingName)
+//                        Log.w("SettingValueSaleRet:", model.settingValue)
+//                        isCheckedSalesReturn = if (model.settingValue == "True") {
+//                            true
+//                        } else {
+//                            false
+//                        }
+//                    }
 //                    else if (model.settingName == "showCatelog") {
 //                        Log.w("SettingNameCatal:", model.settingName)
 //                        Log.w("SettingValueCatal:", model.settingValue)
@@ -500,7 +500,7 @@ class DashboardActivity : NavigationActivity() {
             startActivity(intent)
         })
         picklist_layoutl!!.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this@DashboardActivity, PickListActivity::class.java)
+            val intent = Intent(this@DashboardActivity, NewPickListActivity::class.java)
             startActivity(intent)
         })
         customerLayout!!.setOnClickListener(View.OnClickListener { // need to implement

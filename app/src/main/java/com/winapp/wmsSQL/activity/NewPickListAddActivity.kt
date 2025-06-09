@@ -15,7 +15,6 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -36,12 +35,14 @@ import com.android.volley.RetryPolicy
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.winapp.wmsSQL.CommonMethods
 import com.winapp.wmsSQL.R
-import com.winapp.wmsSQL.adapter.PickListAddAdapter
+import com.winapp.wmsSQL.adapter.PickListAddNewAdapter
 import com.winapp.wmsSQL.model.ItemGroupList
+import com.winapp.wmsSQL.model.PicklistAddNewModel
+import com.winapp.wmsSQL.model.newPickDetail.SalesOrderPickDetail
 import com.winapp.wmsSQL.newtransfer.LocationModel
 import com.winapp.wmsSQL.newtransfer.TransferInModel
-import com.winapp.wmsSQL.newtransfer.TransferInModel.TransferInDetails
 import com.winapp.wmsSQL.utils.BarCodeScanner
 import com.winapp.wmsSQL.utils.CaptureSignatureView
 import com.winapp.wmsSQL.utils.Constants
@@ -52,26 +53,26 @@ import com.winapp.wmsSQL.utils.Utils
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.Objects
 
-class PickListAddActivity : AppCompatActivity() {
+class NewPickListAddActivity : AppCompatActivity() {
     var pDialog: SweetAlertDialog? = null
-    private var transferInModels: ArrayList<TransferInModel>? = null
-    private var transferInDetailsl: ArrayList<TransferInDetails>? = null
+    private var picklistDetailsl: ArrayList<PicklistAddNewModel>? = null
     private var locationDetailsl: ArrayList<LocationModel.LocationDetails>? = null
-    var pickListAddAdapter: PickListAddAdapter? = null
-    var rv_takeAddView: RecyclerView? = null
+    var pickListAddAdapter: PickListAddNewAdapter? = null
+    var rv_pickListAddView: RecyclerView? = null
     var pdtsizel: TextView? = null
     var count = 0
     private val itemGroup: ArrayList<ItemGroupList>? = null
     private var groupspinner: AppCompatSpinner? = null
     var fromWarehouseCode: String? = ""
     var fromWarehouseName = ""
+    private var currentSaveDateTime: String? = ""
+    var custCodeStr: String? = ""
     var search_ed: EditText? = null
     var emptytxt: TextView? = null
     var date_takel: TextView? = null
@@ -98,12 +99,18 @@ class PickListAddActivity : AppCompatActivity() {
     private var sharedPreferenceUtil: SharedPreferenceUtil? = null
     var RESULT_CODE = 12
     var scannedBarcode: String? = ""
+    var pickCode: String? = ""
+    var pickSoDate: String? = ""
+    var pickStatus: String? = ""
+    var pickCustCode: String? = ""
+    var orderStatus = ""
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_picklist_add)
         Objects.requireNonNull(supportActionBar)!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.title = "Pick List"
+
         Log.w("activity_cg", javaClass.simpleName.toString())
         session = SessionManager(this)
         user = session!!.userDetails
@@ -115,15 +122,14 @@ class PickListAddActivity : AppCompatActivity() {
         locationCode = user!!.get(SessionManager.KEY_LOCATION_CODE)
         islocationPermission = user!!.get(SessionManager.IS_LOCATION_PERMISSION)
         default_uom_transfl = findViewById(R.id.default_uom_transf)
-        rv_takeAddView = findViewById(R.id.rv_takeaddlist)
-        search_ed = findViewById(R.id.searchBar_transfer)
+        rv_pickListAddView = findViewById(R.id.rv_picklist_addlist)
+        search_ed = findViewById(R.id.searchBar_picklist)
         emptytxt = findViewById(R.id.empty_txt)
         date_takel = findViewById(R.id.date_take)
         locationTxt = findViewById(R.id.location_takeAdd)
-        pdtsizel = findViewById(R.id.pdtsize)
+        pdtsizel = findViewById(R.id.pdtsize_Picklist)
         groupspinner = findViewById(R.id.spinner_status)
 
-        transferInDetailsl = ArrayList()
         val c = Calendar.getInstance().time
         println("Current time => $c")
         val df1 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
@@ -131,23 +137,24 @@ class PickListAddActivity : AppCompatActivity() {
         val df = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val formattedDate = df.format(c)
         date_takel!!.setText(formattedDate)
-        if (intent != null) {
-            //  locationTxt.setText(locationCode);
-            //   fromWarehouseCode = locationCode;
+
+        if (intent.hasExtra("salesCode")) {
+            pickCode = intent.getStringExtra("salesCode")
+            pickSoDate = intent.getStringExtra("pick_SoDate")
+            pickCustCode = intent.getStringExtra("custCodePick")
+            if (intent.getStringExtra("pick_status").equals("OC") ||
+                intent.getStringExtra("pick_status").equals("OW") ||
+                intent.getStringExtra("pick_status").equals("OP")
+            ) {
+                pickStatus = "O"
+            } else {
+                pickStatus = intent.getStringExtra("pick_status")
+            }
+            supportActionBar!!.title = "SO"+" - "+ pickCode
+            getPicklistAddDetails(pickCode!!)
+
         }
-//        locationTxt.setOnClickListener(View.OnClickListener { getfromlocationDialog(locationDetailsl) })
-        if (transferInDetailsl == null) {
-            emptytxt!!.setVisibility(View.VISIBLE)
-            pdtsizel!!.setVisibility(View.GONE)
-            search_ed!!.setEnabled(false)
-            rv_takeAddView!!.setVisibility(View.GONE)
-        }
-        try {
-            // getGrouplist();
-            locationlist
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
+
         search_ed!!.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 if (!s.toString().isEmpty()) {
@@ -160,8 +167,10 @@ class PickListAddActivity : AppCompatActivity() {
 //                    }
                     //  Log.w("transFiltSize",""+transferInDetailsl.size());
                 } else {
-                    Log.w("transFiltSizeaa", "" + transferInDetailsl!!.size)
-                    setpickListAddAdapter(transferInDetailsl!!)
+                    if(picklistDetailsl != null && picklistDetailsl!!.size > 0) {
+                        Log.w("picklistSize", "" + picklistDetailsl!!.size)
+                        setpickListAddAdapter(picklistDetailsl!!)
+                    }
                 }
             }
 
@@ -173,9 +182,9 @@ class PickListAddActivity : AppCompatActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             var count = 0
-            for (i in transferInDetailsl!!.indices) {
-                if (!transferInDetailsl!![i].qty.isEmpty()) {
-                    count += transferInDetailsl!![i].qty.toInt()
+            for (i in picklistDetailsl!!.indices) {
+                if (!picklistDetailsl!![i].qty!!.isEmpty()) {
+                    count += picklistDetailsl!![i].qty!!.toInt()
                 }
             }
             if (count > 0) {
@@ -192,7 +201,7 @@ class PickListAddActivity : AppCompatActivity() {
     }
 
     fun showDeleteAlert() {
-        val builder1 = AlertDialog.Builder(this@PickListAddActivity)
+        val builder1 = AlertDialog.Builder(this@NewPickListAddActivity)
         builder1.setMessage("Data Will be Cleared are you sure want to back?")
         builder1.setCancelable(false)
         builder1.setPositiveButton(
@@ -209,26 +218,26 @@ class PickListAddActivity : AppCompatActivity() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setpickListAddAdapter(transferInList: ArrayList<TransferInDetails>) {
-        try {
-            rv_takeAddView!!.visibility = View.VISIBLE
+    fun setpickListAddAdapter(pickAddList: ArrayList<PicklistAddNewModel>) {
+    //    try {
+            rv_pickListAddView!!.visibility = View.VISIBLE
             pdtsizel!!.visibility = View.VISIBLE
             search_ed!!.isEnabled = true
             emptytxt!!.visibility = View.GONE
-            pdtsizel!!.text = transferInList.size.toString() + " Products"
-            pickListAddAdapter = PickListAddAdapter(applicationContext, transferInList)
-            rv_takeAddView!!.layoutManager =
-                LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
-            rv_takeAddView!!.itemAnimator = DefaultItemAnimator()
-            rv_takeAddView!!.adapter = pickListAddAdapter
-            pickListAddAdapter!!.notifyDataSetChanged()
+            pdtsizel!!.text = pickAddList.size.toString() + " Products"
+
+            rv_pickListAddView!!.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            rv_pickListAddView!!.itemAnimator = DefaultItemAnimator()
+        pickListAddAdapter = PickListAddNewAdapter(this,pickAddList)
+            rv_pickListAddView!!.adapter = pickListAddAdapter
+         //   pickListAddAdapter!!.notifyDataSetChanged()
             //categoriesView.setVisibility(View.VISIBLE);
             //emptyLayout.setVisibility(View.GONE);
-        } catch (ex: Exception) {
-            Log.e("TAG", "Error in Populating the data:" + ex.message)
-        }
+//        } catch (ex: Exception) {
+//            Log.e("TAG", "Error in Populating the data:" + ex.message)
+//        }
     }
-
     fun showSaveAlert() {
         try {
             // create an alert builder
@@ -255,8 +264,8 @@ class PickListAddActivity : AppCompatActivity() {
 
             invoicePrintCheck!!.setVisibility(View.GONE)
             //invoicePrintCheck.setVisibility(View.GONE);
-            saveTitle!!.setText("Save Stock Take")
-            saveMessage!!.setText("Are you sure want to save Stock Take?")
+            saveTitle!!.setText("Save  PickList")
+            saveMessage!!.setText("Are you sure want to save picklist?")
             //                invoicePrintCheck.setText("Stock Request Print");
             invoicePrintCheck!!.setOnClickListener(View.OnClickListener {
                 if (invoicePrintCheck!!.isChecked()) {
@@ -305,7 +314,7 @@ class PickListAddActivity : AppCompatActivity() {
         val mContent = customLayout.findViewById<LinearLayout>(R.id.signature_layout)
         acceptButton.isEnabled = false
         acceptButton.alpha = 0.4f
-        val mSig = CaptureSignatureView(this@PickListAddActivity, null) {
+        val mSig = CaptureSignatureView(this@NewPickListAddActivity, null) {
             acceptButton.isEnabled = true
             acceptButton.alpha = 1f
         }
@@ -335,82 +344,145 @@ class PickListAddActivity : AppCompatActivity() {
 
     @Throws(JSONException::class)
     private fun createJsonObject() {
-        // transferInDetailsl = transferInAdapter.getTransferInlist();
+        val Picklists1: ArrayList<SalesOrderPickDetail> = ArrayList<SalesOrderPickDetail>()
+
         val rootJson = JSONObject()
         var itemsObject = JSONObject()
         val itemsArray = JSONArray()
-        rootJson.put("DocEntry", "")
-        rootJson.put("Status", "")
-        rootJson.put("DocDate", currentDate)
-        rootJson.put("Remarks", "")
-        rootJson.put("Image", "")
-        rootJson.put("Signature", "")
+
+
 
         // Sales Details Add to the Objects
         var index = 1
-        for (model in transferInDetailsl!!) {
-            if (model.qty != null && !model.qty.isEmpty() && model.qty.toInt() > 0) {
+        for (model in picklistDetailsl!!) {
+            if (model.qty != null && !model.qty!!.isEmpty() && model.qty!!.toInt() > 0) {
                 Log.w("takeQtyaa", "" + model.qty)
                 itemsObject = JSONObject()
-                itemsObject.put("itemCode", model.productCode)
-                itemsObject.put("itemName", model.productName)
-                itemsObject.put("qty", model.qty.toString())
-                itemsObject.put("price", "")
-                itemsObject.put("WarehouseCode", fromWarehouseCode)
-                itemsObject.put("UomCode", model.inventoryUOM)
+
+                itemsObject.put("AdditionalRemarks", "")
+                itemsObject.put("LineNum", model.lineNum)
+                itemsObject.put("NoofCarton", model.qty.toString())
+                itemsObject.put("NoofPCS", "")
+                itemsObject.put("PickedQty", model.pickQty!!)
+                itemsObject.put("ProductCode", model.productCode)
+                itemsObject.put("Quantity", model.qty)
+                itemsObject.put("Remarks", model.remarks)
+                itemsObject.put("UnitPrice", model.unitPrice)
+                itemsObject.put("UomCode", model.uomCode)
+                itemsObject.put("WarehouseCode", model.warehouseCode)
+
                 itemsArray.put(itemsObject)
                 index++
             }
         }
-        rootJson.put("InventorycountingDetails", itemsArray)
-        Log.w("GivenStockRequest:", rootJson.toString())
-        saveTransferOrRequest(rootJson, 1)
-    }
+        if (currentSaveDateTime == null || currentSaveDateTime!!.isEmpty()) {
+            val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+            val currentDateandTime = sdf.format(Date())
+            currentSaveDateTime = currentDateandTime
+        }
+        orderStatus = "OC"
+        rootJson.put("CurrentDateTime", currentSaveDateTime)
+        rootJson.put("CustomerCode", pickCustCode)
+        rootJson.put("OrderStatus", orderStatus)
+        rootJson.put("SODate", CommonMethods.dateConvert(pickSoDate!!))
+        rootJson.put("SONumber", pickCode)
+        rootJson.put("SOStatus", pickStatus)
+        rootJson.put("createUser", locationCode)
+//        for (model in picklistDetailsl!!) {
+//         if (model.qty != null && !model.qty!!.isEmpty() && model.qty!!.toInt() > 0) {
+//             val picklistdetail = SalesOrderPickDetail(
+//                 model.noofCarton.toString(),
+//                 model.noofPCS.toString(),
+//                 model.noofPallet.toString(),
+//                 model.productCode.toString(),
+//                 model.pickQty!!.toDouble(),
+//                 model.remarks.toString(),
+//                 model.palletRemarks.toString(),
+//                 model.unitPrice!!.toDouble(),
+//                 model.uomCode.toString(),
+//                 locationCode!!,
+//                 model.lineNum
+//                 //newpickListDetail_Item_List.get(i).selectedBatchDetails
+//             )
+//             Picklists1.add(picklistdetail)
+//        }
+  //  }
+//        for (model in picklistDetailsl!!) {
+//            if (model.qty != null && !model.qty!!.isEmpty() && model.qty!!.toInt() > 0) {
+//                Log.w("takeQtyaa", "" + model.qty)
+//                itemsObject = JSONObject()
+//                itemsObject.put("itemCode", model.productCode)
+//                itemsObject.put("itemName", model.productName)
+//                itemsObject.put("qty", model.qty.toString())
+//                itemsObject.put("price", "")
+//                itemsObject.put("WarehouseCode", fromWarehouseCode)
+//                itemsObject.put("UomCode", model.inventoryUOM)
+//                itemsArray.put(itemsObject)
+//                index++
+//            }
+//        }
+//        val postingRequest = SoPickRequests(
+//            username!!,
+//            currentSaveDateTime!!,
+//            custCodeStr!!,
+//            CommonMethods.dateConvert(pickSoDate!!)!!,
+//            pickCode!!,
+//            orderStatus,
+//            pickStatus!!,
+//            Picklists1
+//        )
+//        val postingPicklistmodel = SalesOrderNewPickModel(postingRequest)
 
+        rootJson.put("SalesOrderDetails", itemsArray)
+        saveTransferOrRequest(rootJson,1)
+
+        Log.w("picklistJson:", rootJson.toString())
+    }
     fun saveTransferOrRequest(jsonBody: JSONObject, copy: Int) {
         try {
-            pDialog = SweetAlertDialog(this@PickListAddActivity, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
             pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
             pDialog!!.setCancelable(false)
             val requestQueue = Volley.newRequestQueue(this)
             Log.w("GiventakeRequest:", jsonBody.toString())
             var URL = ""
-            URL = Utils.getBaseUrl(this) + "PostingStockTake"
-            Log.w("Given_takeApi:", URL)
-            pDialog!!.setTitleText("Saving Take...")
+            URL = Utils.getBaseUrl(this) + "SalesOrderCreation"
+            Log.w("Given_pickApi:", URL)
+            pDialog!!.setTitleText("Saving Picklist...")
             pDialog!!.show()
+
             val salesOrderRequest: JsonObjectRequest = object : JsonObjectRequest(
-                Method.POST,
-                URL,
-                jsonBody,
+                Method.POST, URL, jsonBody,
                 Response.Listener { response: JSONObject ->
-                    Log.w("Take_ResSap:", response.toString())
+                    Log.w("picklis_ResSap:", response.toString())
                     pDialog!!.dismiss()
                     val statusCode = response.optString("statusCode")
                     val message = response.optString("statusMessage")
+                    Log.w("msggpickl",""+message)
                     var responseData: JSONObject? = null
                     responseData = response.optJSONObject("responseData")
                     if (statusCode == "1") {
                         val docNum = responseData.optString("docNum")
                         Toast.makeText(
                             applicationContext,
-                            "Transfer Saved Success...!",
+                            "pickList Saved Success...!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        val intent = Intent(applicationContext, StockTakeListActivity::class.java)
-                        if (isPrintEnable) {
+                        val intent = Intent(applicationContext, NewPickListActivity::class.java)
+
+                        if (StockTakeAddActivity.isPrintEnable) {
                             intent.putExtra("docNum", docNum)
                         }
                         startActivity(intent)
                         finish()
                     } else {
                         /* Intent intent=new Intent(getApplicationContext(),TransferListProductActivity.class);
-                    if (isPrintEnable) {
-                        intent.putExtra("docNum","22010004");
-                        intent.putExtra("transferType",transferType);
-                    }
-                    startActivity(intent);
-                    finish();*/
+                      if (isPrintEnable) {
+                          intent.putExtra("docNum","22010004");
+                          intent.putExtra("transferType",transferType);
+                      }
+                      startActivity(intent);
+                      finish();*/
                         if (responseData != null) {
                             Toast.makeText(
                                 applicationContext,
@@ -439,7 +511,7 @@ class PickListAddActivity : AppCompatActivity() {
                 }
 
                 override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
+                    val params = java.util.HashMap<String, String>()
                     val creds = String.format(
                         "%s:%s",
                         Constants.API_SECRET_CODE,
@@ -464,23 +536,125 @@ class PickListAddActivity : AppCompatActivity() {
                 }
             })
             requestQueue.add(salesOrderRequest)
-        } catch (e: Exception) {
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
     }
 
+//    fun savePicklistAdd(jsonBody:JSONObject) {
+//
+//        try {
+//            pDialog = SweetAlertDialog(this@NewPickListAddActivity, SweetAlertDialog.PROGRESS_TYPE)
+//            pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
+//            pDialog!!.setCancelable(false)
+//            val requestQueue = Volley.newRequestQueue(this)
+//
+//            var URL = ""
+//            URL = Utils.getBaseUrl(this) + "SalesOrderCreation"
+//            Log.w("Given_picklistApi:", URL)
+//            Log.w("picklist_Request:", jsonBody.toString())
+//
+//            pDialog!!.setTitleText("Saving Picklist...")
+//            pDialog!!.show()
+//            val salesOrderRequest: JsonObjectRequest = object : JsonObjectRequest(
+//                Method.POST,
+//                URL,
+//                null,
+//                Response.Listener { response: JSONObject ->
+//                    Log.w("Take_ResSap:", response.toString())
+//                    pDialog!!.dismiss()
+//                    val statusCode = response.optString("statusCode")
+//                    val message = response.optString("statusMessage")
+//                    var responseData: JSONObject? = null
+//                    responseData = response.optJSONObject("responseData")
+//                    if (statusCode == "1") {
+//                        val docNum = responseData.optString("docNum")
+//                        Toast.makeText(
+//                            applicationContext,
+//                            "Picklist Saved Success...!",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        val intent = Intent(applicationContext, NewPickListActivity::class.java)
+//                        if (isPrintEnable) {
+//                            intent.putExtra("docNum", docNum)
+//                        }
+//                        startActivity(intent)
+//                        finish()
+//                    } else {
+//                        /* Intent intent=new Intent(getApplicationContext(),TransferListProductActivity.class);
+//                    if (isPrintEnable) {
+//                        intent.putExtra("docNum","22010004");
+//                        intent.putExtra("transferType",transferType);
+//                    }
+//                    startActivity(intent);
+//                    finish();*/
+//                        if (responseData != null) {
+//                            Toast.makeText(
+//                                applicationContext,
+//                                responseData.optString("error"),
+//                                Toast.LENGTH_LONG
+//                            ).show()
+//                        } else {
+//                            Toast.makeText(
+//                                applicationContext,
+//                                "Error in Saving Data...",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//                    }
+//                },
+//                Response.ErrorListener { error: VolleyError ->
+//                    Log.w("SalesOrder_Response:", error.toString())
+//                    pDialog!!.dismiss()
+//                }) {
+//                /* @Override
+//                 public byte[] getBody() {
+//                     return jsonBody.toString().getBytes();
+//                 }*/
+//
+//                override fun getHeaders(): Map<String, String> {
+//                    val params = HashMap<String, String>()
+//                    val creds = String.format(
+//                        "%s:%s",
+//                        Constants.API_SECRET_CODE,
+//                        Constants.API_SECRET_PASSWORD
+//                    )
+//                    val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+//                    params["Authorization"] = auth
+//                    return params
+//                }
+//            }
+//            salesOrderRequest.setRetryPolicy(object : RetryPolicy {
+//                override fun getCurrentTimeout(): Int {
+//                    return 50000
+//                }
+//
+//                override fun getCurrentRetryCount(): Int {
+//                    return 50000
+//                }
+//
+//                @Throws(VolleyError::class)
+//                override fun retry(error: VolleyError) {
+//                }
+//            })
+//            requestQueue.add(salesOrderRequest)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+
     private fun filter(text: String) {
         try {
             //new array list that will hold the filtered data
-            val filterProducts = ArrayList<TransferInDetails>()
+            val filterProducts = ArrayList<PicklistAddNewModel>()
             //looping through existing elements
             //   for (ProductsModel s : selectProductAdapter.getProductsList()) {
             emptytxt!!.visibility = View.GONE
-            for (s in transferInDetailsl!!) {
+            for (s in picklistDetailsl!!) {
                 //if the existing elements contains the search input
-                if (s.productName.lowercase(Locale.getDefault())
+                if (s.productName!!.lowercase(Locale.getDefault())
                         .contains(text.lowercase(Locale.getDefault())) ||
-                    s.productCode.lowercase(Locale.getDefault())
+                    s.productCode!!.lowercase(Locale.getDefault())
                         .contains(text.lowercase(Locale.getDefault()))
                 ) {
                     //adding the element to filtered list
@@ -489,7 +663,7 @@ class PickListAddActivity : AppCompatActivity() {
                 }
             }
             //calling a method of the adapter class and passing the filtered list
-            pickListAddAdapter!!.updateList(filterProducts)
+            //pickListAddAdapter!!.updateList(filterProducts)
             Log.e("filter", "" + filterProducts)
             if (filterProducts.isEmpty()) {
                 emptytxt!!.visibility = View.VISIBLE
@@ -516,22 +690,22 @@ class PickListAddActivity : AppCompatActivity() {
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private fun getTakeAdd(warehouseCode: String?, itemGroupCode: String) {
+    private fun getPicklistAddDetails(soNum: String) {
         val url: String
         try {
             val jsonObj = JSONObject()
-            jsonObj.put("WarehouseCode", warehouseCode)
-            jsonObj.put("ItemGroupCode", itemGroupCode)
+            jsonObj.put("SalesOrderNo", soNum)
+
             val requestQueue = Volley.newRequestQueue(this)
-            url = Utils.getBaseUrl(this) + "ProductList"
-            Log.w("pdtlist_urlTransAdd:", url + jsonObj)
+            url = Utils.getBaseUrl(this) + "SalesOrderwithBatchDetails"
+            Log.w("pdtlist_detailAdd:", url + jsonObj)
             pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
             pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
-            pDialog!!.setTitleText("Loading...")
+            pDialog!!.setTitleText("Loading Details...")
             pDialog!!.setCancelable(false)
             pDialog!!.show()
-            transferInModels = ArrayList()
-            transferInDetailsl = ArrayList()
+
+            picklistDetailsl = ArrayList()
             val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
                 Method.POST,
                 url,
@@ -539,17 +713,17 @@ class PickListAddActivity : AppCompatActivity() {
                 Response.Listener { response: JSONObject ->
                     try {
                         pDialog!!.dismiss()
-                        Log.w("pdtlistTransAdd:", response.toString())
+                        Log.w("picklistDetail_res:", response.toString())
 
                         //pDialog.dismiss();
                         val statusCode = response.optString("statusCode")
                         val statusMessage = response.optString("statusMessage")
-                        if (statusCode == "1") {
+
                             val transferInModel = TransferInModel()
                             val pdtArray = response.optJSONArray("responseData")
+                            if(pdtArray.length() > 0){
                             for (i in 0 until pdtArray.length()) {
-                                val jsonObject = pdtArray.getJSONObject(i)
-
+                                val jsonObj = pdtArray.getJSONObject(i)
 //                                    if (transferType.equals("Transfer In")) {
 //                                        if (jsonObject.optInt("stockInHand") > 0){
 //                                            TransferInModel.TransferInDetails transferInDetails = new TransferInModel.TransferInDetails();
@@ -561,27 +735,53 @@ class PickListAddActivity : AppCompatActivity() {
 //                                            transferInDetailsl.add(transferInDetails);
 //                                        }
 //                                    } else {
-                                val transferInDetails = TransferInDetails()
-                                transferInDetails.productName = jsonObject.optString("productName")
-                                transferInDetails.productCode = jsonObject.optString("productCode")
-                                transferInDetails.stockInHand = jsonObject.optInt("stockInHand")
-                                transferInDetails.qty = ""
-                                transferInDetails.inventoryUOM =
-                                    jsonObject.optString("defaultInventoryUOM")
-                                transferInDetailsl!!.add(transferInDetails)
-                                //  }
+                                val pdtDetailArray = jsonObj.optJSONArray("salesOrderDetails")
+                                for (i in 0 until pdtDetailArray.length()) {
+                                    val jsonObject = pdtDetailArray.getJSONObject(i)
+
+
+                                val picklistDetails = PicklistAddNewModel()
+                                picklistDetails.productName = jsonObject.optString("productName")
+                                picklistDetails.productCode = jsonObject.optString("productCode")
+                                picklistDetails.stock = jsonObject.optString("stockInHand")
+                                picklistDetails.qty = ""
+                                picklistDetails.pickQty = jsonObject.optString("pickedQty")
+                                picklistDetails.openQty = jsonObject.optString("quantity")
+                                picklistDetails.noofCarton = jsonObject.optString("noofCarton")
+                                picklistDetails.noofPCS = jsonObject.optString("noofPCS")
+                                picklistDetails.noofPallet = jsonObject.optString("noofPallet")
+                                picklistDetails.remarks = jsonObject.optString("remarks")
+                                picklistDetails.palletRemarks = jsonObject.optString("quantity")
+                                picklistDetails.unitPrice = jsonObject.optString("unitPrice")
+                                picklistDetails.uomCode = jsonObject.optString("uomCode")
+                                picklistDetails.warehouseCode = jsonObject.optString("warehouseCode")
+                                picklistDetails.lineNum = jsonObject.optString("lineNum")
+
+                                picklistDetailsl!!.add(picklistDetails)
+                                 }
                             }
-                            Log.w("entrTake_ddd", "" + transferInDetailsl!!.size)
-                            if (transferInDetailsl!!.size > 0) {
-                                transferInModel.transferInDetails = transferInDetailsl
-                                setpickListAddAdapter(transferInDetailsl!!)
-                                Log.w("entrTake", "" + transferInDetailsl!!.size)
+                            if (picklistDetailsl!!.size > 0) {
+                                setpickListAddAdapter(picklistDetailsl!!)
+                                emptytxt!!.setVisibility(View.GONE)
+                                search_ed!!.setEnabled(true)
+                                rv_pickListAddView!!.setVisibility(View.VISIBLE)
+
+                                Log.w("entrpicklis", "" + picklistDetailsl!!.size)
+                            }else{
+                                    emptytxt!!.setVisibility(View.VISIBLE)
+                                    search_ed!!.setEnabled(false)
+                                    rv_pickListAddView!!.setVisibility(View.GONE)
+                                pdtsizel!!.text = "0 Products"
+
                             }
                         } else {
-                            pickListAddAdapter!!.notifyDataSetChanged()
-                            transferInDetailsl!!.clear()
-                            rv_takeAddView!!.adapter = null
+                            if (pickListAddAdapter != null) {
+                                pickListAddAdapter!!.notifyDataSetChanged()
+                            }
+                            picklistDetailsl!!.clear()
                             pdtsizel!!.text = "0 Products"
+                            emptytxt!!.setVisibility(View.VISIBLE)
+
                             Toast.makeText(applicationContext, statusMessage, Toast.LENGTH_SHORT)
                                 .show()
                             Log.w("entrTake", "")
@@ -625,121 +825,21 @@ class PickListAddActivity : AppCompatActivity() {
         }
     }
 
-    @get:Throws(JSONException::class)
-    private val locationlist: Unit
-        private get() {
-            val requestQueue = Volley.newRequestQueue(this)
-            val url = Utils.getBaseUrl(this) + "WarehouseList"
-            // Initialize a new JsonArrayRequest instance
-            Log.w("Given_url_location:", url)
-            pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
-            pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
-            pDialog!!.setTitleText("Loading Warehouses...")
-            pDialog!!.setCancelable(false)
-            pDialog!!.show()
-            locationDetailsl = ArrayList()
-            val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
-                Method.GET,
-                url,
-                null,
-                Response.Listener { response: JSONObject ->
-                    try {
-                        Log.w("locationlist:", response.toString())
-                        pDialog!!.dismiss()
-                        val statusCode = response.optString("statusCode")
-                        val statusMessage = response.optString("statusMessage")
-                        if (statusCode == "1") {
-                            val locationModel = LocationModel()
-                            val locationArray = response.optJSONArray("responseData")
-                            for (i in 0 until locationArray.length()) {
-                                val jsonObject = locationArray.getJSONObject(i)
-                                val locationDetails = LocationModel.LocationDetails()
-                                locationDetails.locationName = jsonObject.optString("whsName")
-                                locationDetails.locationCode = jsonObject.optString("whsCode")
-                                locationDetailsl!!.add(locationDetails)
-                            }
-                            if (locationDetailsl!!.size > 0) {
-                                locationModel.setLocationDetailsArrayList(locationDetailsl)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }, Response.ErrorListener { error: VolleyError ->
-                    // Do something when error occurred
-                    pDialog!!.dismiss()
-                    Log.w("Error_throwing:", error.toString())
-                }) {
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    val creds = String.format(
-                        "%s:%s",
-                        Constants.API_SECRET_CODE,
-                        Constants.API_SECRET_PASSWORD
-                    )
-                    val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                    params["Authorization"] = auth
-                    return params
-                }
-            }
-            jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
-                override fun getCurrentTimeout(): Int {
-                    return 50000
-                }
 
-                override fun getCurrentRetryCount(): Int {
-                    return 50000
-                }
-
-                @Throws(VolleyError::class)
-                override fun retry(error: VolleyError) {
-                }
-            })
-            // Add JsonArrayRequest to the RequestQueue
-            requestQueue.add(jsonObjectRequest)
-        }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun getfromlocationDialog(locationDetailsArrayList: ArrayList<LocationModel.LocationDetails>?) {
-        val builderSingle = AlertDialog.Builder(this)
-        builderSingle.setTitle("Select From Warehouse")
-        val arrayAdapter = ArrayAdapter<String>(this, R.layout.selection_single_dialog)
-        for (i in locationDetailsArrayList!!.indices) {
-            arrayAdapter.add(locationDetailsArrayList[i].locationName)
-        }
-        val checkedItem = -1
-        builderSingle.setSingleChoiceItems(
-            arrayAdapter,
-            checkedItem
-        ) { dialog, which -> // user checked an item
-            val strName = arrayAdapter.getItem(which)
-            locationTxt!!.text = strName
-            for (i in locationDetailsArrayList.indices) {
-                if (strName == locationDetailsArrayList[i].locationName) {
-                    Log.e("fromlocatcode", "" + locationDetailsArrayList[i].locationCode)
-                    fromWarehouseCode = locationDetailsArrayList[i].locationCode
-                    fromWarehouseName = locationDetailsArrayList[i].locationName
-                }
-            }
-            getTakeAdd(fromWarehouseCode, "All")
-            dialog.dismiss()
-        }
-        builderSingle.setNegativeButton("Cancel") { dialog, which -> dialog.dismiss() }
-        builderSingle.setCancelable(false)
-        builderSingle.show()
-    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.save_menu, menu)
+         val action_scan_menul = menu.findItem(R.id.action_scan_menu)
+        action_scan_menul.setVisible(false)
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 var count = 0
-                for (i in transferInDetailsl!!.indices) {
-                    if (!transferInDetailsl!![i].qty.isEmpty()) {
-                        count += transferInDetailsl!![i].qty.toInt()
+                for (i in picklistDetailsl!!.indices) {
+                    if (!picklistDetailsl!![i].qty!!.isEmpty()) {
+                        count += picklistDetailsl!![i].qty!!.toInt()
                     }
                 }
                 if (count > 0) {
@@ -752,13 +852,12 @@ class PickListAddActivity : AppCompatActivity() {
 
             R.id.action_save -> {
 
-                for (i in transferInDetailsl!!.indices) {
-                    if (!transferInDetailsl!![i].qty.isEmpty()) {
-                        count += transferInDetailsl!![i].qty.toInt()
+                for (i in picklistDetailsl!!.indices) {
+                    if (!picklistDetailsl!![i].qty!!.isEmpty()) {
+                        count += picklistDetailsl!![i].qty!!.toInt()
                     }
                 }
                 Log.e("qqty", "" + count)
-                if (fromWarehouseCode != null && !fromWarehouseCode!!.isEmpty()) {
                     if (count > 0) {
                         try {
                             showSaveAlert()
@@ -769,17 +868,12 @@ class PickListAddActivity : AppCompatActivity() {
                         Toast.makeText(applicationContext, "Add product first...!", Toast.LENGTH_SHORT)
                             .show()
                     }
-                } else {
-                    Toast.makeText(applicationContext, "Select Locations...!", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
                 true
             }
 
             R.id.action_scan_menu -> {
                 scannedBarcode = ""
-                val intent = Intent(this@PickListAddActivity, BarCodeScanner::class.java)
+                val intent = Intent(this@NewPickListAddActivity, BarCodeScanner::class.java)
                 startActivityForResult(intent, RESULT_CODE)
                 true
             }

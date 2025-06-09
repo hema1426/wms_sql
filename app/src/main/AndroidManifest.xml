@@ -258,15 +258,21 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.PickListActivity"
+            android:name=".activity.NewPickListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+      />
         <activity
             android:name=".activity.PickListDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+             />
+        <activity
+            android:name=".activity.NewPickListAddActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            />
+
         <activity
             android:name=".activity.TransferActivity"
             android:exported="false"

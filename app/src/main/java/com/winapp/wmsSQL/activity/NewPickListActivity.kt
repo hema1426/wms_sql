@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
-import android.bluetooth.BluetoothAdapter
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -21,6 +21,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import cn.pedant.SweetAlert.SweetAlertDialog
 import com.android.volley.Response
 import com.android.volley.RetryPolicy
 import com.android.volley.VolleyError
@@ -32,6 +33,8 @@ import com.winapp.wmsSQL.CommonMethods
 import com.winapp.wmsSQL.R
 import com.winapp.wmsSQL.adapter.PickListNewAdapter
 import com.winapp.wmsSQL.model.AddressZoneModel
+import com.winapp.wmsSQL.model.SalesOrderModel
+import com.winapp.wmsSQL.model.SalesOrderPrintPreviewModel.SalesList
 import com.winapp.wmsSQL.model.SupplierModel1
 import com.winapp.wmsSQL.multiselectspinner.MultiSelectSpinnerView
 import com.winapp.wmsSQL.multiselectspinner.MultipleSelectSpinnerPojo
@@ -46,16 +49,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PickListActivity : AppCompatActivity() ,OnClickListener {
+class NewPickListActivity : AppCompatActivity(), OnClickListener {
 
     private var picklistinvoice_rv: RecyclerView? = null
     private var sharedPreferenceUtil: SharedPreferenceUtil? = null
-   // var intentIntegrator: IntentIntegrator? = null
+
+    // var intentIntegrator: IntentIntegrator? = null
     var pickListNewAdapter: PickListNewAdapter? = null
     private var barCodelay: LinearLayout? = null
     var session: SessionManager? = null
@@ -119,6 +122,7 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
     var addressZoneList: ArrayList<AddressZoneModel> = ArrayList()
     var zoneSpinner: MultiSelectSpinnerView? = null
     val zoneSpinnerStr: String? = ""
+    private var pDialog: SweetAlertDialog? = null
 
     var date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
     private var search_ed: EditText? = null
@@ -181,33 +185,35 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
             getVendorList()
         }
         getCustomerList()
-        Log.w("selectdateSO",""+select_FromDateShowStr+".."+select_FromDateStr)
-        Log.w("selectdateSOTo",""+select_ToDateShowStr+".."+select_ToDateStr)
+        Log.w("selectdateSO", "" + select_FromDateShowStr + ".." + select_FromDateStr)
+        Log.w("selectdateSOTo", "" + select_ToDateShowStr + ".." + select_ToDateStr)
 
 
-        if(select_FromDateShowStr!!.isNotEmpty()) {
+        if (select_FromDateShowStr!!.isNotEmpty()) {
             pickifromdate_txt!!.setText(select_FromDateShowStr)
             fromdateShared = select_FromDateStr
-        }else{
+        } else {
             select_FromDateStr = CommonMethods.getCurrentDateApiNOSpace()
             fromdateShared = select_FromDateStr
-            pickifromdate_txt!!.setText(CommonMethods.getCurrentTime())
+            pickifromdate_txt!!.setText(CommonMethods.getCurrentTime1())
         }
 
-        if(select_ToDateShowStr!!.isNotEmpty()) {
+        if (select_ToDateShowStr!!.isNotEmpty()) {
             pickitodate_txt!!.setText(select_ToDateShowStr)
             todateShared = select_ToDateStr
 
-        }else{
+        } else {
             select_ToDateStr = CommonMethods.getCurrentDateApiNOSpace()
             todateShared = select_ToDateStr
-            pickitodate_txt!!.setText(CommonMethods.getCurrentTime())
+            pickitodate_txt!!.setText(CommonMethods.getCurrentTime1())
         }
 
-        getpicklist_Detail("", "",
-            fromdateShared!!, todateShared!!, soNum!!, spinnertxt!!, zoneStrCode!!)
+        getpicklist_Detail(
+            "", "",
+            fromdateShared!!, todateShared!!, soNum!!, spinnertxt!!, zoneStrCode!!
+        )
 
-        Log.w("zoneStrCode",""+zoneStrCode)
+        Log.w("zoneStrCode", "" + zoneStrCode)
 
         searchTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
@@ -272,14 +278,13 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
 //        }
 
         sharedPreferenceUtil = SharedPreferenceUtil(this)
-      //  intentIntegrator = IntentIntegrator.forSupportFragment(this) // use this instead
+        //  intentIntegrator = IntentIntegrator.forSupportFragment(this) // use this instead
         session = SessionManager(this)
 
         user = session!!.getUserDetails()
         companyId = user!!.get(SessionManager.KEY_COMPANY_CODE)
         locationCode = user!!.get(SessionManager.KEY_LOCATION_CODE)
         username = user!!.get(SessionManager.KEY_USER_NAME)
-
 
 
 //        user = Helper.getLoggedInUser(sharedPreferenceUtil!!)
@@ -385,109 +390,111 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
         status: String,
         zone: String
     ) {
-        CommonMethods.showProgressDialog(this)
-
+        // Initialize a new RequestQueue instance
+        val requestQueue = Volley.newRequestQueue(this)
+        // Initialize a new JsonArrayRequest instance
         val jsonObject = JSONObject()
+        //        if (selectedUser!=null && !selectedUser.isEmpty()){
+//            jsonObject.put("User",selectedUser);
+//        }else {
+//            jsonObject.put("User",userName);
+//        }
         jsonObject.put("CustomerCode", customerCode)
         jsonObject.put("CustomerName", "")
-        jsonObject.put("User", user)
+        jsonObject.put("UserCode", user)
         jsonObject.put("FromDate", fromdate)
         jsonObject.put("ToDate", todate)
         jsonObject.put("DocNumber", docNum)
         jsonObject.put("DocStatus", status)
-        jsonObject.put("Zone", zone)
+//        jsonObject.put("Zone", zone)
+        val url = Utils.getBaseUrl(this) + "SalesOrderwithBatchList"
+        Log.w("Given_url:", "$url-$jsonObject")
+        pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog!!.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"))
+        pDialog!!.setTitleText("Getting PickList...")
+        pDialog!!.setCancelable(false)
+        pDialog!!.show()
 
-        val requestQueue = Volley.newRequestQueue(this)
-//        http://101.100.181.5:92/api/SalesOrderDetailsAll/salesorderdetail?Requestdata={"CustomerCode":"C003-GE-GT-001","CustomerName":"Abdul Munaff Enterprise",
-//        // "UserCode":"DELIXP01","FromDate":"20230106","ToDate":"20231123","DocNumber":"24010002","DocStatus":"Y"}
-
-        val url = Utils.getBaseUrl(this) + "SalesOrderDetailsAll/salesorderdetail?Requestdata=$jsonObject"
-
-        Log.w("url_pickDetail_list:",""+ url)
-
-        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
-            Method.GET,
-            url,
-            null,
-            Response.Listener { response: JSONObject ->
+        val jsonArrayRequest: JsonObjectRequest = object : JsonObjectRequest(
+            Method.POST, url, jsonObject,
+            Response.Listener<JSONObject> { response: JSONObject ->
                 try {
-                    GlobalScope.launch {
-                        withContext(Dispatchers.Main) {
-                            picklistNew = ArrayList()
+                    Log.w("picklist_res:", response.toString())
 
-                            Log.w("picklis_list_res:", response.toString())
-                            val statusCode = response.optString("StatusCode")
-                            val statusMsg = response.optString("StatusMessage")
+                    pDialog!!.dismiss()
+                    val statusCode = response.optString("statusCode")
+                    val statusMsg = response.optString("statusMessage")
 
-                            if (statusCode == "1") {
-                                val responseData = response.optJSONArray("ResponseData")!!
+                    if (statusCode == "1") {
+                        val responseData = response.optJSONArray("responseData")!!
 
-                                if (responseData!!.length() > 0) {
+                        if (responseData!!.length() > 0) {
 
-                                    for (i in 0 until responseData.length()) {
-                                        val obj = responseData.optJSONObject(i)
+                            for (i in 0 until responseData.length()) {
+                                val obj = responseData.optJSONObject(i)
 
-                                        val model = PickIistResponseNew(
-                                            obj.optString("Code"),
-                                            obj.optString("CustomerCode"),
-                                            obj.optString("CustomerName"),
-                                            obj.optString("DocDate"),
-                                            obj.optString("DocNumber"),
-                                            obj.optString("DocStatus"),
-                                            obj.optString("NoOfItem"),
-                                            obj.optString("PickListStatus"),
-                                            obj.optString("PickListNumber"),
-                                            obj.optString("SalesEmployee"),
-                                            obj.optString("OwnerName"),
-                                            obj.optString("DateTime"),
-                                            obj.optString("soNumber"),
-                                            false
-                                        )
-                                        picklistNew!!.add(model)
-                                    }
+                                val model = PickIistResponseNew(
+                                    obj.optString("code"),
+                                    obj.optString("customerCode"),
+                                    obj.optString("customerName"),
+                                    obj.optString("docDate"),
+                                    obj.optString("docNumber"),
+                                    "",
+//                                            obj.optString("DocStatus"),
+                                    obj.optString("noOfItem"),
+                                    obj.optString("pickListStatus"),
+                                    obj.optString("pickListNumber"),
+                                    obj.optString("salesEmployee"),
+                                    obj.optString("ownerName"),
+                                    obj.optString("dateTime"), "",
+//                                            obj.optString("soNumber") ,
+                                    false
+                                )
+                                picklistNew!!.add(model)
+                            }
 
-                                    withContext(Dispatchers.Main) {
-                                        if (picklistNew!!.size > 0) {
-                                            searchFilterView!!.visibility = View.GONE
-                                            setAdapter(picklistNew!!)
-                                            cleartxt()
+                         //   withContext(Dispatchers.Main) {
+                                if (picklistNew!!.size > 0) {
+                                    searchFilterView!!.visibility = View.GONE
+                                    setAdapter(picklistNew!!)
+                                    cleartxt()
 
-                                        } else {
-                                            emptytxt()
-                                        }
-                                    }
                                 } else {
                                     emptytxt()
                                 }
-                            } else {
-                                toast(this@PickListActivity, statusMsg)
-                                emptytxt()
-
-                            }
-                            CommonMethods.cancelProgressDialog()
+                         //   }
+                        } else {
+                            emptytxt()
                         }
+                    } else {
+                        toast(this@NewPickListActivity, statusMsg)
+                        emptytxt()
+
                     }
-                } catch (e: Exception) {
+                } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }
-            }, Response.ErrorListener { error: VolleyError ->
+            },
+            Response.ErrorListener { error: VolleyError ->
+                pDialog!!.dismiss()
                 // Do something when error occurred
-                CommonMethods.cancelProgressDialog()
                 Log.w("Error_throwing:", error.toString())
+                Toast.makeText(
+                    applicationContext,
+                    "Server Error,Please try again..",
+                    Toast.LENGTH_LONG
+                ).show()
             }) {
             override fun getHeaders(): Map<String, String> {
-                val params = java.util.HashMap<String, String>()
-                val creds = java.lang.String.format(
-                    "%s:%s",
-                    Constants.API_SECRET_CODE,
-                    Constants.API_SECRET_PASSWORD
-                )
+                val params = HashMap<String, String>()
+                val creds =
+                    String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD)
                 val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
                 params["Authorization"] = auth
                 return params
             }
         }
-        jsonObjectRequest.retryPolicy = object : RetryPolicy {
+        jsonArrayRequest.setRetryPolicy(object : RetryPolicy {
             override fun getCurrentTimeout(): Int {
                 return 50000
             }
@@ -499,10 +506,145 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
             @Throws(VolleyError::class)
             override fun retry(error: VolleyError) {
             }
-        }
+        })
         // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
+        requestQueue.add(jsonArrayRequest)
     }
+
+
+//    @Throws(JSONException::class)
+//    private fun getpicklist_Detail(
+//        customerCode: String,
+//        user: String,
+//        fromdate: String,
+//        todate: String,
+//        docNum: String,
+//        status: String,
+//        zone: String
+//    ) {
+//        CommonMethods.showProgressDialog(this)
+//
+//        val jsonObject = JSONObject()
+//        jsonObject.put("CustomerCode", customerCode)
+//        jsonObject.put("CustomerName", "")
+//        jsonObject.put("UserCode", user)
+//        jsonObject.put("FromDate", fromdate)
+//        jsonObject.put("ToDate", todate)
+//        jsonObject.put("DocNumber", docNum)
+//        jsonObject.put("DocStatus", status)
+////        jsonObject.put("Zone", zone)
+//
+//        val requestQueue = Volley.newRequestQueue(this)
+//
+//        // val url = Utils.getBaseUrl(this) + "SalesOrderDetailsAll/salesorderdetail?Requestdata=$jsonObject"
+//        val url = Utils.getBaseUrl(this@NewPickListActivity) + "SalesOrderwithBatchList"
+//        Log.w("url_pickDetail_list:", "" + url + jsonObject)
+//
+//        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(Method.GET,
+//            url,
+//            jsonObject,
+//            Response.Listener { response: JSONObject ->
+//                try {
+//                    GlobalScope.launch {
+//                        withContext(Dispatchers.Main) {
+//                            picklistNew = ArrayList()
+//
+//                            Log.w("picklis_list_res:", response.toString())
+//                            val statusCode = response.optString("StatusCode")
+//                            val statusMsg = response.optString("StatusMessage")
+//
+//                            if (statusCode == "1") {
+//                                val responseData = response.optJSONArray("ResponseData")!!
+//
+//                                if (responseData!!.length() > 0) {
+//
+//                                    for (i in 0 until responseData.length()) {
+//                                        val obj = responseData.optJSONObject(i)
+//
+//                                        val model = PickIistResponseNew(
+//                                            obj.optString("Code"),
+//                                            obj.optString("CustomerCode"),
+//                                            obj.optString("CustomerName"),
+//                                            obj.optString("DocDate"),
+//                                            obj.optString("DocNumber"),
+//                                            "",
+////                                            obj.optString("DocStatus"),
+//                                            obj.optString("NoOfItem"),
+//                                            obj.optString("PickListStatus"),
+//                                            obj.optString("PickListNumber"),
+//                                            obj.optString("SalesEmployee"),
+//                                            obj.optString("OwnerName"),
+//                                            obj.optString("DateTime"), ""
+////                                            obj.optString("soNumber")
+//                                            ,
+//                                            false
+//                                        )
+//                                        picklistNew!!.add(model)
+//                                    }
+//
+//                                    withContext(Dispatchers.Main) {
+//                                        if (picklistNew!!.size > 0) {
+//                                            searchFilterView!!.visibility = View.GONE
+//                                            setAdapter(picklistNew!!)
+//                                            cleartxt()
+//
+//                                        } else {
+//                                            emptytxt()
+//                                        }
+//                                    }
+//                                } else {
+//                                    emptytxt()
+//                                }
+//                            } else {
+//                                toast(this@NewPickListActivity, statusMsg)
+//                                emptytxt()
+//
+//                            }
+//                            CommonMethods.cancelProgressDialog()
+//                        }
+//                    }
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
+//            }, Response.ErrorListener { error: VolleyError ->
+//                // Do something when error occurred
+//                //  pDialog.dismiss();
+//                Log.w("Error_throwing:", error.toString())
+//                CommonMethods.cancelProgressDialog()
+//            }) {
+//            override fun getBodyContentType(): String {
+//                return "application/json"
+//            }
+//
+//            override fun getHeaders(): Map<String, String> {
+//                val params = HashMap<String, String>()
+//                val creds =
+//                    String.format(
+//                        "%s:%s",
+//                        Constants.API_SECRET_CODE,
+//                        Constants.API_SECRET_PASSWORD
+//                    )
+//                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+//                params["Authorization"] = auth
+//                return params
+//            }
+//        }
+//        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
+//            override fun getCurrentTimeout(): Int {
+//                return 50000
+//            }
+//
+//            override fun getCurrentRetryCount(): Int {
+//                return 50000
+//            }
+//
+//            @Throws(VolleyError::class)
+//            override fun retry(error: VolleyError) {
+//            }
+//        })
+//        // Add JsonArrayRequest to the RequestQueue
+//        requestQueue.add(jsonObjectRequest)
+//    }
 
     override fun onClick(view: View) {
         when (view.id) {
@@ -654,12 +796,12 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
                             customerStr = ""
                         }
                         var zoneMutipleCodeStr = ""
-                        if(zoneMutipleCode!!.isNotEmpty()){
+                        if (zoneMutipleCode!!.isNotEmpty()) {
                             zoneMutipleCodeStr = zoneMutipleCode!!
-                        }else{
+                        } else {
                             zoneMutipleCodeStr = zoneStrCode!!
                         }
-                        Log.w("selectdateSOToaa",""+fromdateShared+todateShared)
+                        Log.w("selectdateSOToaa", "" + fromdateShared + todateShared)
                         getpicklist_Detail(
                             customerStr!!, "", fromdateShared!!, todateShared!!, soNum!!,
                             spinnertxt!!, zoneMutipleCodeStr!!
@@ -773,12 +915,12 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
     fun setZoneAdapter(arrayList: ArrayList<AddressZoneModel>) {
 
         val nameList: ArrayList<MultipleSelectSpinnerPojo> = arrayList.map {
-            MultipleSelectSpinnerPojo(  it.name, false)
+            MultipleSelectSpinnerPojo(it.name, false)
         } as ArrayList<MultipleSelectSpinnerPojo>
 
         Log.w("cg_spinner:", zoneStrName.toString())
         nameList.forEach {
-            if (zoneStrCode!!.isNotEmpty()  && it.text.contains(zoneStrName.toString())) {
+            if (zoneStrCode!!.isNotEmpty() && it.text.contains(zoneStrName.toString())) {
                 it.isSelected = true
                 it.isEnabled = false
             }
@@ -789,9 +931,9 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
 //                tvDispString.text = "Display String:  $displayString"
             Log.w("zoneSpinnermulti:", displayString.trim())
 
-            var selectedList =  TextUtils.split(displayString.trim(),",")
+            var selectedList = TextUtils.split(displayString.trim(), ",")
 
-            var filterList =  arrayList.filter { selected ->
+            var filterList = arrayList.filter { selected ->
                 selectedList.contains(selected.name)
             }
 
@@ -800,7 +942,7 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
             zoneMutipleCode = filterList.joinToString(",") {
                 it.code
             }
-            Log.w("zoneSpinnermulti2v:",  zoneMutipleCode.toString())
+            Log.w("zoneSpinnermulti2v:", zoneMutipleCode.toString())
         }
     }
 
@@ -850,7 +992,7 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
 
                                 } else {
                                     Toast.makeText(
-                                        this@PickListActivity,
+                                        this@NewPickListActivity,
                                         statusMessage,
                                         Toast.LENGTH_LONG
                                     ).show()
@@ -934,7 +1076,8 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
 
         val requestQueue = Volley.newRequestQueue(this)
 
-        val url = Utils.getBaseUrl(this@PickListActivity) + "vendorList/vendorList?Requestdata=$jsonObject"
+        val url =
+            Utils.getBaseUrl(this@NewPickListActivity) + "vendorList/vendorList?Requestdata=$jsonObject"
 
         Log.w("url_vendorlist:", url)
 
@@ -1025,7 +1168,7 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
         jsonObject.put("GroupCode", "")
 
         val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this@PickListActivity) + "CustomerList/customerList"
+        val url = Utils.getBaseUrl(this@NewPickListActivity) + "CustomerList/customerList"
 
         Log.w("url_custlist:", url + jsonObject)
 
@@ -1116,21 +1259,21 @@ class PickListActivity : AppCompatActivity() ,OnClickListener {
 
     fun setDataToAdapter(arrayList: ArrayList<String>?) {
         try {
-                val adapter = ArrayAdapter(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    arrayList!!
-                )
-                custFilterAutol!!.setAdapter(adapter)
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_list_item_1,
+                arrayList!!
+            )
+            custFilterAutol!!.setAdapter(adapter)
 
-                custFilterAutol!!.setOnItemClickListener(OnItemClickListener { adapterView, view, i, l ->
-                    val supplierValue = adapterView.getItemAtPosition(i).toString().trim { it <= ' ' }
-                        .split("~".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            custFilterAutol!!.setOnItemClickListener(OnItemClickListener { adapterView, view, i, l ->
+                val supplierValue = adapterView.getItemAtPosition(i).toString().trim { it <= ' ' }
+                    .split("~".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 //            supplier_name = supplierValue[0].trim { it <= ' ' }
-                    customerStr = supplierValue[1].trim { it <= ' ' }
-                    custFilterAutol!!.clearFocus()
-                    Log.w("customerStr11:", customerStr!!)
-                })
+                customerStr = supplierValue[1].trim { it <= ' ' }
+                custFilterAutol!!.clearFocus()
+                Log.w("customerStr11:", customerStr!!)
+            })
         } catch (e: JSONException) {
             e.printStackTrace()
         }

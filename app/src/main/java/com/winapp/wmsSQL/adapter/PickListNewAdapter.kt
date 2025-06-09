@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.winapp.wmsSQL.R
+import com.winapp.wmsSQL.activity.NewPickListAddActivity
 import com.winapp.wmsSQL.activity.PickListDetailActivity
 import java.util.ArrayList
 
@@ -81,7 +82,7 @@ class PickListNewAdapter(
                 islongPress = true
                 pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.white))
                 pistatustxt.setBackgroundResource(R.drawable.round_accent_rad3_red)
-                picklistinvoicelay.setBackgroundResource(R.color.colorPrimary)
+           //     picklistinvoicelay.setBackgroundResource(R.color.colorPrimary)
             } else if (pickItem.pickListStatus.equals("R", ignoreCase = true)) {
                 pistatustxt.setText(R.string.release)
                 islongPress = true
@@ -124,8 +125,11 @@ class PickListNewAdapter(
 //                            notifyItemChanged(i)
 //                        }
                         Log.w("picknno", "" + pickItem.pickListNo);
-                        val intent = Intent(context, PickListDetailActivity::class.java)
+                      val intent = Intent(context, NewPickListAddActivity::class.java)
+                        //val intent = Intent(context, PickListDetailActivity::class.java)
+
                         intent.putExtra("salesCode", pickItem.code)
+                        intent.putExtra("custCodePick", pickItem.customerCode)
                         intent.putExtra("pick_item", pickItem.noOfItem)
                         intent.putExtra("pick_SoDate", pickItem.docDate)
                         intent.putExtra("pick_status", pickItem.pickListStatus)

@@ -13,6 +13,7 @@
         android:id="@+id/toolbarnew"
         layout="@layout/cust_img_toolbar"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="60dp">
     </include>
 
@@ -174,6 +175,7 @@
                 android:layout_height="40dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
+                android:visibility="gone"
                 android:orientation="vertical"
                 >
 
@@ -192,7 +194,7 @@
                         android:orientation="horizontal">
 
                         <EditText
-                            android:id="@+id/searchBar_transfer"
+                            android:id="@+id/searchBar_picklist"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:background="@color/white"
@@ -221,7 +223,7 @@
             android:layout_margin="5dp"
          >
             <TextView
-                android:id="@+id/pdtsize"
+                android:id="@+id/pdtsize_Picklist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left"
@@ -235,6 +237,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
+                android:visibility="gone"
                 android:layout_alignParentRight="true"
                 >
             <TextView
@@ -267,14 +270,14 @@
             android:layout_height="wrap_content">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_takeaddlist"
+                android:id="@+id/rv_picklist_addlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:visibility="gone"
                 android:background="@color/white"
-                tools:listitem="@layout/stock_take_add_item">
+                tools:listitem="@layout/new_picklist_add_item">
 
             </androidx.recyclerview.widget.RecyclerView>
 

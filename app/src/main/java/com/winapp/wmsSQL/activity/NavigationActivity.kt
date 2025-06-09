@@ -105,23 +105,24 @@ open class NavigationActivity : AppCompatActivity() {
         if (settings1 != null) {
             if (settings1.size > 0) {
                 for (model in settings1) {
-                   if (model.settingName == "showSalesOrder") {
-                        Log.w("SettingNameSO:", model.settingName)
-                        Log.w("SettingValueSO:", model.settingValue)
-                        isCheckedSO1 = if (model.settingValue == "True") {
-                            true
-                        } else {
-                            false
-                        }
-                    } else if (model.settingName == "showInvoice") {
-                        Log.w("SettingNameInv:", model.settingName)
-                        Log.w("SettingValueInv:", model.settingValue)
-                        isCheckedInvoice1 = if (model.settingValue == "True") {
-                            true
-                        } else {
-                            false
-                        }
-                    }   else if (model.settingName == "showCustomer") {
+//                   if (model.settingName == "showSalesOrder") {
+//                        Log.w("SettingNameSO:", model.settingName)
+//                        Log.w("SettingValueSO:", model.settingValue)
+//                        isCheckedSO1 = if (model.settingValue == "True") {
+//                            true
+//                        } else {
+//                            false
+//                        }
+//                    } else if (model.settingName == "showInvoice") {
+//                        Log.w("SettingNameInv:", model.settingName)
+//                        Log.w("SettingValueInv:", model.settingValue)
+//                        isCheckedInvoice1 = if (model.settingValue == "True") {
+//                            true
+//                        } else {
+//                            false
+//                        }
+//                    }   else
+                      if (model.settingName == "showCustomer") {
                         Log.w("SettingNameCust:", model.settingName)
                         Log.w("SettingValueCust:", model.settingValue)
                         isCheckedCustomer1 = if (model.settingValue == "True") {
@@ -129,15 +130,16 @@ open class NavigationActivity : AppCompatActivity() {
                         } else {
                             false
                         }
-                    } else if (model.settingName == "showSalesReturn") {
-                       Log.w("SettingNameSaleRet:", model.settingName)
-                       Log.w("SettingValueSaleRet:", model.settingValue)
-                       isCheckedSalesReturn1 = if (model.settingValue == "True") {
-                           true
-                       } else {
-                           false
-                       }
-                   }
+                    }
+//                      else if (model.settingName == "showSalesReturn") {
+//                       Log.w("SettingNameSaleRet:", model.settingName)
+//                       Log.w("SettingValueSaleRet:", model.settingValue)
+//                       isCheckedSalesReturn1 = if (model.settingValue == "True") {
+//                           true
+//                       } else {
+//                           false
+//                       }
+//                   }
 //                   else if (model.settingName == "showAPInvoice") {
 //                       Log.w("SettingNameApiInv:", model.settingName)
 //                       Log.w("SettingValueApiInv:", model.settingValue)
@@ -157,17 +159,17 @@ open class NavigationActivity : AppCompatActivity() {
         if (userRolls.size > 0) {
             for (roll in userRolls) {
                 when (roll.formName) {
-                    "Catalog" -> if (roll.havePermission == "true") {
-                        catalog.setVisible(true)
-                    } else {
-                        catalog.setVisible(false)
-                    }
-
-                    "Merchandise Schedule" -> if (roll.havePermission == "true") {
-                        schedule.setVisible(true)
-                    } else {
-                        schedule.setVisible(false)
-                    }
+//                    "Catalog" -> if (roll.havePermission == "true") {
+//                        catalog.setVisible(true)
+//                    } else {
+//                        catalog.setVisible(false)
+//                    }
+//
+//                    "Merchandise Schedule" -> if (roll.havePermission == "true") {
+//                        schedule.setVisible(true)
+//                    } else {
+//                        schedule.setVisible(false)
+//                    }
 
                     "Customer List" -> if (roll.havePermission == "true") {
                         customers.setVisible(true)
@@ -175,35 +177,35 @@ open class NavigationActivity : AppCompatActivity() {
                         customers.setVisible(false)
                     }
 
-                    "Sales Order" -> if (roll.havePermission == "true") {
-                        salesorder.setVisible(true)
-                    } else {
-                        salesorder.setVisible(false)
-                    }
-
-                    "Invoice" -> if (roll.havePermission == "true") {
-                        invoice.setVisible(true)
-                    } else {
-                        invoice.setVisible(false)
-                    }
-
-                    "Receipts" -> if (roll.havePermission == "true") {
-                        receipts.setVisible(true)
-                    } else {
-                        receipts.setVisible(false)
-                    }
+//                    "Sales Order" -> if (roll.havePermission == "true") {
+//                        salesorder.setVisible(true)
+//                    } else {
+//                        salesorder.setVisible(false)
+//                    }
+//
+//                    "Invoice" -> if (roll.havePermission == "true") {
+//                        invoice.setVisible(true)
+//                    } else {
+//                        invoice.setVisible(false)
+//                    }
+//
+//                    "Receipts" -> if (roll.havePermission == "true") {
+//                        receipts.setVisible(true)
+//                    } else {
+//                        receipts.setVisible(false)
+//                    }
 
                     "Settings" -> if (roll.havePermission == "true") {
                         settings.setVisible(true)
                     } else {
                         settings.setVisible(false)
                     }
-
-                    "Sales Return" -> if (roll.havePermission == "true") {
-                        salesreturn.setVisible(true)
-                    } else {
-                        salesreturn.setVisible(false)
-                    }
+//
+//                    "Sales Return" -> if (roll.havePermission == "true") {
+//                        salesreturn.setVisible(true)
+//                    } else {
+//                        salesreturn.setVisible(false)
+//                    }
 
 //                    "Purchase Invoice" -> if (roll.havePermission == "true") {
 //                        purchase_invoice.setVisible(true)

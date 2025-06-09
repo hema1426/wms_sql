@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -32,9 +33,9 @@ import com.winapp.wmsSQL.adapter.BatchListPicklistAdapter
 import com.winapp.wmsSQL.adapter.PickListDetailNewAdapterNew24
 import com.winapp.wmsSQL.model.AppUtils
 import com.winapp.wmsSQL.model.HomePageModel
+import com.winapp.wmsSQL.model.OrderHistoryModel
 import com.winapp.wmsSQL.model.ProductsModel
 import com.winapp.wmsSQL.model.newPickDetail.BatchDetailPickModule
-import com.winapp.wmsSQL.model.newPickDetail.NewPickListDetailResponse
 import com.winapp.wmsSQL.model.newPickDetail.NewSalesOrderDetailItem
 import com.winapp.wmsSQL.model.newPickDetail.SalesOrderDetail
 import com.winapp.wmsSQL.model.newPickDetail.SalesOrderNewModel
@@ -45,6 +46,7 @@ import com.winapp.wmsSQL.utils.SessionManager
 import com.winapp.wmsSQL.utils.SharedPreferenceUtil
 import com.winapp.wmsSQL.utils.Utils
 import com.winapp.wmsSQL.utils.Utils.hideKeyboard
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.http.POST
 import java.text.SimpleDateFormat
@@ -149,6 +151,7 @@ class PickListDetailActivity : BaseActivity(), View.OnClickListener,
     var user: java.util.HashMap<String, String>? = null
     var companyId: String? = null
     var locationCode: String? = ""
+    lateinit var pDialog: SweetAlertDialog
     var userName: String? = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -2055,6 +2058,96 @@ class PickListDetailActivity : BaseActivity(), View.OnClickListener,
 //            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 ////        dialog.window!!.setLayout(1000, 1000)
 //    }
+
+    @Throws(JSONException::class)
+    fun getInvoiceDetails(invoiceNumber: String) {
+        // Initialize a new RequestQueue instance
+        val jsonObject = JSONObject()
+        ///jsonObject.put("CompanyCode",companyId);
+        jsonObject.put("InvoiceNo", invoiceNumber)
+        jsonObject.put("LocationCode", locationCode)
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val url = Utils.getBaseUrl(this) + "SalesOrderDetails/salesorder"
+        // Initialize a new JsonArrayRequest instance
+        Log.w("picklist_Detail", "" + url + jsonObject)
+
+        pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"))
+        pDialog.setTitleText("Getting Invoice Details...")
+        pDialog.setCancelable(false)
+        pDialog.show()
+        newpickListDetail_Item_get_List = arrayListOf()
+
+        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
+            Method.POST, url, jsonObject,
+            Response.Listener { response: JSONObject ->
+                try {
+                    Log.w("picklist SAP:", response.toString())
+//                    if (response.length() > 0) {
+//
+//                        val statusCode = response.optString("statusCode")
+//                        if (statusCode == "1") {
+//                            val salesArray = response.optJSONArray("responseData")
+//                            val salesObject = salesArray.optJSONObject(0)
+//                            val invoice_number = salesObject.optString("invoiceNumber")
+//
+//                            val products = salesObject.getJSONArray("salesOrderDetails")
+//                            for (i in 0 until products.length()) {
+//                                val objPdt: JSONObject = products.optJSONObject(i)
+//                                val model = NewSalesOrderDetailItem()
+//
+//                                model.customerName = objPdt.optString("customerName")
+//
+//                                var lqty: String? = "0.0"
+//                                var cqty: String? = "0.0"
+//                                if (`object`.optString("unitQty") != "null") {
+//                                    lqty = `object`.optString("unitQty")
+//                                }
+//                                if (`object`.optString("quantity") != "null") {
+//                                    cqty = `object`.optString("quantity")
+//                                }
+//                                val actualPrice =
+//                                    `object`.optString("unitPrice").toDouble()
+//                            }
+//                        }
+//                    }
+                    pDialog.dismiss()
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+            },
+            Response.ErrorListener { error: VolleyError ->
+                // Do something when error occurred
+                pDialog.dismiss()
+                Log.w("Error_throwing:", error.toString())
+            }) {
+            override fun getHeaders(): Map<String, String> {
+                val params = java.util.HashMap<String, String>()
+                val creds =
+                    String.format("%s:%s", Constants.API_SECRET_CODE, Constants.API_SECRET_PASSWORD)
+                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+                params["Authorization"] = auth
+                return params
+            }
+        }
+        jsonObjectRequest.setRetryPolicy(object : RetryPolicy {
+            override fun getCurrentTimeout(): Int {
+                return 50000
+            }
+
+            override fun getCurrentRetryCount(): Int {
+                return 50000
+            }
+
+            @Throws(VolleyError::class)
+            override fun retry(error: VolleyError) {
+            }
+        })
+        // Add JsonArrayRequest to the RequestQueue
+        requestQueue.add(jsonObjectRequest)
+    }
+
 
     fun searchFilter(batchNo: String, item: NewSalesOrderDetailItem) {
 
