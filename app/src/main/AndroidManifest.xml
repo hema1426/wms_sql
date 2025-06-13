@@ -105,6 +105,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activity.NewPickListAddActivityCopy"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ReportPreview.ReceiptSummaryPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

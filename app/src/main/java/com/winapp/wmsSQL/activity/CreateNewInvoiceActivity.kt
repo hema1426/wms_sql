@@ -893,17 +893,17 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
             }
         }
         Log.w("settleInvDate", "" + isSettlementByNextDate)
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("User", username)
-            jsonObject.put("CardCode", customerCode)
-            jsonObject.put("LocationCode", locationCode)
-
-            getAllProducts(jsonObject)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-            Log.w("Erroraa:", Objects.requireNonNull(e.message!!))
-        }
+//        val jsonObject = JSONObject()
+//        try {
+//            jsonObject.put("User", username)
+//            jsonObject.put("CardCode", customerCode)
+//            jsonObject.put("LocationCode", locationCode)
+//
+//            getAllProducts(jsonObject)
+//        } catch (e: JSONException) {
+//            e.printStackTrace()
+//            Log.w("Erroraa:", Objects.requireNonNull(e.message!!))
+//        }
         val jsonObj = JSONObject()
         try {
             jsonObj.put("CustomerCode", customerCode)
@@ -3790,11 +3790,13 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
         Log.w("Given_SAP_PROUCT_URL:", url + jsonObject.toString())
         productList = ArrayList()
         products = ArrayList()
-        //  SweetAlertDialog pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-        //  pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        //  pDialog.setTitleText("Loading Products...");
-        //  pDialog.setCancelable(false);
-        //  pDialog.show();
+//        var pDialog: SweetAlertDialog? = null
+//
+//          pDialog =  SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+//          pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+//          pDialog.setTitleText("Loading Products...");
+//          pDialog.setCancelable(false);
+//          pDialog.show();
         val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
             Method.POST,
             url,
@@ -3875,15 +3877,16 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                         }
                     }
                     HomePageModel.productsList = ArrayList()
+                    setAdapter(productList)
 //                    productList!!.get(0).barcode = "1234566"
 //                    productList!!.get(1).barcode = "888801566968"
-                    setAdapter(productList)
                     HomePageModel.productsList.addAll(productList!!)
                     // pDialog.dismiss();
                     if (productList!!.size > 0) {
                         runOnUiThread {
-                            AppUtils.setProductsList(productList)
 
+                            AppUtils.setProductsList(productList)
+                            Log.w("pdtlistInvSize:",""+productList!!.size)
                            // setProductsDisplay("All Products")
                         }
                     }
@@ -4720,7 +4723,6 @@ fun UOMdetail1(settingUOMval: String, uomList: ArrayList<UomModel>) {
                         Log.w("entypdt",""+model.barcode)
                         setProductDetails(model)
                         //  addItem(model);
-
                     }
                 } else {
                     Toast.makeText(applicationContext, "Product Found...", Toast.LENGTH_SHORT)

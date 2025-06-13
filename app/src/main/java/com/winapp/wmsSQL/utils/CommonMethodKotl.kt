@@ -5,9 +5,12 @@ import android.app.Dialog
 import android.content.Context
 import android.view.Window
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.winapp.wmsSQL.R
 import com.winapp.wmsSQL.thermalprinter.App
 

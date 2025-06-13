@@ -87,6 +87,8 @@ public class Constants {
 
     // Super Star- Demo
     public static String SUPER_STAR_DEMO ="http://13.215.239.251:81/api/";
+    public static String WMS_SJLITE_INDIA_DEMO ="http://158.140.143.87:91/api/"; //india
+    public static String WMS_SJLITE_SINGAPORE_Live ="http://172.21.60.12:91/api/";  //singapore
     //UNICO
     public static String UNICO ="http://158.140.143.87:79/api/";
 

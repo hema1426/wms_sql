@@ -5,7 +5,30 @@ TO01
 Username: V1  --dec
 Password: 1234
 
+picklist changess
 
+pending , partial ,complete status listing page -- added
+picked qty , non picked -- added
+detail search , scanning qty updated
+picklist back issue - fixed
+highlight list -added
+dulpicte picklist issue -- fixed
+salesOrder add hided
+product alignment issue - fixed
+customer outstanding and preview hide -added
+completed only show details  -- added
+date,time user detail page -- added
+
+
+so -picklist
+deli - picklist
+customer detail , no of item  -- status , image ,sing- deliverd status
+cust filter , frdate , todate , status , invoice  -- search
+
+picked remark -- status picked
+
+add page -- remark - picked , non picked
+delivery qty -- o.qty
 
 scanning device directly getting function - dispatchKeyEvent
 

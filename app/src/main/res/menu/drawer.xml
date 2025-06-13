@@ -148,6 +148,7 @@
         <item
             android:icon="@drawable/ic_baseline_transform_24"
             android:id="@+id/navigation_transfer"
+            android:visible="false"
             android:title="Transfer" />
 
     </group>
@@ -157,6 +158,7 @@
         <item
             android:icon="@drawable/stock_req_blue_24"
             android:id="@+id/navigation_stock_request"
+            android:visible="false"
             android:title="Stock Request" />
     </group>
     <group
@@ -164,7 +166,7 @@
         <item
             android:icon="@drawable/stock_blue_24"
             android:id="@+id/navigation_stock_take"
-            android:visible="true"
+            android:visible="false"
             android:title="Stock Take" />
 
     </group>
@@ -174,7 +176,7 @@
         <item
             android:icon="@drawable/receipt_blue_24"
             android:id="@+id/navigation_stock_adjust"
-            android:visible="true"
+            android:visible="false"
             android:title="Good Receipt" />
     </group>
     <group
@@ -182,7 +184,7 @@
         <item
             android:icon="@drawable/ic_baseline_transform_24"
             android:id="@+id/navigation_good_issue"
-            android:visible="true"
+            android:visible="false"
             android:title="Good Issue" />
     </group>
     <group
@@ -190,6 +192,7 @@
         <item
             android:icon="@drawable/ic_receipt"
             android:id="@+id/navigation_reports"
+            android:visible="false"
             android:title="Reports" />
 
     </group>

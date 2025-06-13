@@ -22,14 +22,16 @@ data class PickIistResponseNew(
     var pickListStatus: String,
     @SerializedName("PickListNumber")
     var pickListNo: String,
-    @SerializedName("SalesEmployee")
+    @SerializedName("salesEmployee")
     var salesEmployee: String,
     @SerializedName("OwnerName")
     var ownerName: String,
     @SerializedName("DateTime")
     var dateTime: String,
-    @SerializedName("sNo")
-    var sNo: String,
+    @SerializedName("pickedQty")
+    var pickedCount: String,
+    @SerializedName("nonPickedQty")
+    var nonPickedCount: String,
 
     var isItemSelected: Boolean = false
 

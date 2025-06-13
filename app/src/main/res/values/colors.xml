@@ -53,6 +53,12 @@
     <color name="btn_pink1">#D25387</color>
     <color name="colorgreen">#55A128</color>
     <color name="btn_orang">#AC655C</color>
+    <color name="btn_greenlit">#45a4b4</color>
+    <color name="btn_bluelit">#4d84b2</color>
+    <color name="btn_pinklit">#8f89b8</color>
+    <color name="btn_greenlit1">#1387ad</color>
+    <color name="btn_bluelit1">#4d84b2</color>
+    <color name="btn_red_lite">#DA5F6A</color>
     <color name="btn_clr1">#6B7F47</color>
     <color name="btn_clr">#88773F</color>
     <color name="btn_pink">#AC6277</color>

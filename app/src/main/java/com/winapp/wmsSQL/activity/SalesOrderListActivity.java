@@ -2026,7 +2026,8 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.sorting_menu, menu);
       //  MenuItem action_save = menu.findItem(R.id.action_filter);
-       // action_save.setVisible(false);
+         MenuItem action_add = menu.findItem(R.id.action_add);
+        action_add.setVisible(false);
         return true;
     }
 

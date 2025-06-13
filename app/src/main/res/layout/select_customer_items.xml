@@ -109,6 +109,7 @@
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:paddingBottom="10dp"
+            android:visibility="gone"
             android:layout_gravity="center"
             android:layout_height="wrap_content">
 
@@ -151,6 +152,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="10dp"
                 android:paddingTop="@dimen/_5sdp"
+                android:visibility="gone"
                 android:paddingBottom="@dimen/_5sdp"
                 android:paddingRight="@dimen/_10sdp"
                 android:paddingLeft="@dimen/_10sdp"

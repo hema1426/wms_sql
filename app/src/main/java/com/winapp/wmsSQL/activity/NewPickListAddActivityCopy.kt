@@ -67,7 +67,7 @@ import java.util.Locale
 import java.util.Objects
 
 
-class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
+class NewPickListAddActivityCopy : AppCompatActivity() ,View.OnClickListener {
     var pDialog: SweetAlertDialog? = null
     private var picklistDetailsl: ArrayList<PicklistAddNewModel>? = null
     private var locationDetailsl: ArrayList<LocationModel.LocationDetails>? = null
@@ -88,6 +88,9 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
     var invoiceNod: TextView? = null
     var date_takel: TextView? = null
     var locationTxt: TextView? = null
+    var pendingLay: LinearLayout? = null
+    var partialLay: LinearLayout? = null
+    var completedLay: LinearLayout? = null
     var companyCode: String? = null
     var username: String? = null
     var user: HashMap<String, String>? = null
@@ -117,6 +120,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
     var pickSalesEmp: String? = ""
     var pickDocNum: String? = ""
     var pickDateTime: String? = ""
+    var statusMode: String? = ""
     var orderStatus = ""
     private val MY_CAMERA_REQUEST_CODE = 100
     private var permissionEnabled = false
@@ -125,7 +129,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
     @RequiresApi(api = Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_picklist_add)
+        setContentView(R.layout.activity_picklist_add_copy)
         Objects.requireNonNull(supportActionBar)!!.setDisplayHomeAsUpEnabled(true)
 
         Log.w("activity_cg", javaClass.simpleName.toString())
@@ -148,7 +152,14 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         date_takel = findViewById(R.id.date_take)
         locationTxt = findViewById(R.id.location_takeAdd)
         pdtsizel = findViewById(R.id.pdtsize_Picklist)
+        pendingLay = findViewById(R.id.pending_picki)
+        partialLay = findViewById(R.id.partial_picki)
+        completedLay = findViewById(R.id.completed_picki)
         groupspinner = findViewById(R.id.spinner_status)
+
+        pendingLay!!.setOnClickListener(this)
+        partialLay!!.setOnClickListener(this)
+        completedLay!!.setOnClickListener(this)
 
         val c = Calendar.getInstance().time
         println("Current time => $c")
@@ -229,7 +240,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
     }
 
     fun showDeleteAlert() {
-        val builder1 = AlertDialog.Builder(this@NewPickListAddActivity)
+        val builder1 = AlertDialog.Builder(this@NewPickListAddActivityCopy)
         builder1.setMessage("Data Will be Cleared are you sure want to back?")
         builder1.setCancelable(false)
         builder1.setPositiveButton(
@@ -244,7 +255,6 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         val alert11 = builder1.create()
         alert11.show()
     }
-
 
     @SuppressLint("NotifyDataSetChanged")
     fun setpickListAddAdapter(pickAddList: ArrayList<PicklistAddNewModel>) {
@@ -363,7 +373,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         val mContent = customLayout.findViewById<LinearLayout>(R.id.signature_layout)
         acceptButton.isEnabled = false
         acceptButton.alpha = 0.4f
-        val mSig = CaptureSignatureView(this@NewPickListAddActivity, null) {
+        val mSig = CaptureSignatureView(this@NewPickListAddActivityCopy, null) {
             acceptButton.isEnabled = true
             acceptButton.alpha = 1f
         }
@@ -399,6 +409,8 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         var itemsObject = JSONObject()
         val itemsArray = JSONArray()
 
+
+
         // Sales Details Add to the Objects
         var index = 1
         for (model in picklistDetailsl!!) {
@@ -412,7 +424,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
                 itemsObject.put("NoofPCS", "")
                 itemsObject.put("PickedQty", model.qty)
                 itemsObject.put("ProductCode", model.productCode)
-                itemsObject.put("Quantity", model.openQty)
+                itemsObject.put("Quantity", model.qty)
                 itemsObject.put("Remarks", model.remarks)
                 itemsObject.put("UnitPrice", model.unitPrice)
                 itemsObject.put("UomCode", model.uomCode)
@@ -942,7 +954,36 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         }
         //  return super.onOptionsItemSelected(item);
     }
+    override fun onClick(v: View?) {
+        if (v!!.id == R.id.pending_picki) {
+            pendingLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_greenlit));
+            partialLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_pinklit));
+            completedLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_pinklit));
 
+            //  transferInText.setTextColor(Color.parseColor("#FFFFFF"))
+           // transferOutText.setTextColor(Color.parseColor("#212121"))
+
+//            val fromdate =
+//                Utils.convertDate(fromDate.getText().toString(), "dd-MM-yyyy", "yyyyMMdd")
+//            val todate = Utils.convertDate(toDate.getText().toString(), "dd-MM-yyyy", "yyyyMMdd")
+           // getTransferInRequest("In", fromdate, todate)
+            statusMode = "pending"
+           // transferInButton.setEnabled(false)
+           // transferOutButton.setEnabled(true)
+        } else if (v!!.id == R.id.partial_picki) {
+            pendingLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_pinklit));
+            partialLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_greenlit));
+            completedLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_pinklit));
+
+            statusMode = "partial"
+        } else if (v!!.id == R.id.completed_picki) {
+            pendingLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_pinklit));
+            partialLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_pinklit));
+            completedLay!!.setBackgroundColor(ContextCompat.getColor(this, R.color.btn_greenlit));
+
+            statusMode = "completed"
+        }
+    }
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
@@ -954,7 +995,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         ScanContract()
     ) { result ->
         if (result.contents == null) {
-            Toast.makeText(this@NewPickListAddActivity, "No Product Found", Toast.LENGTH_LONG)
+            Toast.makeText(this@NewPickListAddActivityCopy, "No Product Found", Toast.LENGTH_LONG)
                 .show()
         } else {
             scanBarTxt(result.contents)
@@ -962,9 +1003,7 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
             Log.e("scan_barcode.. ", "${result.contents}")
         }
     }
-    override fun onClick(v: View?) {
 
-    }
     @SuppressLint("SuspiciousIndentation")
     fun scanBarTxt(barcode: String) {
         isscanpdt = false
@@ -1068,6 +1107,5 @@ class NewPickListAddActivity : AppCompatActivity() , View.OnClickListener{
         var signatureString = ""
         var imageString: String? = null
     }
-
 
 }

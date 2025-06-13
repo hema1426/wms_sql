@@ -52,7 +52,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NewPickListActivity : AppCompatActivity(), OnClickListener {
+class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener {
 
     private var picklistinvoice_rv: RecyclerView? = null
     private var sharedPreferenceUtil: SharedPreferenceUtil? = null
@@ -470,7 +470,7 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
                             emptytxt()
                         }
                     } else {
-                        toast(this@NewPickListActivity, statusMsg)
+                        toast(this@NewDeliveryPickListActivity, statusMsg)
                         emptytxt()
 
                     }
@@ -995,7 +995,7 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
 
                                 } else {
                                     Toast.makeText(
-                                        this@NewPickListActivity,
+                                        this@NewDeliveryPickListActivity,
                                         statusMessage,
                                         Toast.LENGTH_LONG
                                     ).show()
@@ -1080,7 +1080,7 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
         val requestQueue = Volley.newRequestQueue(this)
 
         val url =
-            Utils.getBaseUrl(this@NewPickListActivity) + "vendorList/vendorList?Requestdata=$jsonObject"
+            Utils.getBaseUrl(this@NewDeliveryPickListActivity) + "vendorList/vendorList?Requestdata=$jsonObject"
 
         Log.w("url_vendorlist:", url)
 
@@ -1171,7 +1171,7 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
         jsonObject.put("GroupCode", "")
 
         val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this@NewPickListActivity) + "CustomerList/customerList"
+        val url = Utils.getBaseUrl(this@NewDeliveryPickListActivity) + "CustomerList/customerList"
 
         Log.w("url_custlist:", url + jsonObject)
 

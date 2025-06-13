@@ -217,15 +217,15 @@ class DashboardActivity : NavigationActivity() {
                             false
                         }
                     }
-//                    else if (model.settingName == "showSalesOrder") {
-//                        Log.w("SettingNameSO:", model.settingName)
-//                        Log.w("SettingValueSO:", model.settingValue)
-//                        isCheckedSO = if (model.settingValue == "True") {
-//                            true
-//                        } else {
-//                            false
-//                        }
-//                    }
+                    else if (model.settingName == "showSalesOrder") {
+                        Log.w("SettingNameSO:", model.settingName)
+                        Log.w("SettingValueSO:", model.settingValue)
+                        isCheckedSO = if (model.settingValue == "True") {
+                            true
+                        } else {
+                            false
+                        }
+                    }
 //                    else if (model.settingName == "showDeliveryOrder") {
 //                        Log.w("SettingNameDO:", model.settingName)
 //                        Log.w("SettingValueDO:", model.settingValue)
@@ -281,15 +281,15 @@ class DashboardActivity : NavigationActivity() {
                     }
                 }
             }
-//            if (isCheckedSO && (locationCodem != null && !locationCodem!!.isEmpty()) ) {
-//                salesOrderLayout!!.setAlpha(0.9f)
-//                salesOrderLayout!!.setEnabled(true)
-//                salesOrderLayout!!.setClickable(true)
-//            } else {
-//                salesOrderLayout!!.setAlpha(0.4f)
-//                salesOrderLayout!!.setEnabled(false)
-//                salesOrderLayout!!.setClickable(false)
-//            }
+            if (isCheckedSO && (locationCodem != null && !locationCodem!!.isEmpty()) ) {
+                salesOrderLayout!!.setAlpha(0.9f)
+                salesOrderLayout!!.setEnabled(true)
+                salesOrderLayout!!.setClickable(true)
+            } else {
+                salesOrderLayout!!.setAlpha(0.4f)
+                salesOrderLayout!!.setEnabled(false)
+                salesOrderLayout!!.setClickable(false)
+            }
 //            if (isCheckedCatalog && (locationCodem != null && !locationCodem!!.isEmpty()) ) {
 //                catalogCard!!.setAlpha(0.9f)
 //                catalogCard!!.setEnabled(true)
@@ -399,11 +399,11 @@ class DashboardActivity : NavigationActivity() {
 //                            catalogLayout!!.setVisibility(View.GONE)
 //                        }
 
-//                        "Sales Order" -> if (roll.havePermission == "true") {
-//                            salesOrderLayout!!.setVisibility(View.VISIBLE)
-//                        } else {
-//                            salesOrderLayout!!.setVisibility(View.GONE)
-//                        }
+                        "Sales Order" -> if (roll.havePermission == "true") {
+                            salesOrderLayout!!.setVisibility(View.VISIBLE)
+                        } else {
+                            salesOrderLayout!!.setVisibility(View.GONE)
+                        }
 
 //                        "Invoice" -> if (roll.havePermission == "true") {
 //                            invoiceLayout!!.setVisibility(View.VISIBLE)

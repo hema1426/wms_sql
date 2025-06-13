@@ -121,17 +121,16 @@ public class SelectCustomerAdapter extends RecyclerView.Adapter<SelectCustomerAd
 
         if (context instanceof CustomerListActivity){
             viewHolder.moreIcon.setVisibility(View.GONE);
-            viewHolder.customerLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                  //  onMoreButtonClicked.moreOption(model.getCustomerName(),model.getCustomerCode(),model.getOutstandingAmount());
-
-                    onMoreButtonClicked.createInvoice(model.getCustomerCode(),model.getCustomerName(),model.getTaxCode(),
-                            model.getTaxPerc(),model.getTaxType() , model.getBillDiscPercentage() ,
-                            model.getAllowFOC(),model.getMailId());
-
-                }
-            });
+//            viewHolder.customerLayout.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                  //  onMoreButtonClicked.moreOption(model.getCustomerName(),model.getCustomerCode(),model.getOutstandingAmount());
+//
+//                    onMoreButtonClicked.createInvoice(model.getCustomerCode(),model.getCustomerName(),model.getTaxCode(),
+//                            model.getTaxPerc(),model.getTaxType() , model.getBillDiscPercentage() ,
+//                            model.getAllowFOC(),model.getMailId());
+//                }
+//            });
         }
         Log.w("custContex",""+activityName);
      if (activityName.equals("SalesOrder") || activityName.equals("Invoice")){

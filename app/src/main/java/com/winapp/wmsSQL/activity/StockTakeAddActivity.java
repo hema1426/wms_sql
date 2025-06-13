@@ -244,7 +244,6 @@ public class StockTakeAddActivity extends AppCompatActivity {
 //                        setTransferInAdapter(transferInDetailsl);
 //                    }
                   //  Log.w("transFiltSize",""+transferInDetailsl.size());
-
                 }else{
                     Log.w("transFiltSizeaa",""+transferInDetailsl.size());
                     setStockTakeAddAdapter(transferInDetailsl);
@@ -707,7 +706,9 @@ public class StockTakeAddActivity extends AppCompatActivity {
                                     Log.w("entrTake",""+transferInDetailsl.size());
                                 }
                             } else{
-                                stockTakeAddAdapter.notifyDataSetChanged();
+                                if(stockTakeAddAdapter != null) {
+                                    stockTakeAddAdapter.notifyDataSetChanged();
+                                }
                                 transferInDetailsl.clear();
                                 rv_takeAddView.setAdapter(null);
                                 pdtsizel.setText("0 Products");

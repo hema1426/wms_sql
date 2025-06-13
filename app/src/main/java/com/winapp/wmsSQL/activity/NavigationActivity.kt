@@ -105,15 +105,16 @@ open class NavigationActivity : AppCompatActivity() {
         if (settings1 != null) {
             if (settings1.size > 0) {
                 for (model in settings1) {
-//                   if (model.settingName == "showSalesOrder") {
-//                        Log.w("SettingNameSO:", model.settingName)
-//                        Log.w("SettingValueSO:", model.settingValue)
-//                        isCheckedSO1 = if (model.settingValue == "True") {
-//                            true
-//                        } else {
-//                            false
-//                        }
-//                    } else if (model.settingName == "showInvoice") {
+                   if (model.settingName == "showSalesOrder") {
+                        Log.w("SettingNameSO:", model.settingName)
+                        Log.w("SettingValueSO:", model.settingValue)
+                        isCheckedSO1 = if (model.settingValue == "True") {
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    // else if (model.settingName == "showInvoice") {
 //                        Log.w("SettingNameInv:", model.settingName)
 //                        Log.w("SettingValueInv:", model.settingValue)
 //                        isCheckedInvoice1 = if (model.settingValue == "True") {
@@ -122,7 +123,7 @@ open class NavigationActivity : AppCompatActivity() {
 //                            false
 //                        }
 //                    }   else
-                      if (model.settingName == "showCustomer") {
+                      else if (model.settingName == "showCustomer") {
                         Log.w("SettingNameCust:", model.settingName)
                         Log.w("SettingValueCust:", model.settingValue)
                         isCheckedCustomer1 = if (model.settingValue == "True") {
@@ -177,12 +178,12 @@ open class NavigationActivity : AppCompatActivity() {
                         customers.setVisible(false)
                     }
 
-//                    "Sales Order" -> if (roll.havePermission == "true") {
-//                        salesorder.setVisible(true)
-//                    } else {
-//                        salesorder.setVisible(false)
-//                    }
-//
+                    "Sales Order" -> if (roll.havePermission == "true") {
+                        salesorder.setVisible(true)
+                    } else {
+                        salesorder.setVisible(false)
+                    }
+
 //                    "Invoice" -> if (roll.havePermission == "true") {
 //                        invoice.setVisible(true)
 //                    } else {
@@ -341,13 +342,15 @@ open class NavigationActivity : AppCompatActivity() {
                 startActivity(intent)
                 drawerLayout!!.closeDrawers()
                 return@OnNavigationItemSelectedListener true
-            } else if (itemId == R.id.navigation_reports) {
-                val intent: Intent
-                intent = Intent(this@NavigationActivity, ReportsActivity::class.java)
-                startActivity(intent)
-                drawerLayout!!.closeDrawers()
-                return@OnNavigationItemSelectedListener true
-            } else if (itemId == R.id.navigation_transfer) {
+            }
+//            else if (itemId == R.id.navigation_reports) {
+//                val intent: Intent
+//                intent = Intent(this@NavigationActivity, ReportsActivity::class.java)
+//                startActivity(intent)
+//                drawerLayout!!.closeDrawers()
+//                return@OnNavigationItemSelectedListener true
+//            }
+            else if (itemId == R.id.navigation_transfer) {
                 val intent: Intent
                 intent = Intent(this@NavigationActivity, TransferListProductActivity::class.java)
                 intent.putExtra("docNum", "")

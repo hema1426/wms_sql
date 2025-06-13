@@ -21,7 +21,7 @@ import com.winapp.wmsSQL.utils.Utils
 
 
 class PickListAddNewAdapter(
-    private val context: Context, var pickListItem: ArrayList<PicklistAddNewModel>,
+    private val context: Context, var pickListItem: ArrayList<PicklistAddNewModel>,var statusStr:String
 ) : RecyclerView.Adapter<PickListAddNewAdapter.MyViewHolder>()
 {
     private var sharedPreferenceUtil: SharedPreferenceUtil? = null
@@ -63,6 +63,7 @@ class PickListAddNewAdapter(
 //        var editpick: ImageView
 //        var remarkpick: ImageView
         var picklistlay: CardView
+        var picklistlayLine: LinearLayout
         var pickQtytxt: TextView
         var textWatcher: TextWatcher? = null
 
@@ -73,11 +74,27 @@ class PickListAddNewAdapter(
             pcodetxt.text = pickItem.productCode
             oqtytxt.text = pickItem.openQty.toString()
             pickQtytxt.text = Utils.twoDecimalPoint(pickItem.pickQty!!.toDouble())
+
+            if(pickItem.qty != null && !pickItem.qty.equals("0.0",true)
+                && !pickItem.qty.equals("")) {
+                qtyTextPick.setText( Utils.twoDecimalPoint(pickItem.qty!!.toDouble()).toString())
+               picklistlay.setBackgroundResource(R.color.lightble1)
+
+            }else{
+                qtyTextPick.setText("")
+                picklistlay.setBackgroundResource(R.color.white)
+            }
+
             stocktxt.text = pickItem.stock.toString()
 
             qtyTextPick.removeTextChangedListener(textWatcher)
             qtyTextPick.setSelection(qtyTextPick.getText().length)
             qtyTextPick.setSelectAllOnFocus(true)
+            if(statusStr.equals("C",true)){
+                qtyTextPick.setEnabled(false)
+            }else{
+                qtyTextPick.setEnabled(true)
+            }
 
             qtyTextPick.addTextChangedListener(object : TextWatcher {
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -88,18 +105,15 @@ class PickListAddNewAdapter(
                     after: Int
                 ) {
                 }
-
                 override fun afterTextChanged(s: Editable) {
                     val pos = adapterPosition
                     if (pos != -1) {
-                        Log.e("editabl_s", "" + s.toString())
-                        if (!s.toString().isEmpty()) {
-                            // if (transferMode.equals("Stock Request")){
-
-                         ////   dataList.get(pos).setQty(s.toString())
+                        Log.w("editabl_pick", "" + s.toString())
+                        Log.w("pick_pos", "" +pos)
+                        if (s.toString().isNotEmpty()) {
                             pickListItem.get(pos).qty = s.toString()
 
-                            //                  //              notifyDataSetChanged();
+                            //notifyDataSetChanged();
 //                            }else {
 //                                if (dataList.get(pos).getStockInHand() >= Integer.parseInt(s.toString())) {
 //                                    dataList.get(pos).setQty(s.toString());
@@ -167,22 +181,28 @@ class PickListAddNewAdapter(
 //                checkboxpick.visibility = View.GONE
                 pickQtytxt.isEnabled = false
             }
-
             if (::selectedModel.isInitialized
                 && selectedModel.productCode == pickItem.productCode
 //                && selectedModel.location == pickItem.location
                 && istrue) {
-                Log.e("graadd_entry","")
+                Log.e("pickadd_entry","")
+                val pos = adapterPosition
 
-                object : CountDownTimer(1000, 500) {
+                qtyTextPick.requestFocus()
+
+             //   qtyTextPick.setSelection(pos)
+
+                object : CountDownTimer(1500, 500) {
                     override fun onTick(millisUntilFinished: Long) {
-                        CommonMethods.setBlinkingText(pickQtytxt)
-                        CommonMethods.setBlinkingText(qtyTextPick)
+                        CommonMethods.setBlinkingLay(picklistlayLine)
+//                        CommonMethods.setBlinkingText(pickQtytxt)
+//                        CommonMethods.setBlinkingText(qtyTextPick)
                     }
 
                     override fun onFinish() {
-                        pickQtytxt.clearAnimation()
-                        qtyTextPick.clearAnimation()
+                        picklistlayLine.clearAnimation()
+//                        pickQtytxt.clearAnimation()
+//                        qtyTextPick.clearAnimation()
                     }
                 }.start()
             } else {
@@ -202,6 +222,7 @@ class PickListAddNewAdapter(
          
 //            checkboxpick = itemView.findViewById<View>(R.id.checkbox_pick) as CheckBox
             picklistlay = itemView.findViewById<View>(R.id.picklist_add_lay) as CardView
+            picklistlayLine = itemView.findViewById<View>(R.id.picklist_add_lay1) as LinearLayout
 //            editpick = itemView.findViewById<View>(R.id.edit_pick) as ImageView
 //            remarkpick = itemView.findViewById<View>(R.id.remark_pick) as ImageView
 //            baltxt = itemView.findViewById<View>(R.id.pbal_item) as TextView

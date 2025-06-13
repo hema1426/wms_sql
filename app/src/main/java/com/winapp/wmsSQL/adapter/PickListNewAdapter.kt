@@ -1,22 +1,22 @@
 package com.winapp.wmsSQL.adapter
 
-import com.winapp.pickanddrop.ui.model.PickIistResponseNew
-import androidx.recyclerview.widget.RecyclerView
-import android.view.ViewGroup
-import android.view.LayoutInflater
-import android.widget.TextView
-import androidx.cardview.widget.CardView
-import android.widget.ProgressBar
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.winapp.pickanddrop.ui.model.PickIistResponseNew
 import com.winapp.wmsSQL.R
 import com.winapp.wmsSQL.activity.NewPickListAddActivity
-import com.winapp.wmsSQL.activity.PickListDetailActivity
-import java.util.ArrayList
+import com.winapp.wmsSQL.activity.NewPickListAddActivityCopy
 
 class PickListNewAdapter(
     private val context: Context,
@@ -49,6 +49,8 @@ class PickListNewAdapter(
         var salesEmpnametxt : TextView
         var usernametxt : TextView
         var picustnametxt: TextView
+        var nonPicked_count_item: TextView
+        var picked_count_item: TextView
         var picklistinvoicelay: CardView
         var progressBar: ProgressBar? = null
         @SuppressLint("ClickableViewAccessibility")
@@ -60,6 +62,8 @@ class PickListNewAdapter(
             pistatustxt.text = pickItem.pickListStatus
             usernametxt.text = pickItem.ownerName
             salesEmpnametxt.text = pickItem.salesEmployee
+            picked_count_item.text = pickItem.pickedCount
+            nonPicked_count_item.text = pickItem.nonPickedCount
 
             Log.e("cust_nameaa", ".." + pickItem.customerName+" .."+pickItem.noOfItem)
             //   schedule_date.setText(scheduledatel.getDate());
@@ -68,7 +72,7 @@ class PickListNewAdapter(
                     ignoreCase = true
                 ) || pickItem.pickListStatus.equals("Open", ignoreCase = true)
             ) {
-                pistatustxt.setText(" Open ")
+                pistatustxt.setText(" Pending ")
                 islongPress = true
                 pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.white))
                 pistatustxt.setBackgroundResource(R.drawable.round_accent_rad3_blue)
@@ -78,7 +82,7 @@ class PickListNewAdapter(
                     ignoreCase = true
                 ) || pickItem.pickListStatus.equals("Close", ignoreCase = true)
             ) {
-                pistatustxt.setText(" Close ")
+                pistatustxt.setText(" Completed ")
                 islongPress = true
                 pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.white))
                 pistatustxt.setBackgroundResource(R.drawable.round_accent_rad3_red)
@@ -97,7 +101,7 @@ class PickListNewAdapter(
                 picklistinvoicelay.setBackgroundResource(R.color.white)
             }
             else if (pickItem.pickListStatus.equals("OC", ignoreCase = true)) {
-                pistatustxt.setText("Open Check")
+                pistatustxt.setText(" Partial ")
                 islongPress = false
                 pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.black))
                 pistatustxt.setBackgroundResource(R.drawable.round_accent_rad3_yellow)
@@ -112,7 +116,7 @@ class PickListNewAdapter(
             }
             itemView.setOnClickListener {
                     val pos = adapterPosition
-                if(!pickItem.pickListStatus.equals("C")) {
+              //  if(!pickItem.pickListStatus.equals("C")) {
 
                     if (pos != -1) {
                         //card_bg.setBackgroundResource(R.color.colorPrimaryLight);
@@ -125,8 +129,8 @@ class PickListNewAdapter(
 //                            notifyItemChanged(i)
 //                        }
                         Log.w("picknno", "" + pickItem.pickListNo);
-                      val intent = Intent(context, NewPickListAddActivity::class.java)
-                        //val intent = Intent(context, PickListDetailActivity::class.java)
+                     val intent = Intent(context, NewPickListAddActivity::class.java)
+                       // val intent = Intent(context, NewPickListAddActivityCopy::class.java)
 
                         intent.putExtra("salesCode", pickItem.code)
                         intent.putExtra("custCodePick", pickItem.customerCode)
@@ -136,12 +140,23 @@ class PickListNewAdapter(
                         intent.putExtra("pick_listNo", pickItem.pickListNo)
                         intent.putExtra("pick_owner", pickItem.ownerName)
                         intent.putExtra("pick_salesEmp", pickItem.salesEmployee)
+                        intent.putExtra("pick_DocNum", pickItem.docNumber)
+                        intent.putExtra("pick_Datetime", pickItem.dateTime)
 
                         context.startActivity(intent)
 
                         //  pickListInvoiceClickListener.pickListInvoiceSelected(pos)
                     }
-                }
+//                }else{
+//
+//                    // Device does not support Bluetooth
+//                    Toast.makeText(
+//                        context,
+//                        "Already Completed",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//
+//                }
             }
 
 //            if (pickItem.isItemSelected()) {
@@ -161,6 +176,8 @@ class PickListNewAdapter(
             pinoofitemtxt = itemView.findViewById<View>(R.id.picki_noitem_item) as TextView
             pistatustxt = itemView.findViewById<View>(R.id.picki_status_item) as TextView
             picustnametxt = itemView.findViewById<View>(R.id.cust_name_picki_item) as TextView
+            picked_count_item = itemView.findViewById<View>(R.id.picked_count_item) as TextView
+            nonPicked_count_item = itemView.findViewById<View>(R.id.nonPicked_count_item) as TextView
             usernametxt = itemView.findViewById<View>(R.id.user_picki_item) as TextView
             salesEmpnametxt = itemView.findViewById<View>(R.id.sale_emp_picki_item) as TextView
             picklistinvoicelay = itemView.findViewById<View>(R.id.picklistinvoice_lay) as CardView

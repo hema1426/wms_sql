@@ -243,7 +243,7 @@
                     android:layout_gravity="center"
                     android:textSize="12sp"
                     android:layout_marginRight="10dp"
-                    android:id="@+id/btn_cancel"
+                    android:id="@+id/btn_cancel_pickl"
                     android:text="Cancel"
                     android:background="?actionBarItemBackground"
                     android:textColor="@color/red_btn_bg_color"
