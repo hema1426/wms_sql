@@ -122,7 +122,6 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
     var zoneSpinner: MultiSelectSpinnerView? = null
     val zoneSpinnerStr: String? = ""
     private var pDialog: SweetAlertDialog? = null
-
     var date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
     private var search_ed: EditText? = null
     var searchTextWatcher: TextWatcher? = null
@@ -152,7 +151,7 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
         custFilterAutol = findViewById(R.id.custFilterAuto)
         zoneSpinner = findViewById(R.id.zoneSpinnerl)
 
-        val status = arrayOf("All", "Open", "Open Check", "Open Weight")
+        val status = arrayOf("All", "Pending", "Partial", "Completed")
 
         val langAdapter =
             ArrayAdapter<CharSequence>(this, R.layout.cust_spinner_item, status)
@@ -463,7 +462,6 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
 
                                 } else {
                                     emptytxt()
-                                    searchFilterView!!.visibility = View.GONE
                                 }
                          //   }
                         } else {
@@ -472,7 +470,6 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
                     } else {
                         toast(this@NewPickListActivity, statusMsg)
                         emptytxt()
-
                     }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
@@ -763,20 +760,19 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
 
                     if (spinner_statusl!!.selectedItem.equals("All")) {
                         spinnertxt = ""
-                    } else if (spinner_statusl!!.selectedItem.equals("Open")) {
+                    } else if (spinner_statusl!!.selectedItem.equals("Pending")) {
                         spinnertxt = "O"
                         Log.w("api2_s1", ".." + spinnertxt)
 
-                    } else if (spinner_statusl!!.selectedItem.equals("Close")) {
-                        spinnertxt = "C"
+                    } else if (spinner_statusl!!.selectedItem.equals("partial")) {
+                        spinnertxt = "OC"
                         Log.w("api2_s2", ".." + spinnertxt)
 
-                    } else if (spinner_statusl!!.selectedItem.equals("Open Check")) {
-                        spinnertxt = "OC"
+                    } else if (spinner_statusl!!.selectedItem.equals("Completed")) {
+                        spinnertxt = "C"
                         Log.w("api2_s3", ".." + spinnertxt)
-                    } else if (spinner_statusl!!.selectedItem.equals("Open Weight")) {
-                        spinnertxt = "OW"
                     }
+
 
                     if (so_number_filter_pickl!!.text.toString().isNotEmpty()
                     ) {
@@ -876,7 +872,8 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
         picklistinvoice_rv!!.visibility = View.GONE
         totalSize!!.visibility = View.INVISIBLE
         emptytxt!!.visibility = View.VISIBLE
-
+        spinner_statusl!!.setSelection(0)
+        searchFilterView!!.visibility = View.GONE
         //  searchProduct!!.isEnabled = false
     }
 
@@ -1294,4 +1291,6 @@ class NewPickListActivity : AppCompatActivity(), OnClickListener {
         startActivity(intent)
         finish()
     }
+
+
 }

@@ -129,6 +129,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activity.NewDeliveryPickListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />

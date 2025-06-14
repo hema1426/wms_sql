@@ -1022,8 +1022,6 @@ public class CashCollectionActivity extends AppCompatActivity {
                                 .show())
                 .onSameThread()
                 .check();
-
-
     }
     /**
      * Showing Alert Dialog with Settings option
@@ -1178,7 +1176,7 @@ public class CashCollectionActivity extends AppCompatActivity {
             cancelButton=customLayout.findViewById(R.id.btn_cancel);
             Button signatureButton=customLayout.findViewById(R.id.btn_signature);
             signatureCapture=customLayout.findViewById(R.id.signature_capture);
-            printCheckBox=customLayout.findViewById(R.id.receipt_print_check);
+            printCheckBox = customLayout.findViewById(R.id.receipt_print_check);
             LinearLayout printLayout=customLayout.findViewById(R.id.print_layout);
             decreaseButton=customLayout.findViewById(R.id.decrease);
             increaseButton=customLayout.findViewById(R.id.increase);

@@ -1,6 +1,7 @@
 package com.winapp.wmsSQL.activity;
 
 import static com.winapp.wmsSQL.utils.Constants.WMS_SJLITE_SINGAPORE_Live;
+import static com.winapp.wmsSQL.utils.Constants.WMS_SJLITE_SINGAPORE_Live1;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -159,8 +160,8 @@ public class SplashActivity extends AppCompatActivity {
     //  String apiUrl=Constants.FUXIN;
     //  String apiUrl=Constants.test_URL_OCT24;
     //String apiUrl=Constants.SUPER_STAR_DEMO;
-    String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
-    //String apiUrl= WMS_SJLITE_SINGAPORE_Live;
+      String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
+   // String apiUrl= WMS_SJLITE_SINGAPORE_Live1;
 
                 dbHelper.insertUrl(apiUrl);
                 startActivity(new Intent(SplashActivity.this,LoginActivity.class));

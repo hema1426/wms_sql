@@ -86,8 +86,6 @@
                         android:layout_height="35dp"/>
 
                 </LinearLayout>
-
-
                 <LinearLayout
                     android:layout_width="400dp"
                     android:padding="5dp"
@@ -104,7 +102,6 @@
                         android:layout_height="35dp"
                         android:entries="@array/sales_arrays"
                         android:prompt="@string/invoice_prompt" />
-
                 </LinearLayout>
 
             </LinearLayout>
