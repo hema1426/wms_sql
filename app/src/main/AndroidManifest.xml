@@ -109,6 +109,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activity.PickListDeliveryPrintPreviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ReportPreview.ReceiptSummaryPreviewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

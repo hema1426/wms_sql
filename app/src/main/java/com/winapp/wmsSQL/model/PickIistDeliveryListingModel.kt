@@ -1,7 +1,8 @@
-package com.winapp.pickanddrop.ui.model
+package com.winapp.wmsSQL.model
 
 
 import com.google.gson.annotations.SerializedName
+import com.winapp.wmsSQL.model.InvoicePrintPreviewModel
 
 data class PickIistDeliveryListingModel(
     @SerializedName("code")
@@ -21,7 +22,8 @@ data class PickIistDeliveryListingModel(
     @SerializedName("DateTime")
     var dateTime: String,
     var customerAddress: String,
-
-    var isItemSelected: Boolean = false
-
-)
+     var isShow: Boolean = false,
+    var isItemSelected: Boolean = false,
+    var invoiceList: ArrayList<PicklistDeliveryPrintPreviewModel.InvoiceList>? = null
+){
+}

@@ -47,12 +47,13 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.winapp.pickanddrop.ui.model.PickIistDeliveryListingModel
+import com.winapp.wmsSQL.model.PickIistDeliveryListingModel
 import com.winapp.wmsSQL.BuildConfig
 import com.winapp.wmsSQL.CommonMethods
 import com.winapp.wmsSQL.R
 import com.winapp.wmsSQL.adapter.DeliveryPickListNewAdapter
 import com.winapp.wmsSQL.model.AddressZoneModel
+import com.winapp.wmsSQL.model.PicklistDeliveryPrintPreviewModel
 import com.winapp.wmsSQL.model.SupplierModel1
 import com.winapp.wmsSQL.multiselectspinner.MultiSelectSpinnerView
 import com.winapp.wmsSQL.utils.CaptureSignatureView
@@ -73,6 +74,7 @@ import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,DeliveryPickListNewAdapter.PickListUploadClickListener {
 
@@ -163,6 +165,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
         setContentView(R.layout.activity_delivery_picklist_list)
         Objects.requireNonNull(supportActionBar)!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.title = "Delivery PickList"
+        Log.w("activity_cg", javaClass.getSimpleName().toString()+"ar invoice")
 
         picklistinvoice_rv = findViewById(R.id.rv_picklist_delivery)
         barCodelay = findViewById(R.id.barcode_lay)
@@ -170,8 +173,8 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
         pickifromdatelay = findViewById(R.id.picki_fromdatelay)
         pickifromdate_txt = findViewById(R.id.picki_fromdate_txt)
         pickitodate_txt = findViewById(R.id.picki_todate_txt)
-        pickdate_search = findViewById(R.id.search_dat_picki)
-        btn_cancelm = findViewById(R.id.btn_cancel_pickl)
+        pickdate_search = findViewById(R.id.search_dat_pickiDel)
+        btn_cancelm = findViewById(R.id.btn_cancel_pickDel)
 //        search_lay =  findViewById(R.id.picklist_search_lay)
         search_ed = findViewById(R.id.searchBar_pick)
         spinner_statusl = findViewById<View>(R.id.spinner_status_pick) as Spinner
@@ -179,12 +182,12 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
         emptytxt = findViewById(R.id.empty_txt)
         totalSize = findViewById(R.id.item_size_list)
         so_number_filter_pickl = findViewById(R.id.so_number_filter_pick)
-        filter_iconl = findViewById(R.id.filter_icon)
-        searchFilterView = findViewById(R.id.search_filter)
+        filter_iconl = findViewById(R.id.filter_icon_pickDel)
+        searchFilterView = findViewById(R.id.search_filter_pickDel)
         custFilterAutol = findViewById(R.id.custFilterAuto)
         zoneSpinner = findViewById(R.id.zoneSpinnerl)
 
-        val status = arrayOf("All", "Pending", "Partial", "Completed")
+        val status = arrayOf("All", "Pending", "Picked", "Completed")
 
         val langAdapter =
             ArrayAdapter<CharSequence>(this, R.layout.cust_spinner_item, status)
@@ -447,7 +450,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
 
                             for (i in 0 until responseData.length()) {
                                 val obj = responseData.optJSONObject(i)
-
+                                var invoiceList: ArrayList<PicklistDeliveryPrintPreviewModel.InvoiceList>? = ArrayList()
                                 val model = PickIistDeliveryListingModel(
                                     obj.optString("code"),
                                     obj.optString("customerCode"),
@@ -458,7 +461,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
                                     obj.optString("invoiceStatus"),
                                     obj.optString("dateTime"),
                                     obj.optString("customerAddress"),
-                                    false
+                                    false,false,invoiceList
                                 )
                                 picklistNew!!.add(model)
                             }
@@ -746,12 +749,12 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
                 datePickerDialog.show()
             }
 
-            R.id.btn_cancel_pickl -> {
+            R.id.btn_cancel_pickDel -> {
                 cleartxt()
                 searchFilterView!!.visibility = View.GONE
             }
 
-            R.id.search_dat_picki -> {
+            R.id.search_dat_pickiDel -> {
                 if (pickifromdate_txt!!.text.toString()
                         .isNotEmpty() && pickitodate_txt!!.text.toString()
                         .isNotEmpty()
@@ -1278,7 +1281,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
 //        popup.setOnMenuItemClickListener(MyMenuItemClickListener(position))
 //        popup.show()
 //    }
-    private fun showPopupMenu( pickModel: PickIistDeliveryListingModel , view: View) {
+    private fun showPopupMenu(pickModel: PickIistDeliveryListingModel, view: View) {
         val menuItemView = findViewById<View>(R.id.fab)
         val popupMenu = PopupMenu(this@NewDeliveryPickListActivity, view)
         popupMenu.menuInflater.inflate(R.menu.three_dot_pick_menu, popupMenu.menu)
@@ -1383,7 +1386,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
         alert!!.setCanceledOnTouchOutside(false)
         alert!!.show()
     }
-    override fun pickListUploadSelected(pickModel: PickIistDeliveryListingModel,view: View) {
+    override fun pickListUploadSelected(pickModel: PickIistDeliveryListingModel, view: View) {
         // showUploadImageAlert(pickModel)
         showPopupMenu(pickModel,view)
     }

@@ -318,7 +318,8 @@ public class PaidInvoiceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void showMoreOption(String invoiceId, String customerName);
     }
 
-    private void getInvoiceDetails(String invoiceNumber,RecyclerView.ViewHolder  viewHolder, int position,InvoiceModel invoice,String action) throws JSONException {
+    private void getInvoiceDetails(String invoiceNumber,RecyclerView.ViewHolder  viewHolder, int position,
+                                   InvoiceModel invoice,String action) throws JSONException {
         // Initialize a new RequestQueue instance
         JSONObject jsonObject=new JSONObject();
         // jsonObject.put("CompanyCode",companyId);
