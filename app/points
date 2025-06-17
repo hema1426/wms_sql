@@ -18,7 +18,7 @@ deli - picklist
 customer detail , no of item  -- status ,
 cust filter , frdate , todate , status , invoice  -- search
 
-image ,sing iruntha- deliverd status
+image ,sing iruntha- compl status  o -pending , oc - picked , c- complted
 picked remark iruntha --picked status
 
 add page -- remark - picked , non picked

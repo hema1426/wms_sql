@@ -40,7 +40,7 @@
 
 
         <ImageView
-            android:id="@+id/close_btn_edit_inv"
+            android:id="@+id/close_btn_pickdel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -116,7 +116,7 @@
             android:layout_margin="10dp"
             android:drawablePadding="10dp"
             android:text="Select Image"
-            android:id="@+id/select_Img_edit_inv"
+            android:id="@+id/select_Img_pickdel"
             android:drawableLeft="@drawable/ic_baseline_camera_enhance_24"
             android:layout_height="40dp"
             android:background="#F3f3f3" />

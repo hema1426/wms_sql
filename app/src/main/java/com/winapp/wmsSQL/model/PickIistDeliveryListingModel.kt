@@ -2,7 +2,6 @@ package com.winapp.wmsSQL.model
 
 
 import com.google.gson.annotations.SerializedName
-import com.winapp.wmsSQL.model.InvoicePrintPreviewModel
 
 data class PickIistDeliveryListingModel(
     @SerializedName("code")
@@ -14,7 +13,7 @@ data class PickIistDeliveryListingModel(
     @SerializedName("docDate")
     var docDate: String,
     @SerializedName("docNumber")
-    var docNumber: String,
+    var invNumber: String,
     @SerializedName("noOfItem")
     var noOfItem: String,
     @SerializedName("pickListStatus")
@@ -22,7 +21,10 @@ data class PickIistDeliveryListingModel(
     @SerializedName("DateTime")
     var dateTime: String,
     var customerAddress: String,
-     var isShow: Boolean = false,
+    var signature: String,
+    var imageUrl: String,
+    var remark: String,
+    var isShow: Boolean = false,
     var isItemSelected: Boolean = false,
     var invoiceList: ArrayList<PicklistDeliveryPrintPreviewModel.InvoiceList>? = null
 ){

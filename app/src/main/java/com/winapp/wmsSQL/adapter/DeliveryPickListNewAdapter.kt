@@ -21,15 +21,18 @@ import com.android.volley.RetryPolicy
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.winapp.wmsSQL.model.PickIistDeliveryListingModel
 import com.winapp.wmsSQL.R
-import com.winapp.wmsSQL.activity.NewDeliveryPickListActivity
 import com.winapp.wmsSQL.activity.PickListDeliveryPrintPreviewActivity
+import com.winapp.wmsSQL.model.PickIistDeliveryListingModel
 import com.winapp.wmsSQL.model.PicklistDeliveryPrintPreviewModel
 import com.winapp.wmsSQL.utils.Constants
 import com.winapp.wmsSQL.utils.Utils
 import org.json.JSONException
 import org.json.JSONObject
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class DeliveryPickListNewAdapter(
     private val context: Context,
@@ -80,10 +83,10 @@ class DeliveryPickListNewAdapter(
         fun setData(pickItem: PickIistDeliveryListingModel, holder: MyViewHolder) {
             picustnametxt.text = pickItem.customerName+" - "+pickItem.customerCode
             pidatetxt.text = pickItem.docDate
-            piinvoicenotxt.text = pickItem.docNumber
+            piinvoicenotxt.text = pickItem.invNumber
             pinoofitemtxt.text = pickItem.noOfItem
             pistatustxt.text = pickItem.pickListStatus
-            pistatustxt.text = pickItem.customerAddress
+            custaddrtxt.text = pickItem.customerAddress
 
             Log.e("cust_nameaa", ".." + pickItem.customerName+" .."+pickItem.noOfItem)
             //   schedule_date.setText(scheduledatel.getDate());
@@ -161,10 +164,10 @@ class DeliveryPickListNewAdapter(
                         intent.putExtra("pick_itemDel", pickItem.noOfItem)
                         intent.putExtra("pick_InvDateDel", pickItem.docDate)
                         intent.putExtra("pick_statusDel", pickItem.pickListStatus)
-                        intent.putExtra("pick_DocNumDel", pickItem.docNumber)
+                        intent.putExtra("pick_DocNumDel", pickItem.invNumber)
                         intent.putExtra("pick_DatetimeDel", pickItem.dateTime)
-                     context.startActivity(intent)
-
+                        Log.w("delDateStr1a:",  pickItem.dateTime);
+                        context.startActivity(intent)
                         //  pickListInvoiceClickListener.pickListInvoiceSelected(pos)
                     }
 //                }else{

@@ -78,7 +78,9 @@ Pwd - 12345
 //invoice print -- PrinterUtils
  public void printInvoice(int copy
 
-
+date format
+------------
+ PickListDeliveryPrintPreviewActivity --dateFormatHour()
 // layout view
  if (search_lay_listl.getVisibility() == View.GONE) {
                     search_lay_listl.setVisibility(View.VISIBLE);

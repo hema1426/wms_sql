@@ -32,7 +32,7 @@
                         android:textSize="12sp"
                         android:selectAllOnFocus="true"
                         android:singleLine="true"
-                        android:hint="Search Customer"
+                        android:hint="Enter Customer detail"
                         android:background="@drawable/edit_text_corner"
                         android:layout_below="@+id/code_title"
                         android:layout_height="wrap_content"/>
@@ -80,7 +80,7 @@
                         android:drawableRight="@drawable/ic_baseline_search_24"
                         android:gravity="top"
                         android:textSize="12sp"
-                        android:hint="SO Number"
+                        android:hint="Delivery Number"
                         android:background="@drawable/invoice_edit_text"
                         android:layout_below="@+id/code_title"
                         android:layout_height="35dp"/>

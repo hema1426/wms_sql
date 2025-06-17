@@ -81,13 +81,12 @@
 
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_marginLeft="5dp"
-                        android:maxLines="2"
-                        android:maxWidth="250dp"
+                        android:maxLines="3"
                         android:ellipsize="end"
                         android:text="sssdd"
-                        android:textColor="@color/dark_orang"
+                        android:textColor="@color/black"
                         android:id="@+id/cust_addr_pick_deli_item"
                         android:textSize="12sp"
                         android:layout_height="wrap_content"/>
@@ -109,6 +108,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
                     android:src="@drawable/three_dot"
                     />
             </LinearLayout>
@@ -251,6 +251,7 @@
                     android:background="@drawable/corner_picklist_red_text"
                     android:gravity="center"
                     android:padding="4dp"
+                    android:textStyle="bold"
                     android:layout_gravity="center"
                     android:textColor="@color/black"
                     android:textSize="14sp"
@@ -260,8 +261,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
-                    android:layout_marginLeft="10dp"
-                    android:padding="5dp"
+                    android:padding="10dp"
                     android:tag="hide"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:layout_gravity="center"
@@ -337,7 +337,7 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/pickDel_downlist"
                             android:layout_width="match_parent"
-                            tools:listitem="@layout/invoice_details_view_items"
+                            tools:listitem="@layout/pick_delivery_details_view_items"
                             android:layout_height="wrap_content"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"

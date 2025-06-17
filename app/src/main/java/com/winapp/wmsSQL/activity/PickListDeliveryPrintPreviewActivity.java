@@ -74,14 +74,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
+public class  PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
 
     private String companyId;
     private String locationCode;
@@ -107,6 +111,8 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
     private TextView companyAddress3Text;
     private TextView companyPhoneText;
     private TextView companyGstText;
+    private TextView userTxt;
+    private TextView dateTimeTxt;
     private String company_name;
     private String company_address1;
     private String company_address2;
@@ -136,6 +142,7 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
     Button cancelButton;
     private static final int PERMISSION_REQUEST_CODE = 100;
     public String outstanding_amount="0.0";
+    public String delDateStr="";
 
     LinearLayout address1Layout;
     LinearLayout address2Layout;
@@ -147,7 +154,7 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
     TextView customerAddress3;
     TextView customerAddress4;
     String company_phone;
-    String company_gst;
+    String company_gst,username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,8 +173,10 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
         company_address3 = user.get(SessionManager.KEY_ADDRESS3);
         company_phone=user.get(SessionManager.KEY_PHONE_NO);
         company_gst=user.get(SessionManager.KEY_COMPANY_REG_NO);
-        Log.w("activity_cg",getClass().getSimpleName().toString());
 
+        username = user.get(SessionManager.KEY_USER_NAME);
+
+        Log.w("activity_cg",getClass().getSimpleName().toString());
 
         invoiceListView = findViewById(R.id.invoiceList);
         invoiceNumberText = findViewById(R.id.sr_no);
@@ -185,6 +194,8 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
         companyPhoneText=findViewById(R.id.mobile_no);
         addressLayout = findViewById(R.id.adressLayout);
         rootLayout = findViewById(R.id.rootLayout);
+        userTxt = findViewById(R.id.del_preview_user);
+        dateTimeTxt = findViewById(R.id.del_preview_date);
 
         sharedPreferences = getSharedPreferences("PrinterPref", MODE_PRIVATE);
         printerType = sharedPreferences.getString("printer_type", "");
@@ -213,15 +224,21 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
         Log.w("Printer_Mac_Id:", printerMacId);
         Log.w("Printer_Type:", printerType);
 
+        userTxt.setText(username);
         if (getIntent() != null) {
             invoiceNumber = getIntent().getStringExtra("salesCodeDel");
             outstanding_amount=getIntent().getStringExtra("outstandingAmount");
+            delDateStr=getIntent().getStringExtra("pick_DatetimeDel");
+            Log.w("delDateStr1:", delDateStr);
             if (invoiceNumber != null) {
                 try {
                     getInvoiceDetails(invoiceNumber);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+            if(!delDateStr.isEmpty()) {
+                dateFormatHour(delDateStr);
             }
         }
 
@@ -249,6 +266,25 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
         });
     }
 
+    private void dateFormatHour(String dateStr){
+        DateFormat readFormat = new SimpleDateFormat( "yyyyMMdd_HHmmss");
+        DateFormat writeFormat = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss a");
+        Date date = null;
+        try {
+            date = readFormat.parse( dateStr );
+        } catch ( ParseException e ) {
+            e.printStackTrace();
+        }
+
+        String formattedDate = "";
+        if( date != null ) {
+            formattedDate = writeFormat.format( date );
+        }
+        dateTimeTxt.setText(formattedDate);
+
+        Log.w("pickdel_date",""+formattedDate);
+    }
+
     private void getInvoiceDetails(String invoiceNumber) throws JSONException {
         // Initialize a new RequestQueue instance
         JSONObject jsonObject = new JSONObject();
@@ -268,7 +304,9 @@ public class PickListDeliveryPrintPreviewActivity extends AppCompatActivity {
               JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
                 jsonObject, response -> {
                     try {
-                      //  Log.w("DetailsResponse::", response.toString());
+                        Log.w("picklist_deli_res:", response.toString());
+
+                        //  Log.w("DetailsResponse::", response.toString());
                         String statusCode=response.optString("statusCode");
                         if (statusCode.equals("1")){
                             JSONArray responseData=response.getJSONArray("responseData");
