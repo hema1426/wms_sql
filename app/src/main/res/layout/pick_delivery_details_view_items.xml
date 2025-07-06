@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/sl_no_pickDel"
-        android:layout_width="35dp"
+        android:layout_width="38dp"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
@@ -52,7 +52,7 @@
         >
 
         <TextView
-            android:layout_width="35dp"
+            android:layout_width="38dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center"
@@ -92,7 +92,7 @@
             android:gravity="center"
             android:text="QTY"
             android:textColor="#212121"
-            android:textSize="13sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             />
 

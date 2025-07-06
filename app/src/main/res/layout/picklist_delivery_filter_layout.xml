@@ -19,19 +19,21 @@
             android:layout_height="match_parent">
 
                 <LinearLayout
+                    android:id="@+id/custLay_pickD"
                     android:layout_width="match_parent"
                     android:padding="7dp"
                     android:orientation="vertical"
                     android:layout_height="wrap_content">
 
-                    <AutoCompleteTextView
+                    <TextView
                         android:id="@+id/custFilterAuto"
                         android:layout_width="match_parent"
                         android:padding="8dp"
                         android:drawableRight="@drawable/ic_baseline_search_24"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:selectAllOnFocus="true"
                         android:singleLine="true"
+                        android:textColor="@color/black"
                         android:hint="Enter Customer detail"
                         android:background="@drawable/edit_text_corner"
                         android:layout_below="@+id/code_title"
@@ -76,13 +78,12 @@
                         android:layout_width="match_parent"
                         android:layout_marginTop="5dp"
                         android:padding="5dp"
-                        android:focusable="false"
                         android:drawableRight="@drawable/ic_baseline_search_24"
                         android:gravity="top"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
+                        android:textColor="#212121"
                         android:hint="Delivery Number"
                         android:background="@drawable/invoice_edit_text"
-                        android:layout_below="@+id/code_title"
                         android:layout_height="35dp"/>
 
                 </LinearLayout>
@@ -175,7 +176,8 @@
                         android:layout_width="match_parent"
                         android:hint="From Date"
                         android:padding="5dp"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
+                        android:textColor="@color/pink_clr"
                         android:focusable="false"
                         android:drawableRight="@drawable/ic_calendar"
                         android:layout_marginTop="5dp"
@@ -215,7 +217,8 @@
                         android:layout_marginTop="5dp"
                         android:padding="5dp"
                         android:focusable="false"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
+                        android:textColor="@color/pink_clr"
                         android:drawableRight="@drawable/ic_calendar"
                         android:hint="To Date"
                         android:background="@drawable/invoice_edit_text"

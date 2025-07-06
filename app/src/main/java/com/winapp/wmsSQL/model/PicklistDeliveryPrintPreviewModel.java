@@ -36,14 +36,23 @@ public class PicklistDeliveryPrintPreviewModel {
     private String paymentTerm;
     private String excQty;
     private String allowDeliveryAddress;
-    private String currentAddress;
+    private String phoneNo;
+    private String lineNo;
 
-    public String getCurrentAddress() {
-        return currentAddress;
+    public String getPhoneNo() {
+        return phoneNo;
     }
 
-    public void setCurrentAddress(String currentAddress) {
-        this.currentAddress = currentAddress;
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+
+    public String getLineNo() {
+        return lineNo;
+    }
+
+    public void setLineNo(String lineNo) {
+        this.lineNo = lineNo;
     }
 
     public String getPaymentTerm() {

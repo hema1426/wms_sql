@@ -99,6 +99,7 @@ public class StockProductsActivity extends NavigationActivity {
     public CustomerNameAdapter customerNameAdapter;
     public BottomSheetBehavior behavior;
     public TextView userName;
+    public String usertxt;
     private ArrayList<CustomerDetails> allCustomersList;
     private RecyclerView customerView;
     public static TextView textCartItemCount;
@@ -135,6 +136,8 @@ public class StockProductsActivity extends NavigationActivity {
         rootLayout=findViewById(R.id.rootLayout);
         sharedPreferences = getSharedPreferences("customerPref",MODE_PRIVATE);
         customerView = findViewById(R.id.customerView);
+
+        usertxt = user.get(SessionManager.KEY_USER_NAME);
         userName.setText(user.get(SessionManager.KEY_USER_NAME));
         transLayout=findViewById(R.id.transparent_layout);
         addProductButton=findViewById(R.id.add_product);
@@ -166,6 +169,17 @@ public class StockProductsActivity extends NavigationActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+//        try {
+//            jsonObject.put("User", usertxt);
+//            jsonObject.put("CardCode", "");
+////            jsonObject.put("ItemGroupCode", "All")
+//            jsonObject.put("LocationCode", locationCode);
+//
+//            getAllProducts(jsonObject);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
 //        Objects.requireNonNull(getSupportActionBar()).setTitle("Search");
         //      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -759,11 +773,14 @@ public class StockProductsActivity extends NavigationActivity {
     public void getAllProducts(JSONObject jsonObject){
         // Initialize a new RequestQueue instance
         RequestQueue requestQueue = Volley.newRequestQueue(StockProductsActivity.this);
+       //String url=Utils.getBaseUrl(this) +"CustomerProductList";
         String url=Utils.getBaseUrl(this) +"ProductListForTransfer";
+       // String url=Utils.getBaseUrl(this) +"ProductList";
         // Initialize a new JsonArrayRequest instance
         Log.w("Given_pdt_stock_URL:",url+jsonObject);
         productList=new ArrayList<>();
         products=new ArrayList<>();
+
         dialog=new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setMessage("Getting Stock Products List...");

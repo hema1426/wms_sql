@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -76,6 +77,7 @@ public class SplashActivity extends AppCompatActivity {
     private SharedPreferences.Editor registerPrefsEditor;
     private SharedPreferences registerPreferences;
     private boolean isRegister;
+    public TextView version_txtl;
 
 
     @Override
@@ -148,6 +150,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, SPLASH_TIME);*/
 
+        version_txtl = findViewById(R.id.version_txt);
+        version_txtl.setText("Version 1.1"); // 6.07.25
 
         new Handler().postDelayed(() -> {
             // Testing Function
@@ -162,6 +166,7 @@ public class SplashActivity extends AppCompatActivity {
     //String apiUrl=Constants.SUPER_STAR_DEMO;
    //   String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
     String apiUrl= WMS_SJLITE_SINGAPORE_Demo;
+   // String apiUrl= WMS_SJLITE_SINGAPORE_Live;
 
                 dbHelper.insertUrl(apiUrl);
                 startActivity(new Intent(SplashActivity.this,LoginActivity.class));

@@ -50,6 +50,7 @@ import com.winapp.wmsSQL.receipts.ReceiptsListActivity
 import com.winapp.wmsSQL.salesreturn.NewSalesReturnListActivity
 import com.winapp.wmsSQL.utils.Constants
 import com.winapp.wmsSQL.utils.GridSpacingItemDecoration
+import com.winapp.wmsSQL.utils.LocationTrack
 import com.winapp.wmsSQL.utils.SessionManager
 import com.winapp.wmsSQL.utils.SharedPreferenceUtil
 import com.winapp.wmsSQL.utils.Utils
@@ -89,6 +90,7 @@ class DashboardActivity : NavigationActivity() {
     private var catalogCard: CardView? = null
     private var creditLimit_Img: ImageView? = null
     private var sharedPreferenceUtil: SharedPreferenceUtil? = null
+    var locationTrack: LocationTrack? = null
 
     var locationCodem: String? = null
     private var timeText: TextView? = null
@@ -152,6 +154,7 @@ class DashboardActivity : NavigationActivity() {
         companyLogo = findViewById(R.id.company_logo)
         picklist_layoutl = findViewById(R.id.picklist_layout)
         deli_picklistLay = findViewById(R.id.deli_picklist_lay)
+       // getCurrentLocation()
 
         val c = Calendar.getInstance().time
         println("Current time => $c")
@@ -419,11 +422,11 @@ class DashboardActivity : NavigationActivity() {
 //                            receiptsLayout!!.setVisibility(View.GONE)
 //                        }
 
-                        "Settings" -> if (roll.havePermission == "true") {
-                            settingsLayout!!.setVisibility(View.VISIBLE)
-                        } else {
-                            settingsLayout!!.setVisibility(View.GONE)
-                        }
+//                        "Settings" -> if (roll.havePermission == "true") {
+//                            settingsLayout!!.setVisibility(View.VISIBLE)
+//                        } else {
+//                            settingsLayout!!.setVisibility(View.GONE)
+//                        }
 
                         "Sales Return" -> if (roll.havePermission == "true") {
                             salesReturnLayout!!.setVisibility(View.VISIBLE)
@@ -630,13 +633,13 @@ class DashboardActivity : NavigationActivity() {
                 if (locationDetailsl!!.size > 0) {
                     getLocationDialog(locationDetailsl)
                 } else {
-                    Toast.makeText(applicationContext, "No Location Found..!", Toast.LENGTH_SHORT)
+                    Toast.makeText(applicationContext, "No Warehouse Found..!", Toast.LENGTH_SHORT)
                         .show()
                 }
             } else {
                 Toast.makeText(
                     applicationContext,
-                    "You Don't have permission to change location..!",
+                    "You Don't have permission to change Warehouse..!",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -649,7 +652,7 @@ class DashboardActivity : NavigationActivity() {
             user1 = session1!!.userDetails
             locationCodem = user1!![SessionManager.KEY_LOCATION_CODE]
             menu.getItem(0).setVisible(true)
-            menu.getItem(0).setTitle("Location : $locationCodem")
+            menu.getItem(0).setTitle("WareHouse : $locationCodem")
         } catch (ex: Exception) {
         }
         return true
@@ -731,7 +734,7 @@ class DashboardActivity : NavigationActivity() {
 
     private fun getLocationDialog(locationDetailsArrayList: ArrayList<NewLocationModel.LocationDetails>?) {
         val builderSingle = AlertDialog.Builder(this)
-        builderSingle.setTitle("Select Location")
+        builderSingle.setTitle("Select Warehouse")
         val arrayAdapter = ArrayAdapter<String>(this, R.layout.selection_single_dialog)
         for (i in locationDetailsArrayList!!.indices) {
             arrayAdapter.add(locationDetailsArrayList[i].locationName + " - " + locationDetailsArrayList[i].locationCode)
@@ -1007,6 +1010,34 @@ class DashboardActivity : NavigationActivity() {
                     }
                 }
             }
+        }
+    }
+    fun getCurrentLocation() {
+        locationTrack = LocationTrack(this@DashboardActivity)
+        if (locationTrack!!.canGetLocation()) {
+            val longitude: Double = locationTrack!!.getLongitude()
+            val latitude: Double = locationTrack!!.getLatitude()
+//            current_latitude = latitude.toString()
+//            current_longitude = longitude.toString()
+            Log.w("longDash", "" + longitude)
+//            if (current_latitude != null && current_latitude.isNotEmpty()) {
+//                val currentAddress =
+//                    Utils.getCompleteAddress(this@DashboardActivity, latitude, longitude)
+//                if (currentAddress != null && !currentAddress.isEmpty()) {
+//                  //  currentAddressl = currentAddress
+//                    Log.w("longAddrInv", "" + currentAddressl)
+//
+//                    // locationText.setText(currentAddress)
+//                }
+            // }
+        } else {
+            // locationTrack.showSettingsAlert();
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        if (locationTrack != null) {
+            locationTrack!!.stopListener()
         }
     }
 }

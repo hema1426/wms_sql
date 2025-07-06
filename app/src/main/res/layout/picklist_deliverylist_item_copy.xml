@@ -50,48 +50,43 @@
                         android:id="@+id/cust_name_picki_del_item"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2.6"
+                        android:layout_weight="2"
                         android:text="0"
                         android:layout_gravity="center"
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         />
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/picki_del_date_item"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="5dp"
-                        android:orientation="horizontal">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="DO No : "
-                            android:gravity="right"
-                            android:textStyle="bold"
-                            android:layout_gravity="center"
-                            android:textColor="@color/pink_clr"
-                            android:textSize="12sp"
-                            />
-
-                        <TextView
-                        android:id="@+id/picki_del_invoiceno_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="0"
+                        android:layout_weight="1"
                         android:gravity="right"
                         android:layout_gravity="center"
                         android:textColor="@color/black"
-                            android:textStyle="bold"
                         android:textSize="13sp"
                         />
-                    </LinearLayout>
+
                 </LinearLayout>
+                <TextView
+                    android:id="@+id/picki_del_invoiceno_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="3dp"
+                    android:textStyle="bold"
+                    android:layout_gravity="left"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    />
                 </LinearLayout>
                     <LinearLayout
                         android:id="@+id/three_dot_pickl_lay"
-                        android:layout_width="60dp"
-                        android:layout_height="45dp"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:padding="5dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -106,6 +101,7 @@
                             android:src="@drawable/three_dot"
                             />
                     </LinearLayout>
+
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -133,62 +129,16 @@
                         android:textColor="@color/pink_clr"
                         />
                     <TextView
+                        android:id="@+id/shippingAddr_list_pickD"
                         android:layout_width="match_parent"
                         android:maxLines="5"
                         android:ellipsize="end"
-                        android:text=""
+                        android:text="sssdd"
                         android:textColor="@color/black"
                         android:textSize="12sp"
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_height="wrap_content">
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:orientation="horizontal"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/picki_del_date_item"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="3dp"
-                            android:layout_marginTop="2dp"
-                            android:textStyle="bold"
-                            android:layout_gravity="left"
-                            android:textColor="@color/black"
-                            android:textSize="14sp"
-                            />
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/picki_del_status_item"
-                            android:layout_width="100dp"
-                            android:layout_height="wrap_content"
-                            android:text="Open"
-                            android:layout_margin="5dp"
-                            android:background="@drawable/corner_picklist_red_text"
-                            android:gravity="center"
-                            android:padding="4dp"
-                            android:textStyle="bold"
-                            android:textColor="@color/black"
-                            android:textSize="14sp"
-                            />
-                    </LinearLayout>
-                </LinearLayout>
-                <View
-                    android:layout_width="match_parent"
-                    android:background="#d3d3d3"
-                    android:layout_height="1dp"/>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
@@ -215,7 +165,7 @@
                         android:layout_gravity="center"
                         android:textStyle="bold"
                         android:text="Phone No : "
-                        android:textSize="12dp"
+                        android:textSize="11dp"
                         android:textColor="@color/pink_clr"
                         />
                     <TextView
@@ -242,7 +192,7 @@
                             android:layout_gravity="center"
                             android:textStyle="bold"
                             android:text="User : "
-                            android:textSize="12dp"
+                            android:textSize="11dp"
                             android:textColor="@color/pink_clr"
                             />
                         <TextView
@@ -256,44 +206,6 @@
                             android:textStyle="bold"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="1dp"
-                    android:padding="3dp"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:layout_width="15dp"
-                        android:layout_marginLeft="5dp"
-                        android:id="@+id/person_listDel"
-                        android:src="@drawable/ic_user"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        app:tint="@color/pink_clr" />
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="customer contact person : "
-                        android:textSize="12dp"
-                        android:textStyle="bold"
-                        android:textColor="@color/pink_clr"
-                        />
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_marginLeft="5dp"
-                        android:maxLines="5"
-                        android:ellipsize="end"
-                        android:text=""
-                        android:layout_gravity="center"
-                        android:textColor="@color/black"
-                        android:id="@+id/person_pick_deli_item"
-                        android:textSize="13sp"
-                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -313,12 +225,12 @@
                         android:layout_gravity="center"
                         app:tint="@color/pink_clr" />
                     <TextView
-                        android:layout_width="100dp"
+                        android:layout_width="95dp"
                         android:layout_marginLeft="5dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="Shipping Addr : "
-                        android:textSize="12dp"
+                        android:textSize="11dp"
                         android:textStyle="bold"
                         android:textColor="@color/pink_clr"
                         />
@@ -330,12 +242,9 @@
                         android:maxLines="5"
                         android:ellipsize="end"
                         android:text=""
-                        android:textStyle="bold"
-                        android:layout_gravity="center"
-                        android:textColor="@color/blueclr"
-                        android:id="@+id/shippingAddr_list_pickD"
-                        android:textSize="13sp"
-
+                        android:textColor="@color/colorgreen"
+                        android:id="@+id/cust_addr_pick_deli_item"
+                        android:textSize="12sp"
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>
@@ -346,10 +255,47 @@
                     android:layout_marginTop="1dp"
                     android:padding="3dp"
                     android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_marginLeft="5dp"
+                        android:id="@+id/person_listDel"
+                        android:src="@drawable/ic_user"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        app:tint="@color/pink_clr" />
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Delivery Person : "
+                        android:textSize="11dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/pink_clr"
+                        />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:maxLines="5"
+                        android:ellipsize="end"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:id="@+id/person_pick_deli_item"
+                        android:textSize="13sp"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="1dp"
+                    android:background="@color/lightble1"
+                    android:padding="3dp"
+                    android:layout_height="wrap_content">
 
                     <TextView
-                        android:layout_width="115dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_marginLeft="5dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="Remarks : "
@@ -365,7 +311,7 @@
                         android:maxLines="5"
                         android:ellipsize="end"
                         android:text=""
-                        android:textColor="@color/dark_green"
+                        android:textColor="@color/green_clr1"
                         android:id="@+id/remark_pick_deli_item"
                         android:textSize="12sp"
                         android:textStyle="bold"
@@ -443,13 +389,13 @@
             <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-                android:background="@color/lightble1"
         android:orientation="horizontal">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:padding="3dp"
                 android:layout_weight="2"
+                android:layout_marginLeft="5dp"
                 android:orientation="vertical">
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -465,7 +411,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="No.of item :  "
+                            android:text="No.of item : "
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textStyle="bold"
@@ -485,40 +431,24 @@
                         android:textSize="13sp"
                         />
                     </LinearLayout>
-                    <LinearLayout
-                        android:id="@+id/mobUser_Lay"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.5"
-                        android:layout_gravity="center"
-                        android:orientation="horizontal">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Logged User : "
-                            android:gravity="center"
-                            android:layout_gravity="center"
-                            android:textStyle="bold"
-                            android:textColor="@color/pink_clr"
-                            android:textSize="13sp"
-                            />
-
-                        <TextView
-                            android:id="@+id/picki_del_mobUser_item"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:gravity="center"
-                            android:textStyle="bold"
-                            android:layout_gravity="center"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            />
-                    </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
+                <TextView
+                    android:id="@+id/picki_del_status_item"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Open"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/corner_picklist_red_text"
+                    android:gravity="center"
+                    android:padding="4dp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    />
                 <ImageView
                     android:id="@+id/downarrow_pickDel"
                     android:layout_width="wrap_content"

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/lit_grey_new"
+    android:background="@color/gray_lit"
     android:orientation="vertical">
 
     <FrameLayout
@@ -125,13 +125,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="15dp"
                     android:ellipsize="end"
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="Items(0)"
                     android:textColor="@color/red1"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
                     android:visibility="invisible" />
 
                 <LinearLayout

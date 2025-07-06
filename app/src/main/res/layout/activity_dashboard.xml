@@ -379,7 +379,7 @@
                             android:text="Delivery Picklist"
                             android:textStyle="bold"
                             android:textColor="#212121"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:layout_marginTop="20dp"
                             android:layout_height="wrap_content"/>
 
@@ -399,7 +399,7 @@
                 android:layout_width="match_parent"
                 android:id="@+id/picklist_layout"
                 android:layout_weight="1"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">
 
@@ -497,7 +497,7 @@
                             android:layout_marginTop="20dp"
                             android:text="Sales Orders"
                             android:textColor="#212121"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
 
@@ -749,10 +749,8 @@
                             android:layout_marginTop="20dp"
                             android:text="Products"
                             android:textColor="#212121"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
-
-
                     </LinearLayout>
 
                     <View
@@ -808,7 +806,7 @@
                             android:text="Customers"
                             android:textStyle="bold"
                             android:textColor="#212121"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:layout_marginTop="20dp"
                             android:layout_height="wrap_content"/>
 
@@ -832,6 +830,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_weight="1"
+                android:visibility="gone"
                 android:id="@+id/settings_layout"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">

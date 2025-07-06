@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,7 @@ public class PickDeliveryPrintPreviewAdapter extends RecyclerView.Adapter<PickDe
 //        }
         viewHolder.description.setText(invoiceList.getDescription());
         viewHolder.uomtxt.setText(invoiceList.getUomCode());
+       // viewHolder.linetxt.setText(invoiceList.getl());
         viewHolder.qtyValue.setText((int) Double.parseDouble(invoiceList.getNetQuantity()) + "");
 
 //        if (invoiceList.getSaleType() != null &&  !invoiceList.getSaleType().equals("null")) {
@@ -87,7 +89,8 @@ public class PickDeliveryPrintPreviewAdapter extends RecyclerView.Adapter<PickDe
         private TextView description,uomtxt;
         private TextView qtyValue;
         private TextView price;
-        private TextView total;
+        private LinearLayout linetxtLay;
+        private TextView total,linetxt;
         public ViewHolder(View view) {
             super(view);
             slNo=view.findViewById(R.id.sl_no_pickDel);
@@ -97,6 +100,9 @@ public class PickDeliveryPrintPreviewAdapter extends RecyclerView.Adapter<PickDe
             qtyValue=view.findViewById(R.id.qty_pickDel);
             price=view.findViewById(R.id.price_pickDel);
             total=view.findViewById(R.id.total_pickDel);
+            linetxt = view.findViewById(R.id.linetxt_pickDel);
+            linetxtLay = view.findViewById(R.id.lineTxt_lay);
+
         }
     }
 

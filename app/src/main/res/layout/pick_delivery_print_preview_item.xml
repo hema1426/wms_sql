@@ -92,7 +92,7 @@
             android:gravity="center"
             android:text="QTY"
             android:textColor="#212121"
-            android:textSize="13sp"
+            android:textSize="15sp"
             android:textStyle="bold"
 
             />
@@ -125,6 +125,33 @@
 
             />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/lineTxt_lay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        android:visibility="gone"
+        android:layout_margin="4dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/green_clr1"
+            android:text="Line Text : "
+            android:textStyle="bold"
+            android:textSize="12sp"
+            />
+        <TextView
+            android:id="@+id/linetxt_pickDel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text=""
+            android:textSize="12sp"
+            />
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:background="@color/gray_lit"

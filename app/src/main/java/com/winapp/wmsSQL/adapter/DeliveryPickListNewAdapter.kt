@@ -29,10 +29,6 @@ import com.winapp.wmsSQL.utils.Constants
 import com.winapp.wmsSQL.utils.Utils
 import org.json.JSONException
 import org.json.JSONObject
-import java.text.DateFormat
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Date
 
 class DeliveryPickListNewAdapter(
     private val context: Context,
@@ -66,7 +62,8 @@ class DeliveryPickListNewAdapter(
         var pidatetxt: TextView
         var piinvoicenotxt: TextView
         var pinoofitemtxt: TextView
-        var custaddrtxt: TextView
+//        var custaddrtxt: TextView
+        var phonetxt: TextView
         var pistatustxt: TextView
         var usernametxt : TextView
         var picustnametxt: TextView
@@ -77,16 +74,34 @@ class DeliveryPickListNewAdapter(
         var picklist_deli_Lay : LinearLayout
         var three_dot_picklay: LinearLayout
         var rv_pick_downlist: RecyclerView
-
+        var shippingAddr_pickD: TextView? = null
+        var username_list_txt: TextView? = null
+        var remark_list_txt: TextView? = null
+        var person_list_txt: TextView? = null
+        var mobUser_list_txt: TextView? = null
+        var mobUserLay: LinearLayout? = null
         var progressBar: ProgressBar? = null
         @SuppressLint("ClickableViewAccessibility", "SuspiciousIndentation")
         fun setData(pickItem: PickIistDeliveryListingModel, holder: MyViewHolder) {
             picustnametxt.text = pickItem.customerName+" - "+pickItem.customerCode
             pidatetxt.text = pickItem.docDate
-            piinvoicenotxt.text = pickItem.invNumber
+            piinvoicenotxt.text = pickItem.code
             pinoofitemtxt.text = pickItem.noOfItem
             pistatustxt.text = pickItem.pickListStatus
-            custaddrtxt.text = pickItem.customerAddress
+//            custaddrtxt.text = pickItem.customerAddress
+            shippingAddr_pickD!!.text = pickItem.shipAddress
+            phonetxt!!.text = pickItem.phoneNo
+            username_list_txt!!.text = pickItem.user
+            remark_list_txt!!.text = pickItem.remark
+            person_list_txt!!.text = pickItem.contactName
+
+            Log.w("shiaddreee1aa",""+pickItem.shipAddress)
+            if(pickItem.mobileUser != null && pickItem.mobileUser.isNotEmpty()) {
+                mobUserLay!!.visibility = View.VISIBLE
+                mobUser_list_txt!!.text = pickItem.mobileUser
+            }else{
+                mobUserLay!!.visibility = View.GONE
+            }
 
             Log.e("cust_nameaa", ".." + pickItem.customerName+" .."+pickItem.noOfItem)
             //   schedule_date.setText(scheduledatel.getDate());
@@ -94,7 +109,7 @@ class DeliveryPickListNewAdapter(
                     "O",
                     ignoreCase = true
                 ) || pickItem.pickListStatus.equals("Open", ignoreCase = true)
-            ) {
+                || pickItem.pickListStatus.isEmpty() ) {
                 pistatustxt.setText(" Pending ")
                 islongPress = true
                 pistatustxt.setBackgroundResource(R.drawable.corner_picklist_blue_text)
@@ -104,13 +119,21 @@ class DeliveryPickListNewAdapter(
               //  picklistinvoicelay.setBackgroundResource(R.color.white)
             } else if (pickItem.pickListStatus.equals(
                     "C", ignoreCase = true) || pickItem.pickListStatus.equals("Close", ignoreCase = true)) {
-                pistatustxt.setText(" Completed ")
+                pistatustxt.setText(" Delivered ")
                 islongPress = true
                 pistatustxt.setBackgroundResource(R.drawable.corner_picklist_red_text)
 
                 //  pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.white))
            //     picklistinvoicelay.setBackgroundResource(R.color.colorPrimary)
-            } else if (pickItem.pickListStatus.equals("R", ignoreCase = true)) {
+            }
+            else if (pickItem.pickListStatus.equals("OC", ignoreCase = true)) {
+                pistatustxt.setText(" Packed ")
+                islongPress = false
+                pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.black))
+                pistatustxt.setBackgroundResource(R.drawable.corner_picklist_orange_text)
+                picklistinvoicelay.setBackgroundResource(R.color.white)
+            }
+            else if (pickItem.pickListStatus.equals("R", ignoreCase = true)) {
                 pistatustxt.setText(R.string.release)
                 islongPress = true
                 pistatustxt.setBackgroundResource(R.drawable.corner_picklist_orange_text)
@@ -124,14 +147,8 @@ class DeliveryPickListNewAdapter(
                 pistatustxt.setBackgroundResource(R.drawable.round_accent_rad3_green)
                 picklistinvoicelay.setBackgroundResource(R.color.white)
             }
-            else if (pickItem.pickListStatus.equals("OC", ignoreCase = true)) {
-                pistatustxt.setText(" Picked ")
-                islongPress = false
-                pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.black))
-                pistatustxt.setBackgroundResource(R.drawable.round_accent_rad3_yellow)
-                picklistinvoicelay.setBackgroundResource(R.color.white)
-            }
-            else if (pickItem.pickListStatus.equals("P", ignoreCase = true)) {
+
+            else if (pickItem.invoiceStatus.equals("P", ignoreCase = true)) {
                 islongPress = false
                 pistatustxt.setText("Open Printed")
                 pistatustxt.setTextColor(ContextCompat.getColor(context, R.color.white))
@@ -159,6 +176,7 @@ class DeliveryPickListNewAdapter(
 //                        }
                      val intent = Intent(context, PickListDeliveryPrintPreviewActivity::class.java)
 
+                        intent.putExtra("salesCodeDel", pickItem.code)
                         intent.putExtra("salesCodeDel", pickItem.code)
                         intent.putExtra("custCodePickDel", pickItem.customerCode)
                         intent.putExtra("pick_itemDel", pickItem.noOfItem)
@@ -234,7 +252,8 @@ class DeliveryPickListNewAdapter(
             picustnametxt = itemView.findViewById<View>(R.id.cust_name_picki_del_item) as TextView
             piinvoicenotxt = itemView.findViewById<View>(R.id.picki_del_invoiceno_item) as TextView
             pinoofitemtxt = itemView.findViewById<View>(R.id.picki_del_noitem_item) as TextView
-            custaddrtxt = itemView.findViewById<View>(R.id.cust_addr_pick_deli_item) as TextView
+           // custaddrtxt = itemView.findViewById<View>(R.id.cust_addr_pick_deli_item) as TextView
+            phonetxt = itemView.findViewById<View>(R.id.phoneno_list_pickD) as TextView
             pistatustxt = itemView.findViewById<View>(R.id.picki_del_status_item) as TextView
             usernametxt = itemView.findViewById<View>(R.id.user_picki_item) as TextView
             picklistinvoicelay = itemView.findViewById<View>(R.id.picklist_deli_card) as CardView
@@ -246,6 +265,12 @@ class DeliveryPickListNewAdapter(
             mainLayout = itemView.findViewById<LinearLayout>(R.id.main_layout_pickD)
             progressLayout = itemView.findViewById<LinearLayout>(R.id.progress_layout_pickD)
             bottomLayout = itemView.findViewById<CardView>(R.id.bottom_layout_pickD)
+            shippingAddr_pickD = itemView.findViewById(R.id.shippingAddr_list_pickD)
+            person_list_txt = itemView.findViewById(R.id.person_pick_deli_item)
+            username_list_txt = itemView.findViewById(R.id.user_pick_deli_item)
+            remark_list_txt = itemView.findViewById(R.id.remark_pick_deli_item)
+            mobUser_list_txt = itemView.findViewById(R.id.picki_del_mobUser_item)
+            mobUserLay = itemView.findViewById(R.id.mobUser_Lay)
 
         }
     }
@@ -308,14 +333,13 @@ class DeliveryPickListNewAdapter(
                             invoiceListModel.returnQty = detailObject.optString("returnQty")
                             invoiceListModel.cartonPrice = detailObject.optString("cartonPrice")
                             invoiceListModel.unitPrice = detailObject.optString("price")
-                            invoiceListModel.uomCode = detailObject.optString("uomCode")
+                            invoiceListModel.uomCode = detailObject.optString("uoMName")
                             val qty = detailObject.optString("quantity").toDouble()
                             val price = detailObject.optString("price").toDouble()
                             val nettotal = qty * price
                             // invoiceListModel.setTotal(String.valueOf(nettotal));
                             invoiceListModel.total = detailObject.optString("total")
                             invoiceListModel.pricevalue = price.toString()
-                            invoiceListModel.uomCode = detailObject.optString("uomCode")
                             invoiceListModel.pcsperCarton = detailObject.optString("pcsPerCarton")
                             invoiceListModel.itemtax = detailObject.optString("totalTax")
                             invoiceListModel.subTotal = detailObject.optString("subTotal")

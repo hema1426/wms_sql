@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.winapp.wmsSQL.activity.AddInvoiceActivityOld;
 import com.winapp.wmsSQL.activity.CartActivity;
+import com.winapp.wmsSQL.activity.NewDeliveryPickListActivity;
 
 /**
  * Get the Current location from the LcoationTrack classs
@@ -62,7 +64,10 @@ public class LocationTrack extends Service implements LocationListener {
                 this.canGetLocation = true;
                 // if GPS Enabled get lat/long using GPS Services
                 if (checkGPS) {
-                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                    != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
                         // here to request the missing permissions, and then overriding
@@ -81,7 +86,9 @@ public class LocationTrack extends Service implements LocationListener {
                         if (loc != null) {
                             latitude = loc.getLatitude();
                             longitude = loc.getLongitude();
+                            Log.w("longInvTrack1", "" + longitude);
                         }
+                        Log.w("longInvTrack", "" + longitude);
                     }
                 }
                 /*if (checkNetwork) {
@@ -177,6 +184,9 @@ public class LocationTrack extends Service implements LocationListener {
         if (mContext instanceof CartActivity){
             ((CartActivity) mContext).setCurrentLocation(location.getLatitude(),location.getLongitude());
         }else if (mContext instanceof AddInvoiceActivityOld){
+
+        }else if (mContext instanceof NewDeliveryPickListActivity){
+           // ((NewDeliveryPickListActivity) mContext).setCurrentLocation(location.getLatitude(),location.getLongitude());
 
         }
        // Toast.makeText(getApplicationContext(), "Long: " + location.getLongitude() + ", Lat: " + location.getLatitude(), Toast.LENGTH_SHORT).show();
