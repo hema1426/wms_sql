@@ -567,33 +567,37 @@ public class SalesOrderPrintPreview extends AppCompatActivity implements OnPageC
             customerCodetext.setText(model.getCustomerCode());
             customerNameText.setText(model.getCustomerName());
 
+//            if (!model.getDeliveryAddress().isEmpty()){
+//                addressLayout.setVisibility(View.VISIBLE);
+//                deliveryAddressText.setText(model.getDeliveryAddress());
+//            }
             if (!model.getAddress1().isEmpty()){
                 address1Layout.setVisibility(View.VISIBLE);
                 customerAddress1.setText(model.getAddress1());
             }
-            if (!model.getAddress2().isEmpty()){
-                address2Layout.setVisibility(View.VISIBLE);
-                customerAddress2.setText(model.getAddress2());
-            }
-            if (!model.getAddress3().isEmpty()){
-                address3Layout.setVisibility(View.VISIBLE);
-                customerAddress3.setText(model.getAddress3());
-            }
-            if (!model.getAddressstate().isEmpty() ) {
-                if (!model.getAddresssZipcode().isEmpty()) {
-                    address4Layout.setVisibility(View.VISIBLE);
-                    customerAddress4.setText(model.getAddressstate() + " " + model.getAddresssZipcode());
-                } else {
-                    address4Layout.setVisibility(View.VISIBLE);
-                    customerAddress4.setText(model.getAddressstate());
-                }
-            }
-            else{
-                if (!model.getAddresssZipcode().isEmpty() ) {
-                    address4Layout.setVisibility(View.VISIBLE);
-                    customerAddress4.setText(model.getAddresssZipcode());
-                }
-            }
+//            if (!model.getAddress2().isEmpty()){
+//                address2Layout.setVisibility(View.VISIBLE);
+//                customerAddress2.setText(model.getAddress2());
+//            }
+//            if (!model.getAddress3().isEmpty()){
+//                address3Layout.setVisibility(View.VISIBLE);
+//                customerAddress3.setText(model.getAddress3());
+//            }
+//            if (!model.getAddressstate().isEmpty() ) {
+//                if (!model.getAddresssZipcode().isEmpty()) {
+//                    address4Layout.setVisibility(View.VISIBLE);
+//                    customerAddress4.setText(model.getAddressstate() + " " + model.getAddresssZipcode());
+//                } else {
+//                    address4Layout.setVisibility(View.VISIBLE);
+//                    customerAddress4.setText(model.getAddressstate());
+//                }
+//            }
+//            else{
+//                if (!model.getAddresssZipcode().isEmpty() ) {
+//                    address4Layout.setVisibility(View.VISIBLE);
+//                    customerAddress4.setText(model.getAddresssZipcode());
+//                }
+//            }
 
            /* if (!model.getAddress1().isEmpty()){
                 address1Layout.setVisibility(View.VISIBLE);
@@ -613,17 +617,14 @@ public class SalesOrderPrintPreview extends AppCompatActivity implements OnPageC
             }*/
 
 
-            if (!model.getDeliveryAddress().isEmpty()){
-                addressLayout.setVisibility(View.VISIBLE);
-                deliveryAddressText.setText(model.getDeliveryAddress());
-            }
+
             if (model.getBillDiscount()!=null && !model.getBillDiscount().isEmpty() && !model.getBillDiscount().equals("null")){
                 billDiscountText.setText(Utils.twoDecimalPoint(Double.parseDouble(model.getBillDiscount())));
             }else {
                 billDiscountText.setText("0.00");
             }
             if(shortCodeStr.equalsIgnoreCase("FUXIN")) {
-                taxTitle.setText("GST ( " + model.getTaxType() + " : " + Utils.fourDecimalPoint(Double.parseDouble(model.getTaxValue())) + " % ) ");
+//                taxTitle.setText("GST ( " + model.getTaxType() + " : " + Utils.fourDecimalPoint(Double.parseDouble(model.getTaxValue())) + " % ) ");
                 if (model.getTaxType().equals("I")) {
                     double sub_total = Double.parseDouble(model.getNetTotal()) - Double.parseDouble(model.getNetTax());
                     subtotalText.setText(Utils.fourDecimalPoint(sub_total));
@@ -636,7 +637,7 @@ public class SalesOrderPrintPreview extends AppCompatActivity implements OnPageC
                 itemDiscount.setText(Utils.fourDecimalPoint(Double.parseDouble(model.getItemDiscount())));
             }else {
 
-                taxTitle.setText("GST ( " + model.getTaxType() + " : " + Utils.twoDecimalPoint(Double.parseDouble(model.getTaxValue())) + " % ) ");
+//                taxTitle.setText("GST ( " + model.getTaxType() + " : " + Utils.twoDecimalPoint(Double.parseDouble(model.getTaxValue())) + " % ) ");
                 if (model.getTaxType().equals("I")) {
                     double sub_total = Double.parseDouble(model.getNetTotal()) - Double.parseDouble(model.getNetTax());
                     subtotalText.setText(Utils.twoDecimalPoint(sub_total));

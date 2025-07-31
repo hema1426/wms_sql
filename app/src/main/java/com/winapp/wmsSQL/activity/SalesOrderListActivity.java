@@ -159,6 +159,7 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
     String currentDate;
     private ArrayList<UserListModel> usersList;
     private Spinner salesManSpinner;
+    private LinearLayout salesmanLayl;
     private String selectedUser="";
     public static String shortCodeStr = "" ;
     public String userPermission = "";
@@ -214,6 +215,8 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
         progressLayout=findViewById(R.id.progress_layout);
         createSalesOrder=findViewById(R.id.create_sales);
         salesManSpinner=findViewById(R.id.salesman_spinner);
+        salesmanLayl=findViewById(R.id.salesmanLay);
+
         salesManSpinner.setOnItemSelectedListener(this);
 
         shortCodeStr = sharedPreferenceUtil.getStringPreference(sharedPreferenceUtil
@@ -902,9 +905,11 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
                             Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
                         }
                         if (usersList.size()>0){
+                            salesmanLayl.setVisibility(View.VISIBLE);
                             setUserListAdapter(usersList);
                         }else {
-                            Toast.makeText(getApplicationContext(),"No User Found...",Toast.LENGTH_SHORT).show();
+                            salesmanLayl.setVisibility(View.GONE);
+                         //   Toast.makeText(getApplicationContext(),"No User Found...",Toast.LENGTH_SHORT).show();
                         }
                     }catch (Exception e){
                         e.printStackTrace();

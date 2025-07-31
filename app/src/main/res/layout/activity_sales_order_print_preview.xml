@@ -117,6 +117,7 @@
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         android:text="SO Number"
+                        android:textColor="@color/pink_clr1"
                         android:textSize="12sp" />
 
                     <TextView
@@ -150,6 +151,7 @@
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         android:text="SO Date"
+                        android:textColor="@color/pink_clr1"
                         android:textSize="12sp" />
 
                     <TextView
@@ -218,6 +220,7 @@
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         android:text="Customer Name"
+                        android:textColor="@color/pink_clr1"
                         android:textSize="12sp" />
 
                     <TextView
@@ -284,12 +287,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <TextView
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
-                        android:text="Address 1"
+                        android:text="Customer Address"
+                        android:textColor="@color/pink_clr1"
                         android:textSize="12sp" />
 
                     <TextView
@@ -305,9 +309,9 @@
                         android:id="@+id/cus_address1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_gravity="left"
+                        android:text=""
                         android:layout_marginLeft="10dp"
-                        android:gravity="center"
                         android:textSize="12sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -572,6 +576,7 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:padding="5dp"
+                        android:layout_marginRight="5dp"
                         android:textColor="#212121"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -627,9 +632,9 @@
                     android:id="@+id/tax_title"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginRight="10dp"
                     android:padding="5dp"
-                    android:text="Tax (Inc : 7%)  :"
+                    android:text="     GST     :"
                     android:textColor="#212121"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -641,6 +646,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="5dp"
+                    android:layout_marginRight="5dp"
                     android:textColor="#212121"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -678,6 +684,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="5dp"
+                    android:layout_marginRight="5dp"
                     android:textColor="#042B97"
                     android:textSize="12sp"
                     android:textStyle="bold" />

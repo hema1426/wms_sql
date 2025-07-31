@@ -169,6 +169,7 @@
             android:id="@+id/convert_layout"
             android:layout_gravity="center"
             android:padding="5dp"
+            android:visibility="gone"
             android:layout_height="wrap_content">
 
             <TextView

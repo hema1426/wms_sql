@@ -88,11 +88,10 @@ public class Constants {
     // Super Star- Demo
     public static String SUPER_STAR_DEMO ="http://13.215.239.251:81/api/";
     public static String WMS_SJLITE_INDIA_DEMO ="http://158.140.143.87:91/api/"; //india
-    public static String WMS_SJLITE_SINGAPORE_Live ="http://172.21.60.12:91/api/";  //singapore
+    public static String WMS_SJLITE_SINGAPORE_old_Live ="http://172.21.60.12:91/api/";  //singapore
     public static String WMS_SJLITE_SINGAPORE_Demo ="http://103.166.144.45:91/api/";  //singapore
     //UNICO
     public static String UNICO ="http://158.140.143.87:79/api/";
-
     // Super Star- Live
     public static String SUPER_STAR_LIVE_1 ="http://13.215.239.251:83/api/";
 
