@@ -151,7 +151,7 @@ public class SplashActivity extends AppCompatActivity {
         }, SPLASH_TIME);*/
 
         version_txtl = findViewById(R.id.version_txt);
-        version_txtl.setText("Version 1.1"); // 6.07.25
+        version_txtl.setText("Version 1.2"); // 2.08.25
 
         new Handler().postDelayed(() -> {
             // Testing Function
@@ -164,8 +164,8 @@ public class SplashActivity extends AppCompatActivity {
     //  String apiUrl=Constants.FUXIN;
     //  String apiUrl=Constants.test_URL_OCT24;
     //String apiUrl=Constants.SUPER_STAR_DEMO;
-   //   String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
-    String apiUrl= WMS_SJLITE_SINGAPORE_Demo;
+      String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
+  // String apiUrl= WMS_SJLITE_SINGAPORE_Demo;
   // String apiUrl= WMS_SJLITE_SINGAPORE_old_Live;
 
                 dbHelper.insertUrl(apiUrl);

@@ -73,8 +73,11 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.*
 
 
@@ -144,7 +147,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
     var current_addr = ""
     var view_signaturel: ImageView? = null
     var view_imgl: ImageView? = null
-    //    private var SO_sharf: Boolean? = null
+    // private var SO_sharf: Boolean? = null
 //    private var INV_sharf: Boolean? = null
     private var pickifromdatelay: LinearLayout? = null
     private var pickitodatelay: LinearLayout? = null
@@ -240,6 +243,15 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
 
         Log.w("selectdateSO", "" + select_FromDateShowStr + ".." + select_FromDateStr)
         Log.w("selectdateSOTo", "" + select_ToDateShowStr + ".." + select_ToDateStr)
+
+        val startOfMonth = Date.from(
+            LocalDate.now().withDayOfMonth(1).atStartOfDay().toInstant(ZoneOffset.UTC))
+
+        Log.w("startmonth", "" +  Calendar.getInstance().getActualMinimum(Calendar.DAY_OF_MONTH))
+
+        val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+        val date = Date()
+       // return dateFormat.format(date)
 
         if (select_FromDateShowStr!!.isNotEmpty()) {
             pickifromdate_txt!!.setText(select_FromDateShowStr)
@@ -370,7 +382,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
             usernamel  = username!!
         }
         //        getpicklist_Detail("", fromdateShared!!, todateShared!!, soNum!!, spinnertxt!!)
-        getpicklist_Detail(usernamel!!,locationCode!!,"", CommonMethods.getCurrentDateApiNOSpace()!!,
+        getpicklist_Detail(usernamel!!,locationCode!!,"", CommonMethods.getFirstDayApiNOSpace()!!,
             CommonMethods.getCurrentDateApiNOSpace()!!, soNum!!, spinnertxt!!)
     }
 

@@ -452,48 +452,48 @@ public class SalesOrderListActivity extends NavigationActivity implements Adapte
             }
         });
 
-        editLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    viewCloseBottomSheet();
-                    if (!salesOrderStatus.equals("Closed") && !salesOrderStatus.equals("InProgress Invoice")){
-                        if (editSo.equals("true")){
-                            getSalesOrderDetails(soNumber.getText().toString(),"Edit");
-                        }else {
-                            Toast.makeText(getApplicationContext(),
-                                    "You Don't have permission to Edit",Toast.LENGTH_SHORT).show();
-                        }
-                    }else {
-                        Toast.makeText(getApplicationContext(),
-                                "This Sales order already Closed",Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        editSalesOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    viewCloseBottomSheet();
-                    if (!salesOrderStatus.equals("Closed") && !salesOrderStatus.equals("InProgress Invoice")){
-                        if (editSo.equals("true")){
-                            getSalesOrderDetails(soNumber.getText().toString(),"Edit");
-                        }else {
-                            Toast.makeText(getApplicationContext(),
-                                    "You Don't have permission to Edit",Toast.LENGTH_SHORT).show();
-                        }
-                    }else {
-                        Toast.makeText(getApplicationContext(),"This Sales order already Closed",Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        editLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    viewCloseBottomSheet();
+//                    if (!salesOrderStatus.equals("Closed") && !salesOrderStatus.equals("InProgress Invoice")){
+//                        if (editSo.equals("true")){
+//                            getSalesOrderDetails(soNumber.getText().toString(),"Edit");
+//                        }else {
+//                            Toast.makeText(getApplicationContext(),
+//                                    "You Don't have permission to Edit",Toast.LENGTH_SHORT).show();
+//                        }
+//                    }else {
+//                        Toast.makeText(getApplicationContext(),
+//                                "This Sales order already Closed",Toast.LENGTH_SHORT).show();
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        editSalesOrder.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    viewCloseBottomSheet();
+//                    if (!salesOrderStatus.equals("Closed") && !salesOrderStatus.equals("InProgress Invoice")){
+//                        if (editSo.equals("true")){
+//                            getSalesOrderDetails(soNumber.getText().toString(),"Edit");
+//                        }else {
+//                            Toast.makeText(getApplicationContext(),
+//                                    "You Don't have permission to Edit",Toast.LENGTH_SHORT).show();
+//                        }
+//                    }else {
+//                        Toast.makeText(getApplicationContext(),"This Sales order already Closed",Toast.LENGTH_SHORT).show();
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         deleteLayout.setOnClickListener(new View.OnClickListener() {
             @Override

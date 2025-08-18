@@ -13,12 +13,12 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 
 object CommonMethods {
@@ -51,6 +51,21 @@ object CommonMethods {
         val dateFormat: DateFormat = SimpleDateFormat("yyyyMMdd")
         val date = Date()
         return dateFormat.format(date)
+    }
+    fun getFirstDayApiNOSpace(): String? {
+        val cal = Calendar.getInstance()
+        val date =
+            cal.get(Calendar.YEAR).toString()+""+ (cal.get(Calendar.MONTH) + 1).toString() +""+cal.getActualMinimum(Calendar.DAY_OF_MONTH).toString()
+
+//        val cc = Calendar.getInstance()
+//        val year = cc[Calendar.YEAR]
+//        val month = cc[Calendar.MONTH]
+//        val mDay = cc.getActualMinimum(Calendar.DAY_OF_MONTH)
+
+        val dateFormat: DateFormat = SimpleDateFormat("yyyyMMdd")
+
+        return dateFormat.format(date)
+     return date
     }
 
     fun setBlinkingText(textView: TextView) {

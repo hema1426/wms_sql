@@ -69,6 +69,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -243,8 +245,6 @@ public class DeliveryOrderListActivity extends NavigationActivity implements Del
             getCustomers();
             // new GetCustomersTask().execute();
         }*/
-
-
         getDeliveryOrderList("1","","",toDateString,toDateString);
         //setDOAdapter();
 
