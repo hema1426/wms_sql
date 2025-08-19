@@ -76,6 +76,7 @@
                         android:layout_width="match_parent"
                         android:layout_marginTop="5dp"
                         android:padding="5dp"
+                        android:singleLine="true"
                         android:focusable="false"
                         android:drawableRight="@drawable/ic_baseline_search_24"
                         android:gravity="top"

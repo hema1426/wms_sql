@@ -63,11 +63,11 @@ public class FilterCustomerAdapter extends RecyclerView.Adapter<FilterCustomerAd
             viewHolder.customerAddress.setVisibility(View.VISIBLE);
         }
 
-        if (context instanceof CustomerListActivity){
-            viewHolder.moreIcon.setVisibility(View.VISIBLE);
-        }else {
-            viewHolder.moreIcon.setVisibility(View.GONE);
-        }
+//        if (context instanceof CustomerListActivity){
+//            viewHolder.moreIcon.setVisibility(View.VISIBLE);
+//        }else {
+//            viewHolder.moreIcon.setVisibility(View.GONE);
+//        }
        /* if (context instanceof SalesOrderListActivity
                 || context instanceof InvoiceListActivity
                 || context instanceof NewInvoiceListActivity

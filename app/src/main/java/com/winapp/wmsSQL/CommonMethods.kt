@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.AlphaAnimation
@@ -62,12 +63,34 @@ object CommonMethods {
 //        val month = cc[Calendar.MONTH]
 //        val mDay = cc.getActualMinimum(Calendar.DAY_OF_MONTH)
 
-        val dateFormat: DateFormat = SimpleDateFormat("yyyyMMdd")
-
-        return dateFormat.format(date)
+        return (date)
      return date
     }
+    fun  StartMonthDate(): String? {
+        val c = Calendar.getInstance()
+        //ensure the method works within current month
+        c[Calendar.DAY_OF_MONTH] = c.getActualMinimum(Calendar.DAY_OF_MONTH)
+       // println("Before Start Date " + c.time)
+        val date = c.time
+        val dfDate = SimpleDateFormat("yyyyMMdd")
+        val CurrentDate = dfDate.format(date)
 
+        Log.w("startmonth11", "" +  CurrentDate)
+        return CurrentDate
+    }
+
+    fun  StartMonthDate1(): String? {
+        val c = Calendar.getInstance()
+        //ensure the method works within current month
+        c[Calendar.DAY_OF_MONTH] = c.getActualMinimum(Calendar.DAY_OF_MONTH)
+        // println("Before Start Date " + c.time)
+        val date = c.time
+        val dfDate = SimpleDateFormat("dd/MM/yyyy")
+        val CurrentDate = dfDate.format(date)
+
+        Log.w("startmonth", "" +  CurrentDate)
+        return CurrentDate
+    }
     fun setBlinkingText(textView: TextView) {
         mAnim = AlphaAnimation(0.0f, 1.0f)
         mAnim!!.setDuration(1000) // Time of the blink

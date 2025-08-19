@@ -3,6 +3,7 @@ package com.winapp.wmsSQL.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,6 +30,7 @@ import com.winapp.wmsSQL.utils.Constants
 import com.winapp.wmsSQL.utils.Utils
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.Serializable
 
 class DeliveryPickListNewAdapter(
     private val context: Context,
@@ -96,7 +98,7 @@ class DeliveryPickListNewAdapter(
             person_list_txt!!.text = pickItem.contactName
 
             Log.w("shiaddreee1aa",""+pickItem.shipAddress)
-            if(pickItem.mobileUser != null && pickItem.mobileUser.isNotEmpty()) {
+            if(pickItem.mobileUser != null && pickItem.mobileUser!!.isNotEmpty()) {
                 mobUserLay!!.visibility = View.VISIBLE
                 mobUser_list_txt!!.text = pickItem.mobileUser
             }else{
@@ -109,7 +111,7 @@ class DeliveryPickListNewAdapter(
                     "O",
                     ignoreCase = true
                 ) || pickItem.pickListStatus.equals("Open", ignoreCase = true)
-                || pickItem.pickListStatus.isEmpty() ) {
+                || pickItem.pickListStatus!!.isEmpty() ) {
                 pistatustxt.setText(" Pending ")
                 islongPress = true
                 pistatustxt.setBackgroundResource(R.drawable.corner_picklist_blue_text)
@@ -184,7 +186,10 @@ class DeliveryPickListNewAdapter(
                         intent.putExtra("pick_statusDel", pickItem.pickListStatus)
                         intent.putExtra("pick_DocNumDel", pickItem.invNumber)
                         intent.putExtra("pick_DatetimeDel", pickItem.dateTime)
-                        Log.w("delDateStr1a:",  pickItem.dateTime);
+                        intent.putExtra("pick_model_Del" ,pickItem as Serializable)
+
+                        Log.w("delDateStr1a:",  pickItem.dateTime!!);
+
                         context.startActivity(intent)
                         //  pickListInvoiceClickListener.pickListInvoiceSelected(pos)
                     }
@@ -217,7 +222,7 @@ class DeliveryPickListNewAdapter(
                            mainLayout!!.visibility = View.VISIBLE
                         } else {
                             getInvoiceDetails(
-                                pickItem.code,
+                                pickItem.code!!,
                                 holder,
                                 position,
                                 pickItem,

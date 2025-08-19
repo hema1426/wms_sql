@@ -81,7 +81,8 @@ import java.time.ZoneOffset
 import java.util.*
 
 
-class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,DeliveryPickListNewAdapter.PickListUploadClickListener {
+class NewDeliveryPickListActivity : AppCompatActivity(),
+    OnClickListener,DeliveryPickListNewAdapter.PickListUploadClickListener {
 
     private var picklistinvoice_rv: RecyclerView? = null
     private var sharedPreferenceUtil: SharedPreferenceUtil? = null
@@ -244,22 +245,15 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
         Log.w("selectdateSO", "" + select_FromDateShowStr + ".." + select_FromDateStr)
         Log.w("selectdateSOTo", "" + select_ToDateShowStr + ".." + select_ToDateStr)
 
-        val startOfMonth = Date.from(
-            LocalDate.now().withDayOfMonth(1).atStartOfDay().toInstant(ZoneOffset.UTC))
-
-        Log.w("startmonth", "" +  Calendar.getInstance().getActualMinimum(Calendar.DAY_OF_MONTH))
-
-        val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
-        val date = Date()
-       // return dateFormat.format(date)
+        Log.w("startmonth", "" +  CommonMethods.StartMonthDate())
 
         if (select_FromDateShowStr!!.isNotEmpty()) {
             pickifromdate_txt!!.setText(select_FromDateShowStr)
             fromdateShared = select_FromDateStr
         } else {
             select_FromDateStr = CommonMethods.getCurrentDateApiNOSpace()
-            fromdateShared = select_FromDateStr
-            pickifromdate_txt!!.setText(CommonMethods.getCurrentTime1())
+            fromdateShared = CommonMethods.StartMonthDate()
+            pickifromdate_txt!!.setText(CommonMethods.StartMonthDate1())
         }
 
         if (select_ToDateShowStr!!.isNotEmpty()) {
@@ -382,7 +376,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
             usernamel  = username!!
         }
         //        getpicklist_Detail("", fromdateShared!!, todateShared!!, soNum!!, spinnertxt!!)
-        getpicklist_Detail(usernamel!!,locationCode!!,"", CommonMethods.getFirstDayApiNOSpace()!!,
+        getpicklist_Detail(usernamel!!,locationCode!!,"", CommonMethods.StartMonthDate()!!,
             CommonMethods.getCurrentDateApiNOSpace()!!, soNum!!, spinnertxt!!)
     }
 
@@ -520,27 +514,30 @@ class NewDeliveryPickListActivity : AppCompatActivity(), OnClickListener,Deliver
 
 //                                Log.w("shiaddreee1",""+shipAddress)
 //                                Log.w("shiaddreee",""+obj.optString("shippingAddress2") )
-                                val model = PickIistDeliveryListingModel(
-                                    obj.optString("code"),
-                                    obj.optString("customerCode"),
-                                    obj.optString("customerName"),
-                                    obj.optString("invoiceDate"),
-                                    obj.optString("invoiceNumber"),
-                                    obj.optString("noOfItemCount"),
-                                    obj.optString("invoiceStatus"),
-                                    obj.optString("dateTime"),
-                                    obj.optString("pickingStatus"),
-                                    custAddress,
-                                    shipAddress,
-                                    obj.optString("phone1"),
-                                    obj.optString("deliveryContactPerson"),
-                                    obj.optString("remark"),
-                                    obj.optString("user"),
-                                    obj.optString("signature"),
-                                    obj.optString("image"),
-                                    obj.optString("mobileUser"),
-                                    false,false,invoiceList
-                                )
+                                val model = PickIistDeliveryListingModel()
+                                    model.code = obj.optString("code");
+                                model.customerCode = obj.optString("customerCode")
+                                model.customerCode = obj.optString("customerName")
+                                model.docDate = obj.optString("invoiceDate")
+                                model.invNumber = obj.optString("invoiceNumber")
+                                model.noOfItem = obj.optString("noOfItemCount")
+                                model.invoiceStatus = obj.optString("invoiceStatus")
+                                model.dateTime = obj.optString("dateTime")
+                                model.pickListStatus = obj.optString("pickingStatus")
+                                model.customerAddress = custAddress
+                                model.shipAddress = shipAddress
+                                model.phoneNo = obj.optString("phone1")
+                                model.contactName = obj.optString("deliveryContactPerson")
+                                model.remark = obj.optString("remark")
+                                model.user = obj.optString("user")
+                                model.signatureUrl = obj.optString("signature")
+                                model.imageUrl = obj.optString("image")
+                                model.mobileUser = obj.optString("mobileUser")
+                                model.reason = obj.optString("reason")
+                                model.isShow = false
+                                model.isItemSelected = false
+                                model.invoiceList = invoiceList
+
                                 Log.w("delDateStr1a:",".."+obj.optString("dateTime"));
 
                                 picklistNew!!.add(model)

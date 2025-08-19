@@ -91,8 +91,8 @@ public class Constants {
     public static String WMS_SJLITE_SINGAPORE_old_Live ="http://172.21.60.12:91/api/";  //singapore
 
     //singapore move to live - 18.8.25
-    public static String WMS_SJLITE_SINGAPORE_Demo ="http://103.166.144.45:91/api/";  //singapore
-    public static String WMS_SJLITE_SINGAPORE_Test ="http://103.166.144.45:91/api/";  //singapore - 18.8.25
+    public static String WMS_SJLITE_SINGAPORE_Live ="http://103.166.144.45:91/api/";  //singapore
+    public static String WMS_SJLITE_SINGAPORE_Test ="http://103.166.144.45:92/api/";  //singapore - 18.8.25
     //UNICO
     public static String UNICO ="http://158.140.143.87:79/api/";
     // Super Star- Live

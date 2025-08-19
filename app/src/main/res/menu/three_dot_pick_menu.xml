@@ -2,11 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
-
     <item
         android:id="@+id/upload_pick_menu"
         android:title="Upload"
-        android:actionLayout="@layout/net_total_layout"
+        android:visible="false"
         app:showAsAction="always" />
     <item
         android:id="@+id/viewImg_pick_menu"

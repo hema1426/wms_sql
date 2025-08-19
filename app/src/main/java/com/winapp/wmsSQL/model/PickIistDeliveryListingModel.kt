@@ -1,37 +1,51 @@
 package com.winapp.wmsSQL.model
 
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class PickIistDeliveryListingModel(
+class PickIistDeliveryListingModel : java.io.Serializable {
     @SerializedName("code")
-    var code: String,
+    @Expose
+    var code: String? = null
+
     @SerializedName("customerCode")
-    var customerCode: String,
+    @Expose
+    var customerCode: String? = null
     @SerializedName("customerName")
-    var customerName: String,
+    @Expose
+    var customerName: String? = null
     @SerializedName("docDate")
-    var docDate: String,
+    @Expose
+    var docDate: String? = null
     @SerializedName("docNumber")
-    var invNumber: String,
+    @Expose
+    var invNumber: String? = null
     @SerializedName("noOfItem")
-    var noOfItem: String,
+    @Expose
+    var noOfItem: String? = null
     @SerializedName("pickListStatus")
-    var invoiceStatus: String,
+    @Expose
+    var invoiceStatus: String? = null
     @SerializedName("DateTime")
-    var dateTime: String,
-    var pickListStatus: String,
-    var customerAddress: String,
-    var shipAddress: String,
-    var phoneNo: String,
-    var contactName: String,
-    var remark: String,
-    var user: String,
-    var signatureUrl: String,
-    var imageUrl: String,
-    var mobileUser: String,
-    var isShow: Boolean = false,
-    var isItemSelected: Boolean = false,
+    @Expose
+    var dateTime: String? = null
+
+    @SerializedName("reason")
+    @Expose
+    var reason: String? = null
+
+    var pickListStatus: String? = null
+    var customerAddress: String? = null
+    var shipAddress: String? = null
+    var phoneNo: String? = null
+    var contactName: String? = null
+    var remark: String? = null
+    var user: String? = null
+    var signatureUrl: String? = null
+    var imageUrl: String? = null
+    var mobileUser: String? = null
+    var isShow: Boolean = false
+    var isItemSelected: Boolean = false
     var invoiceList: ArrayList<PicklistDeliveryPrintPreviewModel.InvoiceList>? = null
-){
 }

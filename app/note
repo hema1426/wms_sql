@@ -11,6 +11,9 @@ SALES1
 12345
 
 
+http://103.166.144.45:92/api/login
+{"Username":"Ahlee","Password":"1234"}
+
 scanning device directly getting function - dispatchKeyEvent
 
 SVCatering
