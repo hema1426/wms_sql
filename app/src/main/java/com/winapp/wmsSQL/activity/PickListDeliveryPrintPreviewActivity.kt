@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -71,7 +72,9 @@ import com.winapp.wmsSQL.adapter.PickDeliveryPrintPreviewAdapter
 import com.winapp.wmsSQL.model.PickIistDeliveryListingModel
 import com.winapp.wmsSQL.model.PicklistDeliveryPrintPreviewModel
 import com.winapp.wmsSQL.utils.CaptureSignatureView
+import com.winapp.wmsSQL.utils.CommonMethodKotl
 import com.winapp.wmsSQL.utils.Constants
+import com.winapp.wmsSQL.utils.FileCompressor
 import com.winapp.wmsSQL.utils.ImageUtil
 import com.winapp.wmsSQL.utils.LocationTrack
 import com.winapp.wmsSQL.utils.SessionManager
@@ -161,6 +164,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
     val REQUEST_TAKE_PHOTO = 1
     val REQUEST_GALLERY_PHOTO = 2
     var imageString: String? = ""
+    var mCompressor: FileCompressor? = null
     var signatureCapture: ImageView? = null
     private var spinner_pickStatus: Spinner? = null
     var alertUploadView: AlertDialog? = null
@@ -199,6 +203,8 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         company_phone = user!!.get(SessionManager.KEY_PHONE_NO)
         company_gst = user!!.get(SessionManager.KEY_COMPANY_REG_NO)
         username = user!!.get(SessionManager.KEY_USER_NAME)
+        mCompressor = FileCompressor(this)
+
         Log.w("activity_cg", javaClass.getSimpleName().toString())
 
         getCurrentLocation()
@@ -261,6 +267,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             pickModel = intent.getSerializableExtra("pick_model_Del") as PickIistDeliveryListingModel
 
             Log.w("delDateStr1:", delDateStr!!)
+
             if (invoiceNumber != null) {
                 try {
                     getInvoiceDetails(invoiceNumber!!)
@@ -660,7 +667,8 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
         val mSig = CaptureSignatureView(this@PickListDeliveryPrintPreviewActivity, null)
         // mContent.addView(mSig, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        invNo_txt.text = pickModel.invNumber
+        invNo_txt.text = pickModel.code
+        Log.w("pickmodelaa:", pickModel.code!!)
 
         uploadImgDialog_txt!!.setOnClickListener {
             if (uploadImgDialog_txt!!.getTag() == "view_image") {
@@ -843,6 +851,55 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             }
         }
         builder.show()
+    }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_TAKE_PHOTO) {
+                try {
+                    mPhotoFile = mCompressor!!.compressToFile(mPhotoFile)
+                    imageString = ImageUtil.getBase64StringImage(mPhotoFile)
+                    //  Log.w("GivenImage1:",imageString);
+                    Utils.w("GivenImage1Pick", imageString)
+                    showImage()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                /* Glide.with(MainActivity.this)
+                        .load(mPhotoFile)
+                        .apply(new RequestOptions().centerCrop()
+                                .circleCrop()
+                                .placeholder(R.drawable.profile_pic_place_holder))
+                        .into(imageViewProfilePic);*/
+            } else if (requestCode == REQUEST_GALLERY_PHOTO) {
+                val selectedImage = data!!.data
+                try {
+                    mPhotoFile =
+                        mCompressor!!.compressToFile(File(getRealPathFromUri(selectedImage)))
+                    uploadImgDialog_txt!!.setText(selectedImage.toString())
+                    imageString = ImageUtil.getBase64StringImage(mPhotoFile)
+                    // Log.w("GivenImage2:",imageString);
+                    Utils.w("GivenImage2Pick", imageString)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    fun getRealPathFromUri(contentUri: Uri?): String? {
+        var cursor: Cursor? = null
+        return try {
+            val proj = arrayOf(MediaStore.Images.Media.DATA)
+            cursor = contentResolver.query(contentUri!!, proj, null, null, null)
+            assert(cursor != null)
+            val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToFirst()
+            cursor.getString(column_index)
+        } finally {
+            cursor?.close()
+        }
     }
 
     private fun requestStoragePermission(isCamera: Boolean) {
@@ -1111,6 +1168,10 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                         val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
                         startActivity(intent)
                         finish()
+                        if (alertUpload != null && alertUpload!!.isShowing) {
+                            alertUpload!!.dismiss()
+                            alertUpload = null
+                        }
                         if(alert.equals("true")) {
                             alertSave!!.dismiss()
                         }

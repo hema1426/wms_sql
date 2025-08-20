@@ -517,7 +517,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
                                 val model = PickIistDeliveryListingModel()
                                     model.code = obj.optString("code");
                                 model.customerCode = obj.optString("customerCode")
-                                model.customerCode = obj.optString("customerName")
+                                model.customerName = obj.optString("customerName")
                                 model.docDate = obj.optString("invoiceDate")
                                 model.invNumber = obj.optString("invoiceNumber")
                                 model.noOfItem = obj.optString("noOfItemCount")
