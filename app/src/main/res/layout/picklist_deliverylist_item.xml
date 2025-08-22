@@ -94,6 +94,7 @@
                         android:layout_height="45dp"
                         android:layout_gravity="center"
                         android:padding="5dp"
+                        android:visibility="gone"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:orientation="vertical"
                         >

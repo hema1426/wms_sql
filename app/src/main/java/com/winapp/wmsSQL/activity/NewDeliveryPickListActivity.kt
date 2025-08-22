@@ -222,7 +222,8 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         zoneSpinner = findViewById(R.id.zoneSpinnerl)
         mCompressor = FileCompressor(this)
 
-        val status = arrayOf("All", "Pending", "Packed", "Delivered")
+     //   val status = arrayOf("All", "Pending", "Packed", "Delivered")
+        val status = arrayOf("All", "Pending", "Packed")
 
         val langAdapter =
             ArrayAdapter<CharSequence>(this, R.layout.cust_spinner_item, status)
@@ -468,7 +469,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         jsonObject.put("CustomerCode", customerCode)
         jsonObject.put("FromDate", fromdate)
         jsonObject.put("ToDate", todate)
-        jsonObject.put("DocNumber", docNum)
+        jsonObject.put("DocNo", docNum)
         jsonObject.put("DocStatus", status)
 
         val url = Utils.getBaseUrl(this) + "InvoiceList"

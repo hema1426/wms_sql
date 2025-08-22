@@ -158,9 +158,9 @@ class DeliveryPickListNewAdapter(
                 picklistinvoicelay.setBackgroundResource(R.color.white)
             }
 
-            three_dot_picklay.setOnClickListener{ view ->
-                pickListUploadClickListener!!.pickListUploadSelected(pickItem,view)
-            }
+//            three_dot_picklay.setOnClickListener{ view ->
+//                pickListUploadClickListener!!.pickListUploadSelected(pickItem,view)
+//            }
 
             picklist_deli_Lay.setOnClickListener {
                     val pos = adapterPosition

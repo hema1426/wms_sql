@@ -135,20 +135,16 @@ public class SelectCustomerAdapter extends RecyclerView.Adapter<SelectCustomerAd
         Log.w("custContex",""+activityName);
      if (activityName.equals("SalesOrder") || activityName.equals("Invoice")){
        // if ( activityName.equals("Invoice")){
-            viewHolder.three_dot_custl.setVisibility(View.VISIBLE);
+            viewHolder.three_dot_custl.setVisibility(View.GONE);
             if (activityName.equals("SalesOrder")){
                 activityName = "SalesOrder" ;
             }
             else{
-                activityName = "Invoice" ;
-            }
+                activityName = "Invoice" ; }
         }
         else{
             viewHolder.three_dot_custl.setVisibility(View.GONE);
-
         }
-
-
         viewHolder.moreIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -159,11 +155,9 @@ public class SelectCustomerAdapter extends RecyclerView.Adapter<SelectCustomerAd
         viewHolder.three_dot_custl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopupMenu(view,i,model);
-
+            //    showPopupMenu(view,i,model);
             }
         });
-
 
         if (i % 2==0){
             viewHolder.customerLayout.setBackgroundColor(Color.parseColor("#F8F9F9"));
