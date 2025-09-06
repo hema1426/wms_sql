@@ -360,7 +360,7 @@ class NewSalesReturnProductAddActivity : AppCompatActivity() {
         exchangeEditext!!.setEnabled(false)
         discountEditext!!.setEnabled(false)
         returnEditext!!.setEnabled(false)
-        qtyValue!!.setEnabled(false)
+//        qtyValue!!.setEnabled(false)
         val c = Calendar.getInstance().time
         println("Current time => $c")
         val df1 = SimpleDateFormat("yyyyMMdd", Locale.getDefault())

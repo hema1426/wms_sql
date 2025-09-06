@@ -711,7 +711,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
         submit_imgl.setOnClickListener {
 
-            if(signatureString.isNotEmpty()){
+        if(signatureString.isNotEmpty() || imageString!!.isNotEmpty()){
                 spinnertxt_dialog = "C"
                 packStatusStr = "Delivered"
 
@@ -733,12 +733,13 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                     obj.put("image", imageString)
                     obj.put("signature", signatureString)
 
-                    savePicklistDeliveryApi(obj,null,"false")
+                    Log.w("imgSign_","$obj")
+                 savePicklistDeliveryApi(obj,null,"false")
                 } catch (e: JSONException) {
                     throw RuntimeException(e)
                 }
             }else{
-                Toast.makeText(applicationContext,  "Signature Should not be empty!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,  "Choose any one of the option !", Toast.LENGTH_SHORT).show()
 
 //                if (spinner_pickStatus!!.selectedItem.equals("Picked")) {
 //                    spinnertxt_dialog = "OC"
@@ -746,7 +747,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 //                    spinnertxt_dialog = "O"
 //                }
                 // //  spinnertxt_dialog = "OC"
-            }
+       }
 //            {"invoiceNumber":"18","currentDateTime":"20250616_171118","customerCode":"0005","Username":"ST01",
 //            "status":"C",
 //                "latitude":"10.96440894","longitude":"78.44143506","image":"","signature":""}

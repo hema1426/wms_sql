@@ -1,5 +1,6 @@
 package com.winapp.wmsSQLSJLite.activity;
 
+import static com.winapp.wmsSQLSJLite.utils.Constants.WMS_SJLITE_SINGAPORE_Live;
 import static com.winapp.wmsSQLSJLite.utils.Constants.WMS_SJLITE_SINGAPORE_Test;
 
 import android.content.Context;
@@ -150,7 +151,7 @@ public class SplashActivity extends AppCompatActivity {
         }, SPLASH_TIME);*/
 
         version_txtl = findViewById(R.id.version_txt);
-        version_txtl.setText("Version 1.3"); // 18.08.25
+        version_txtl.setText("Version 1.4"); // 4.09.25
 
         new Handler().postDelayed(() -> {
             // Testing Function
@@ -164,8 +165,8 @@ public class SplashActivity extends AppCompatActivity {
     //  String apiUrl=Constants.test_URL_OCT24;
     //String apiUrl=Constants.SUPER_STAR_DEMO;
      // String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
-  //String apiUrl= WMS_SJLITE_SINGAPORE_Live;
-    String apiUrl= WMS_SJLITE_SINGAPORE_Test;
+  String apiUrl= WMS_SJLITE_SINGAPORE_Live;
+   // String apiUrl= WMS_SJLITE_SINGAPORE_Test;
   // String apiUrl= WMS_SJLITE_SINGAPORE_old_Live;
 
                 dbHelper.insertUrl(apiUrl);
