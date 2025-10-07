@@ -20,6 +20,10 @@
         android:title="Upload"
         app:showAsAction="never" />
     <item
+        android:id="@+id/save_pick_menu"
+        android:title="Save"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/viewImg_pick_menu"
         android:title="View Image/Signature"
         android:visible="false"

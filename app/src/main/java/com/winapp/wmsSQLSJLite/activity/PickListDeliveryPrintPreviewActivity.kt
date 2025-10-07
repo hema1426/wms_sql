@@ -69,15 +69,21 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.winapp.wmsSQLSJLite.BuildConfig
 import com.winapp.wmsSQLSJLite.R
 import com.winapp.wmsSQLSJLite.adapter.PickDeliveryPrintPreviewAdapter
+import com.winapp.wmsSQLSJLite.model.AccountModel
 import com.winapp.wmsSQLSJLite.model.PickIistDeliveryListingModel
 import com.winapp.wmsSQLSJLite.model.PicklistDeliveryPrintPreviewModel
 import com.winapp.wmsSQLSJLite.utils.CaptureSignatureView
+import com.winapp.wmsSQLSJLite.utils.CommonMethodKotl
 import com.winapp.wmsSQLSJLite.utils.Constants
 import com.winapp.wmsSQLSJLite.utils.FileCompressor
 import com.winapp.wmsSQLSJLite.utils.ImageUtil
 import com.winapp.wmsSQLSJLite.utils.LocationTrack
 import com.winapp.wmsSQLSJLite.utils.SessionManager
 import com.winapp.wmsSQLSJLite.utils.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -594,6 +600,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         val menuItem = menu.findItem(R.id.switch_btn_menu)
         val viewImg = menu.findItem(R.id.viewImg_pick_menu)
         val uploadItem = menu.findItem(R.id.upload_pick_menu)
+        val saveItem = menu.findItem(R.id.save_pick_menu)
 
         action_print.setVisible(false)
 
@@ -605,6 +612,11 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         }else{
             menuItem.setVisible(true)
         }
+        saveItem.setOnMenuItemClickListener {
+            getStatusConfirm()
+            true
+        }
+
         viewImg.setOnMenuItemClickListener {
             showViewImageAlert(pickModel)
             true
@@ -631,6 +643,89 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
               }
         }
         return true
+    }
+
+    @Throws(JSONException::class)
+    private fun getStatusConfirm() {
+        CommonMethodKotl.showProgressDialog(this)
+
+        val jsonObject = JSONObject()
+        //  jsonObject.put("WhsCode", whsCode)
+
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val url = Utils.getBaseUrl(this) + "AccountCodeList"
+        Log.w("url_statusConfirm:", url)
+
+        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
+            Method.GET,
+            url,
+            null,
+            Response.Listener { response: JSONObject ->
+                try {
+               //     GlobalScope.launch {
+
+                        Log.w("res_statusconfrm:", response.toString())
+                        val statusCode = response.optString("statusCode")
+                        val statusMsg = response.optString("statusMessage")
+
+                        if (statusCode == "1") {
+                            val responseData = response.optJSONArray("responseData")!!
+
+                            if (responseData!!.length() > 0) {
+                                for (i in 0 until responseData.length()) {
+                                    val obj = responseData.optJSONObject(i)
+
+                                    val model = AccountModel(
+                                        obj.optString("accountCode"),
+                                        obj.optString("accountName")
+                                    )
+                                }
+//                                withContext(Dispatchers.Main) {
+//                                    if (accountList!!.size > 0) {
+//                                        setAccountSpinner(accountList!!)
+//                                    }
+//                                }
+                           // }
+                        }
+                        CommonMethodKotl.cancelProgressDialog()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }, Response.ErrorListener { error: VolleyError ->
+                // Do something when error occurred
+                CommonMethodKotl.cancelProgressDialog()
+
+                Log.w("Error_throwing:", error.toString())
+            }) {
+            override fun getHeaders(): Map<String, String> {
+                val params = java.util.HashMap<String, String>()
+                val creds = java.lang.String.format(
+                    "%s:%s",
+                    Constants.API_SECRET_CODE,
+                    Constants.API_SECRET_PASSWORD
+                )
+                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
+                params["Authorization"] = auth
+                return params
+            }
+        }
+        jsonObjectRequest.retryPolicy = object : RetryPolicy {
+            override fun getCurrentTimeout(): Int {
+                return 50000
+            }
+
+            override fun getCurrentRetryCount(): Int {
+                return 50000
+            }
+
+            @Throws(VolleyError::class)
+            override fun retry(error: VolleyError) {
+            }
+        }
+        // Add JsonArrayRequest to the RequestQueue
+        requestQueue.add(jsonObjectRequest)
     }
     private fun showPopupMenu(view: View) {
         val menuItemView = findViewById<View>(R.id.fab)
