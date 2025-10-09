@@ -613,7 +613,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             menuItem.setVisible(true)
         }
         saveItem.setOnMenuItemClickListener {
-            getStatusConfirm()
+           showCompletedAlert()
             true
         }
 
@@ -622,19 +622,19 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             true
         }
         uploadItem.setOnMenuItemClickListener {
-     showUploadImageAlert(pickModel)
+        showUploadImageAlert(pickModel)
             true
         }
 
         switchColor1(switchPicklist,false)
 
-        switchPicklist!!.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+        switchPicklist.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
               if (isChecked) {
                   switchPickStr =  "OC"
                   packStatusStr =  "Picked"
                   switchColor(switchPicklist,isChecked)
 //                  switchPicklist!!.setBackgroundColor(Color.parseColor("#AC655C"));
-                showSaveAlert(switchPicklist)
+                showSaveAlert(switchPicklist,switchPickStr , packStatusStr, "")
             } else {
                   switchColor1(switchPicklist,isChecked)
                //   switchPicklist!!.setBackgroundColor(Color.parseColor("#F95B24"));
@@ -645,88 +645,6 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         return true
     }
 
-    @Throws(JSONException::class)
-    private fun getStatusConfirm() {
-        CommonMethodKotl.showProgressDialog(this)
-
-        val jsonObject = JSONObject()
-        //  jsonObject.put("WhsCode", whsCode)
-
-        val requestQueue = Volley.newRequestQueue(this)
-
-        val url = Utils.getBaseUrl(this) + "AccountCodeList"
-        Log.w("url_statusConfirm:", url)
-
-        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
-            Method.GET,
-            url,
-            null,
-            Response.Listener { response: JSONObject ->
-                try {
-               //     GlobalScope.launch {
-
-                        Log.w("res_statusconfrm:", response.toString())
-                        val statusCode = response.optString("statusCode")
-                        val statusMsg = response.optString("statusMessage")
-
-                        if (statusCode == "1") {
-                            val responseData = response.optJSONArray("responseData")!!
-
-                            if (responseData!!.length() > 0) {
-                                for (i in 0 until responseData.length()) {
-                                    val obj = responseData.optJSONObject(i)
-
-                                    val model = AccountModel(
-                                        obj.optString("accountCode"),
-                                        obj.optString("accountName")
-                                    )
-                                }
-//                                withContext(Dispatchers.Main) {
-//                                    if (accountList!!.size > 0) {
-//                                        setAccountSpinner(accountList!!)
-//                                    }
-//                                }
-                           // }
-                        }
-                        CommonMethodKotl.cancelProgressDialog()
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }, Response.ErrorListener { error: VolleyError ->
-                // Do something when error occurred
-                CommonMethodKotl.cancelProgressDialog()
-
-                Log.w("Error_throwing:", error.toString())
-            }) {
-            override fun getHeaders(): Map<String, String> {
-                val params = java.util.HashMap<String, String>()
-                val creds = java.lang.String.format(
-                    "%s:%s",
-                    Constants.API_SECRET_CODE,
-                    Constants.API_SECRET_PASSWORD
-                )
-                val auth = "Basic " + Base64.encodeToString(creds.toByteArray(), Base64.DEFAULT)
-                params["Authorization"] = auth
-                return params
-            }
-        }
-        jsonObjectRequest.retryPolicy = object : RetryPolicy {
-            override fun getCurrentTimeout(): Int {
-                return 50000
-            }
-
-            override fun getCurrentRetryCount(): Int {
-                return 50000
-            }
-
-            @Throws(VolleyError::class)
-            override fun retry(error: VolleyError) {
-            }
-        }
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonObjectRequest)
-    }
     private fun showPopupMenu(view: View) {
         val menuItemView = findViewById<View>(R.id.fab)
         val popupMenu = PopupMenu(this@PickListDeliveryPrintPreviewActivity, view)
@@ -807,8 +725,8 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         submit_imgl.setOnClickListener {
 
         if(signatureString.isNotEmpty() || imageString!!.isNotEmpty()){
-                spinnertxt_dialog = "C"
-                packStatusStr = "Delivered"
+                spinnertxt_dialog = "OC"
+                packStatusStr = "Picked" // todo
 
                 val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 val currentDateandTime = sdf.format(Date())
@@ -825,10 +743,12 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                     obj.put("latitude", current_latitude)
                     obj.put("longitude", current_longitude)
                     obj.put("CurrentAddress", current_addr)
+                    obj.put("SendMail", "")
                     obj.put("image", imageString)
                     obj.put("signature", signatureString)
 
                     Log.w("imgSign_","$obj")
+
                  savePicklistDeliveryApi(obj,null,"false")
                 } catch (e: JSONException) {
                     throw RuntimeException(e)
@@ -1021,9 +941,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                         }
                     }
                     for (i in report.deniedPermissionResponses.indices) {
-                        Log.d(
-                            "cg_perm", report.deniedPermissionResponses[i].permissionName
-                        )
+                        Log.d("cg_perm", report.deniedPermissionResponses[i].permissionName)
                     }
                     // check for permanent denial of any permission
                     if (report.isAnyPermissionPermanentlyDenied) {
@@ -1175,7 +1093,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun savePickListDelivery(switchPicklist: SwitchCompat?){
+    fun savePickListDelivery(switchPicklist: SwitchCompat?,status: String , pickStatus: String, mail: String){
         val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         val currentDateandTime = sdf.format(Date())
         currentSaveDateTime = currentDateandTime
@@ -1186,11 +1104,12 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             obj.put("currentDateTime", currentSaveDateTime)
             obj.put("customerCode", custCode)
             obj.put("Username", username)
-            obj.put("status", switchPickStr)
-            obj.put("PackStatus", packStatusStr)
+            obj.put("status", status)
+            obj.put("PackStatus", pickStatus)
             obj.put("latitude", current_latitude)
             obj.put("longitude", current_longitude)
             obj.put("CurrentAddress", current_addr)
+            obj.put("SendMail", mail)
             obj.put("image", "")
             obj.put("signature", "")
 
@@ -1232,7 +1151,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
     }
 
 
-    fun savePicklistDeliveryApi(jsonBody: JSONObject ,switchPicklist: SwitchCompat?,alert: String) {
+    fun savePicklistDeliveryApi(jsonBody: JSONObject ,switchPicklist: SwitchCompat?,alert: String) { // todo
         try {
             pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
             pDialog!!.progressHelper.barColor = Color.parseColor("#A5DC86")
@@ -1263,6 +1182,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                         val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
                         startActivity(intent)
                         finish()
+
                         if (alertUpload != null && alertUpload!!.isShowing) {
                             alertUpload!!.dismiss()
                             alertUpload = null
@@ -1271,7 +1191,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                             alertSave!!.dismiss()
                         }
                         if(switchPicklist != null) {
-                            switchPicklist!!.isChecked = false
+                            switchPicklist.isChecked = false
                         }
 //                        if (StockTakeAddActivity.isPrintEnable) {
 //                            intent.putExtra("docNum", docNum)
@@ -1347,7 +1267,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
-    fun showSaveAlert(switchPicklist: SwitchCompat?) {
+    fun showSaveAlert(switchPicklist: SwitchCompat?,status: String , pickStatus: String , mail: String) {
         val builder1 = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
         builder1.setTitle("Are you sure want to save picklist?")
         // builder1.setMessage("Products and Customer Details will be erased.");
@@ -1355,13 +1275,37 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         builder1.setPositiveButton(
             "YES"
         ) { dialog, id -> dialog.cancel()
-            savePickListDelivery(switchPicklist)
+            savePickListDelivery(switchPicklist,status , pickStatus ,mail)
         }
         builder1.setNegativeButton(
             "NO"
         ) { dialog, id -> dialog.cancel()
-            switchPicklist!!.isChecked=false
+            if(switchPicklist != null) {
+                switchPicklist!!.isChecked = false
+            }
             switchPickStr = ""}
+        alertSave = builder1.create()
+        alertSave!! .show()
+    }
+
+    fun showCompletedAlert() {
+        val builder1 = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        builder1.setTitle("Are you sure update to completed status?")
+        // builder1.setMessage("Products and Customer Details will be erased.");
+        builder1.setCancelable(false)
+        builder1.setPositiveButton(
+            "YES"
+        ) { dialog, id ->
+            switchPickStr =  "C"
+            packStatusStr =  "Delivered"
+            savePickListDelivery(null,switchPickStr , packStatusStr,"Yes")
+            dialog.cancel()
+        }
+        builder1.setNegativeButton(
+            "NO"
+        ) { dialog, id -> dialog.cancel()
+            switchPickStr = ""
+        }
         alertSave = builder1.create()
         alertSave!! .show()
     }
