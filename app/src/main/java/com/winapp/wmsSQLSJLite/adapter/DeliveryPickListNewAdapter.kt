@@ -178,18 +178,17 @@ class DeliveryPickListNewAdapter(
                      val intent = Intent(context, PickListDeliveryPrintPreviewActivity::class.java)
 
                         intent.putExtra("salesCodeDel", pickItem.code)
-                        intent.putExtra("salesCodeDel", pickItem.code)
                         intent.putExtra("custCodePickDel", pickItem.customerCode)
                         intent.putExtra("pick_itemDel", pickItem.noOfItem)
                         intent.putExtra("pick_InvDateDel", pickItem.docDate)
                         intent.putExtra("pick_statusDel", pickItem.pickListStatus)
                         intent.putExtra("pick_DocNumDel", pickItem.invNumber)
                         intent.putExtra("pick_DatetimeDel", pickItem.dateTime)
-                        intent.putExtra("pick_model_Del" ,pickItem as Serializable)
-
-                        Log.w("delDateStr1a:",  pickItem.dateTime!!);
+                      //  intent.putExtra("pick_model_Del" ,pickItem as Serializable)
 
                         context.startActivity(intent)
+
+                     //   Log.w("delDateStr1a:",  pickItem.dateTime!!);
                         //  pickListInvoiceClickListener.pickListInvoiceSelected(pos)
                     }
 //                }else{

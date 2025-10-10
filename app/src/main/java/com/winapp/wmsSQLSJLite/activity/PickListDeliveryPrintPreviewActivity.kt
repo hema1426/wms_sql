@@ -269,7 +269,8 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             outstanding_amount = intent.getStringExtra("outstandingAmount")
             delDateStr = intent.getStringExtra("pick_DatetimeDel")
             delStatusStr = intent.getStringExtra("pick_statusDel")
-            pickModel = intent.getSerializableExtra("pick_model_Del") as PickIistDeliveryListingModel
+//            pickModel = intent.getSerializableExtra("pick_model_Del") as PickIistDeliveryListingModel
+          //  pickModel = intent.getParcelableExtra<PickIistDeliveryListingModel>("pick_model_Del")!!
 
             Log.w("delDateStr1:", delDateStr!!)
 
@@ -618,11 +619,12 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         }
 
         viewImg.setOnMenuItemClickListener {
-            showViewImageAlert(pickModel)
+            showViewImageAlert(pickModel) // pickModel not enable check
             true
         }
         uploadItem.setOnMenuItemClickListener {
-        showUploadImageAlert(pickModel)
+      //  showUploadImageAlert(pickModel)
+        showUploadImageAlert()
             true
         }
 
@@ -652,7 +654,8 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.upload_pick_menu -> {
-                    showUploadImageAlert(pickModel)
+                  //  showUploadImageAlert(pickModel)
+                    showUploadImageAlert()
                     true
                 } R.id.viewImg_pick_menu -> {
               //  showViewImageAlert()
@@ -664,7 +667,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         popupMenu.show()
     }
 
-    fun showUploadImageAlert(pickModel: PickIistDeliveryListingModel) {
+    fun showUploadImageAlert() {
         val alertDialog = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
         val customLayout: View = layoutInflater.inflate(R.layout.pick_image_upload_dialog, null)
         alertDialog.setView(customLayout)
@@ -679,8 +682,8 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
         val mSig = CaptureSignatureView(this@PickListDeliveryPrintPreviewActivity, null)
         // mContent.addView(mSig, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        invNo_txt.text = pickModel.code
-        Log.w("pickmodelaa:", pickModel.code!!)
+        invNo_txt.text = invoiceNumber
+//        Log.w("pickmodelaa:", pickModel.code!!)
 
         uploadImgDialog_txt!!.setOnClickListener {
             if (uploadImgDialog_txt!!.getTag() == "view_image") {
