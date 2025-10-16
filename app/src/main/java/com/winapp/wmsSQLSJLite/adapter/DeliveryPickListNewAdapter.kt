@@ -290,7 +290,7 @@ class DeliveryPickListNewAdapter(
         // jsonObject.put("CompanyCode",companyId);
         jsonObject.put("InvoiceNo", invoiceNumber)
         val requestQueue = Volley.newRequestQueue(context)
-        val url = Utils.getBaseUrl(context) + "InvoiceDetails"
+        val url = Utils.getBaseUrl(context) + "InvoiceDetails" jj
         // Initialize a new JsonArrayRequest instance
         Log.w("url_pickDeliver:", url)
 

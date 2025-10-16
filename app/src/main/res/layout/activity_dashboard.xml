@@ -460,6 +460,7 @@
                 android:layout_weight="1"
                 android:id="@+id/sales_order_layout"
                 android:orientation="vertical"
+                android:visibility="gone"
                 android:layout_height="wrap_content">
 
                 <androidx.cardview.widget.CardView
@@ -704,12 +705,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="horizontal"
+            android:visibility="visible"
             android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:id="@+id/product_layout"
                 android:layout_weight="1"
+                android:visibility="gone"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">
 
@@ -768,6 +771,8 @@
                 android:layout_width="match_parent"
                 android:id="@+id/customer_layout"
                 android:layout_weight="1"
+                android:visibility="gone"
+
                 android:orientation="vertical"
                 android:layout_height="wrap_content">
 
@@ -830,7 +835,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_weight="1"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/settings_layout"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">

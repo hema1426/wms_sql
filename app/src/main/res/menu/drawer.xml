@@ -50,6 +50,7 @@
         <item
             android:id="@+id/navigation_item_customer"
             android:icon="@drawable/invoice_user"
+            android:visible="false"
             android:title="Customers" />
 
     </group>
@@ -223,7 +224,7 @@
         <item
             android:id="@+id/navigation_item_settings"
             android:icon="@drawable/ic_baseline_settings_24"
-            android:visible="false"
+            android:visible="true"
             android:title="Settings" />
 
         <item

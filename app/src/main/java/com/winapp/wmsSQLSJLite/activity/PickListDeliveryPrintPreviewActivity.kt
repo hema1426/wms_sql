@@ -327,7 +327,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         jsonObject.put("InvoiceNo", invoiceNumber)
         jsonObject.put("LocationCode", locationCode)
         val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this) + "InvoiceDetails"
+        val url = Utils.getBaseUrl(this) + "InvoiceDetails" jj
         // Initialize a new JsonArrayRequest instance
         Log.w("Given_url:", url + jsonObject.toString())
         pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
@@ -1163,7 +1163,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             val requestQueue = Volley.newRequestQueue(this)
             Log.w("picklDel_request:", jsonBody.toString())
             var URL = ""
-            URL = Utils.getBaseUrl(this) + "PostingSignImageInvoice"
+            URL = Utils.getBaseUrl(this) + "PostingSignImageInvoice" jj
             Log.w("url_picklDel_save:", URL)
             pDialog!!.setTitleText("Saving Picklist...")
             pDialog!!.show()

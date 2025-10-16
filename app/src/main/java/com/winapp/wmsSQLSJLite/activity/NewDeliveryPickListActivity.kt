@@ -469,7 +469,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         jsonObject.put("DocNo", docNum)
         jsonObject.put("DocStatus", status)
 
-        val url = Utils.getBaseUrl(this) + "InvoiceList"
+        val url = Utils.getBaseUrl(this) + "InvoiceList" jj
         Log.w("url_picklis_deli:", "$url-$jsonObject")
         pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
         pDialog!!.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"))

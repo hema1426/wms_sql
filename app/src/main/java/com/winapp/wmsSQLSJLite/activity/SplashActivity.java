@@ -166,7 +166,7 @@ public class SplashActivity extends AppCompatActivity {
     //String apiUrl=Constants.SUPER_STAR_DEMO;
     //  String apiUrl=Constants.WMS_SJLITE_INDIA_DEMO;
   // String apiUrl= WMS_SJLITE_SINGAPORE_Live;
-   String apiUrl= WMS_SJLITE_SINGAPORE_Test;
+  String apiUrl= WMS_SJLITE_SINGAPORE_Test;
   // String apiUrl= WMS_SJLITE_SINGAPORE_old_Live;
 
                 dbHelper.insertUrl(apiUrl);
