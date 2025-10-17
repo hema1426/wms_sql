@@ -120,7 +120,7 @@
                 android:background="@drawable/layout_border_radious5_hash"
                 android:orientation="horizontal">
 
-                <com.winapp.wmsSQLSJLite.multiselectspinner.MultiSelectSpinnerView
+                <com.winapp.KHDelivery.multiselectspinner.MultiSelectSpinnerView
                     android:id="@+id/zoneSpinnerl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

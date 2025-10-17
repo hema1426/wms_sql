@@ -9,10 +9,10 @@ apply plugin: 'com.google.firebase.crashlytics'
 android {
     compileSdk 34
 
-    namespace 'com.winapp.wmsSQLSJLite'
+    namespace 'com.winapp.KHDelivery'
 
     defaultConfig {
-        applicationId "com.winapp.wmsSQLSJLite"
+        applicationId "com.winapp.KHDelivery"
         minSdk 22
         targetSdk 34
         versionCode 1
