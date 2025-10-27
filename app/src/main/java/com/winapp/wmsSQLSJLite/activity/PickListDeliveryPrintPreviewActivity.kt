@@ -2,6 +2,7 @@ package com.winapp.wmsSQLSJLite.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.content.DialogInterface
@@ -27,6 +28,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CompoundButton
@@ -1180,18 +1182,19 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                     responseData = response.optJSONObject("responseData")
                     if (statusCode == "1") {
                         //  val docNum = responseData.optString("docNum")
-                        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-
-                        val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
-                        startActivity(intent)
-                        finish()
-
-                        if (alertUpload != null && alertUpload!!.isShowing) {
-                            alertUpload!!.dismiss()
-                            alertUpload = null
-                        }
                         if(alert.equals("true")) {
+                            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                            val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
+                            startActivity(intent)
+                            finish()
+
                             alertSave!!.dismiss()
+                            if (alertUpload != null && alertUpload!!.isShowing) {
+                                alertUpload!!.dismiss()
+                                alertUpload = null
+                            }
+                        }else{
+                            showSaveConfirmDialog()
                         }
                         if(switchPicklist != null) {
                             switchPicklist.isChecked = false
@@ -1270,6 +1273,31 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
+    fun showSaveConfirmDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.confirm_dialog_picklist)
+        val text = dialog.findViewById<View>(R.id.text_dialog) as TextView
+        val dialogbtn_back = dialog.findViewById<View>(R.id.back_pickdial) as Button
+        val dialogbtn_no = dialog.findViewById<View>(R.id.cancel_pickdial) as Button
+
+       // text.setText("Are you sure want to save picklist?")
+        dialogbtn_back.setOnClickListener {
+            // Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
+            startActivity(intent)
+            finish()
+
+            dialog.dismiss()
+        }
+        dialogbtn_no.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
     fun showSaveAlert(switchPicklist: SwitchCompat?,status: String , pickStatus: String , mail: String) {
         val builder1 = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
         builder1.setTitle("Are you sure want to save picklist?")
