@@ -234,7 +234,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("Username",userId);
         jsonObject.put("Password",password);
-       // http://172.16.5.60:8345/api/Login
+        // http://172.16.5.60:8345/api/Login
         String url= Utils.getBaseUrl(this) +"Login";
         // Initialize a new JsonArrayRequest instance
         Log.w("Given_login_URL:",url + jsonObject);
@@ -244,187 +244,179 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         pDialog.setCancelable(false);
         pDialog.show();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject, response -> {
-                    try{
-                        Log.w("Res_SAP_login:",response.toString());
-                        if (response.length()>0){
-                          //  {"statusCode":1,"statusMessage":"Success",
-                            //  "responseData":[{"userName":"User1","roleName":"DepartmentHead","userID":"1","companyCode":"WINAPP_DEMO",
-                            //  "companyName":"WINAPP_DEMO","address1":"1 XYZ Chennai  IN 600001","address2":"     "}]}
+            try{
+                Log.w("Res_SAP_login:",response.toString());
+                if (response.length()>0){
 
-                            String statusCode=response.optString("statusCode");
-                            if (statusCode.equals("1")){
-                                JSONArray userArray=response.optJSONArray("responseData");
-                                assert userArray != null;
-                                JSONObject object=userArray.optJSONObject(0);
-                                String username=object.optString("userName");
-                                String rollname=object.optString("roleName");
-                               // String locationCode=object.optString("LocationCode");
-                               // String isuserpermission=object.optString("IsUserPermission");
-                               // String ismainlocation=object.optString("IsMainLocation");
+                    String statusCode=response.optString("statusCode");
+                    if (statusCode.equals("1")){
+                        JSONArray userArray=response.optJSONArray("responseData");
+                        assert userArray != null;
+                        JSONObject object=userArray.optJSONObject(0);
+                        String username=object.optString("userName");
+                        String rollname=object.optString("roleName");
+                        // String locationCode=object.optString("LocationCode");
+                        // String isuserpermission=object.optString("IsUserPermission");
+                        // String ismainlocation=object.optString("IsMainLocation");
 
-                              //  : {"statusCode":1,"statusMessage":"Success","responseData":[{"userName":"AADHIVAN 1","roleName":"","userID":"7",
-                                //  "companyCode":"AADHI INTERNATIONAL PTE LTD","companyName":"AADHI INTERNATIONAL PTE LTD","address1":"101 Cecil street  ,
-                                //  #20-11,\r\rSG-069533","address2":"","streetPO":"101 Cecil street  , #20-11","streetNO":"Tong Eng Building","zipcode":"069533",
-                                //  "country":"SG","phone1":"+65 61006061"}]}
+                        String companycode=object.optString("companyCode");
+                        String companyname=object.optString("companyName");
+                        String address1=object.optString("streetPO");
+                        String address2=object.optString("streetNO");
+                        String address3=object.optString("countryName")+"-"+object.optString("zipcode");
+                        String postalcode=object.optString("zipcode");
+                        String country=object.optString("countryName");
+                        String phone=object.optString("phone1");
+                        String gstNo=object.optString("gstNo");
+                        String locationCode=object.optString("warehouse");
+                        String ispermission=object.optString("locationAuthorization");
+                        String logo=object.optString("logo");
+                        String qrcode=object.optString("qrCode");
+                        String paid=object.optString("paid");
+                        String unpaid=object.optString("unPaid");
+                        String paynow=object.optString("payNow");
+                        String bank=object.optString("bank");
+                        String cheque=object.optString("cheque");
+                        String salesManName=object.optString("salesPersonName");
+                        String salesManPhone=object.optString("salesPersonMobile");
+                        String salesManMail=object.optString("salesPersonEmail");
+                        String salesManOffice=object.optString("salesPersonOfficeNo");
+                        String negativeStock =object.optString("allowNegativeStock");
+                        String userMiddlename =object.optString("userMiddleName");
+                        String adminPermission =object.optString("adminPermission");
 
-                                String companycode=object.optString("companyCode");
-                                String companyname=object.optString("companyName");
-                                String address1=object.optString("streetPO");
-                                String address2=object.optString("streetNO");
-                                String address3=object.optString("countryName")+"-"+object.optString("zipcode");
-                                String postalcode=object.optString("zipcode");
-                                String country=object.optString("countryName");
-                                String phone=object.optString("phone1");
-                                String gstNo=object.optString("gstNo");
-                                String locationCode=object.optString("warehouse");
-                                String ispermission=object.optString("locationAuthorization");
-                                String logo=object.optString("logo");
-                                String qrcode=object.optString("qrCode");
-                                String paid=object.optString("paid");
-                                String unpaid=object.optString("unPaid");
-                                String paynow=object.optString("payNow");
-                                String bank=object.optString("bank");
-                                String cheque=object.optString("cheque");
-                                String salesManName=object.optString("salesPersonName");
-                                String salesManPhone=object.optString("salesPersonMobile");
-                                String salesManMail=object.optString("salesPersonEmail");
-                                String salesManOffice=object.optString("salesPersonOfficeNo");
-                                String negativeStock =object.optString("allowNegativeStock");
-                                String userMiddlename =object.optString("userMiddleName");
-                                String adminPermission =object.optString("adminPermission");
+                        String invUOM =object.optString("invoiceDefaultUOM");
+                        String salesUOM =object.optString("salesOrderDefaultUOM");
+                        String returnUOM =object.optString("salesRetunDefaultUOM");
+                        String settleNextDate =object.optString("haveSettlementByDate");
+                        String shortCode =object.optString("shortCode");
+                        String lastPrice =object.optString("showlastSalesPrice");
+                        String totalSales =object.optString("invoiceListShowBalance");
 
-                                String invUOM =object.optString("invoiceDefaultUOM");
-                                String salesUOM =object.optString("salesOrderDefaultUOM");
-                                String returnUOM =object.optString("salesRetunDefaultUOM");
-                                String settleNextDate =object.optString("haveSettlementByDate");
-                                String shortCode =object.optString("shortCode");
-                                String lastPrice =object.optString("showlastSalesPrice");
-                                String totalSales =object.optString("invoiceListShowBalance");
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTING_INV_UOM, invUOM);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTING_SO_UOM, salesUOM);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTING_RETURN_UOM, returnUOM);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTLEMENT_NEXT_DATE, settleNextDate);
+                        //mahudoom given "shortCode": "TRAN",
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SHORT_CODE, shortCode);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_LAST_PRICE, lastPrice);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_TOTAL_SALES, totalSales);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_USER_MIDDLE_NAME, userMiddlename);
+                        sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_ADMIN_PERMISSION, adminPermission);
 
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTING_INV_UOM, invUOM);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTING_SO_UOM, salesUOM);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTING_RETURN_UOM, returnUOM);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SETTLEMENT_NEXT_DATE, settleNextDate);
-                               //mahudoom given "shortCode": "TRAN",
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_SHORT_CODE, shortCode);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_LAST_PRICE, lastPrice);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_TOTAL_SALES, totalSales);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_USER_MIDDLE_NAME, userMiddlename);
-                                sharedPreferenceUtil.setStringPreference(sharedPreferenceUtil.KEY_ADMIN_PERMISSION, adminPermission);
-
-                                session.createLoginSession(
-                                        username,password,rollname,locationCode,"1",ispermission,
-                                        companycode,companyname,address1,address2,address3,country,postalcode,
-                                        phone,gstNo,logo,qrcode,paid,unpaid,paynow,bank,cheque,
-                                        salesManName,salesManPhone,salesManMail,salesManOffice,negativeStock);
-                                // Adding the Preference values to the Session to remember the values
-                                if (rememberMe.isChecked()) {
-                                    loginPrefsEditor.putBoolean("saveLogin", true);
-                                    loginPrefsEditor.putString("username", username);
-                                    loginPrefsEditor.putString("password", password);
-                                    loginPrefsEditor.commit();
-                                } else {
-                                    loginPrefsEditor.clear();
-                                    loginPrefsEditor.commit();
-                                }
-                                // adding details for Loading Content of the Details....
-
-                                if (!logo.isEmpty()){
-                                    Utils.setLogo(logo);
-                                    try {
-                                        ImageUtil.saveStamp(this,logo,"Logo");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }else {
-                                    String filePath = Constants.getSignatureFolderPath(this);
-                                    String fileName = "Logo.jpg";
-                                    File mFile = new File(filePath, fileName);
-                                    if (mFile.exists()){
-                                        mFile.delete();
-                                    }
-                                    Utils.setLogo("");
-                                }
-
-                                if (!qrcode.isEmpty()){
-                                    Utils.setQrcode(qrcode);
-                                    try {
-                                        ImageUtil.saveStamp(this,qrcode,"QrCode");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }else {
-                                    String filePath = Constants.getSignatureFolderPath(this);
-                                    String fileName = "QrCode.jpg";
-                                    File mFile = new File(filePath, fileName);
-                                    if (mFile.exists()){
-                                        mFile.delete();
-                                    }
-                                    Utils.setQrcode("");
-                                }
-
-                                if (!paid.isEmpty()){
-                                    Utils.setPaid(paid);
-                                    try {
-                                        ImageUtil.saveStamp(this,paid,"Paid");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }else {
-                                    String filePath = Constants.getSignatureFolderPath(this);
-                                    String fileName = "Paid.jpg";
-                                    File mFile = new File(filePath, fileName);
-                                    if (mFile.exists()){
-                                        mFile.delete();
-                                    }
-                                    Utils.setPaid("");
-                                }
-
-                                if (!unpaid.isEmpty()){
-                                    Utils.setUnpaid(unpaid);
-                                    try {
-                                        ImageUtil.saveStamp(this,unpaid,"UnPaid");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }else {
-                                    String filePath = Constants.getSignatureFolderPath(this);
-                                    String fileName = "UnPaid.jpg";
-                                    File mFile = new File(filePath, fileName);
-                                    if (mFile.exists()){
-                                        mFile.delete();
-                                    }
-                                    Utils.setUnpaid("");
-                                }
-                                this.newSelectedCompany=companycode;
-                                this.newSelectedCompanyName=companyname;
-                                this.locationCode=locationCode;
-
-                                Log.w("savlog11",""+loginPreferences.getBoolean("saveLogin", false));
-
-                                pDialog.dismiss();
-
-                                getPrinterSetting(username);
-                                Intent intent=new Intent(LoginActivity.this, DashboardActivity.class);
-                                intent.putExtra("isLogin","1");
-                                startActivity(intent);
-                                finish();
-                                //  getCompaniesList();
-                                //  getUserRollPermission(companycode,rollname);
-                            }else {
-                                pDialog.dismiss();
-                                Toast.makeText(getApplicationContext(),"Invalid Username or Password",Toast.LENGTH_LONG).show();
-                            }
+                        session.createLoginSession(
+                                username,password,rollname,locationCode,"1",ispermission,
+                                companycode,companyname,address1,address2,address3,country,postalcode,
+                                phone,gstNo,logo,qrcode,paid,unpaid,paynow,bank,cheque,
+                                salesManName,salesManPhone,salesManMail,salesManOffice,negativeStock);
+                        // Adding the Preference values to the Session to remember the values
+                        if (rememberMe.isChecked()) {
+                            loginPrefsEditor.putBoolean("saveLogin", true);
+                            loginPrefsEditor.putString("username", username);
+                            loginPrefsEditor.putString("password", password);
+                            loginPrefsEditor.commit();
+                        } else {
+                            loginPrefsEditor.clear();
+                            loginPrefsEditor.commit();
                         }
-                    }catch (Exception e){
-                        e.printStackTrace();
+                        // adding details for Loading Content of the Details....
+
+                        if (!logo.isEmpty()){
+                            Utils.setLogo(logo);
+                            try {
+                                ImageUtil.saveStamp(this,logo,"Logo");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else {
+                            String filePath = Constants.getSignatureFolderPath(this);
+                            String fileName = "Logo.jpg";
+                            File mFile = new File(filePath, fileName);
+                            if (mFile.exists()){
+                                mFile.delete();
+                            }
+                            Utils.setLogo("");
+                        }
+
+                        if (!qrcode.isEmpty()){
+                            Utils.setQrcode(qrcode);
+                            try {
+                                ImageUtil.saveStamp(this,qrcode,"QrCode");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else {
+                            String filePath = Constants.getSignatureFolderPath(this);
+                            String fileName = "QrCode.jpg";
+                            File mFile = new File(filePath, fileName);
+                            if (mFile.exists()){
+                                mFile.delete();
+                            }
+                            Utils.setQrcode("");
+                        }
+
+                        if (!paid.isEmpty()){
+                            Utils.setPaid(paid);
+                            try {
+                                ImageUtil.saveStamp(this,paid,"Paid");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else {
+                            String filePath = Constants.getSignatureFolderPath(this);
+                            String fileName = "Paid.jpg";
+                            File mFile = new File(filePath, fileName);
+                            if (mFile.exists()){
+                                mFile.delete();
+                            }
+                            Utils.setPaid("");
+                        }
+
+                        if (!unpaid.isEmpty()){
+                            Utils.setUnpaid(unpaid);
+                            try {
+                                ImageUtil.saveStamp(this,unpaid,"UnPaid");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else {
+                            String filePath = Constants.getSignatureFolderPath(this);
+                            String fileName = "UnPaid.jpg";
+                            File mFile = new File(filePath, fileName);
+                            if (mFile.exists()){
+                                mFile.delete();
+                            }
+                            Utils.setUnpaid("");
+                        }
+                        this.newSelectedCompany=companycode;
+                        this.newSelectedCompanyName=companyname;
+                        this.locationCode=locationCode;
+
+                        Log.w("savlog11",""+loginPreferences.getBoolean("saveLogin", false));
+
+                        pDialog.dismiss();
+
+                        getPrinterSetting(username);
+                        Intent intent=new Intent(LoginActivity.this, DashboardActivity.class);
+                        intent.putExtra("isLogin","1");
+                        startActivity(intent);
+                        finish();
+                        //  getCompaniesList();
+                        //  getUserRollPermission(companycode,rollname);
+                    }else {
+                        pDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"Invalid Username or Password",Toast.LENGTH_LONG).show();
                     }
-                }, error -> {
-                    // Do something when error occurred
-                    pDialog.dismiss();
-                    Log.w("Error_throwing:",error.toString());
-                    Toast.makeText(getApplicationContext(),"Server Error,Please check",Toast.LENGTH_LONG).show();
-                }){
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }, error -> {
+            // Do something when error occurred
+            pDialog.dismiss();
+            Log.w("Error_throwing:",error.toString());
+            Toast.makeText(getApplicationContext(),"Server Error,Please check",Toast.LENGTH_LONG).show();
+        }){
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> params = new HashMap<>();

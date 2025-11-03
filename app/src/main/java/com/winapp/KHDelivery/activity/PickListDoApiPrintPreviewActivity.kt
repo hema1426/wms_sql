@@ -69,21 +69,15 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.winapp.KHDelivery.BuildConfig
 import com.winapp.KHDelivery.R
 import com.winapp.KHDelivery.adapter.PickDeliveryPrintPreviewAdapter
-import com.winapp.KHDelivery.model.AccountModel
 import com.winapp.KHDelivery.model.PickIistDeliveryListingModel
 import com.winapp.KHDelivery.model.PicklistDeliveryPrintPreviewModel
 import com.winapp.KHDelivery.utils.CaptureSignatureView
-import com.winapp.KHDelivery.utils.CommonMethodKotl
 import com.winapp.KHDelivery.utils.Constants
 import com.winapp.KHDelivery.utils.FileCompressor
 import com.winapp.KHDelivery.utils.ImageUtil
 import com.winapp.KHDelivery.utils.LocationTrack
 import com.winapp.KHDelivery.utils.SessionManager
 import com.winapp.KHDelivery.utils.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -96,7 +90,7 @@ import java.util.Locale
 import java.util.Objects
 
 
-class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
+class PickListDoApiPrintPreviewActivity : AppCompatActivity() {
     private var companyId: String? = null
     private var locationCode: String? = null
     private var pDialog: SweetAlertDialog? = null
@@ -115,7 +109,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
     private val addressText: TextView? = null
     private var billAddressText: TextView? = null
     private var shipAddressText: TextView? = null
-    //    private var linetxt: TextView? = null
+//    private var linetxt: TextView? = null
     private var phoneNo_previewl: TextView? = null
     private var deliveryAddr_print_txtl: TextView? = null
     private var deliveryAddr_print_layl: LinearLayout? = null
@@ -270,7 +264,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             delDateStr = intent.getStringExtra("pick_DatetimeDel")
             delStatusStr = intent.getStringExtra("pick_statusDel")
 //            pickModel = intent.getSerializableExtra("pick_model_Del") as PickIistDeliveryListingModel
-            //  pickModel = intent.getParcelableExtra<PickIistDeliveryListingModel>("pick_model_Del")!!
+          //  pickModel = intent.getParcelableExtra<PickIistDeliveryListingModel>("pick_model_Del")!!
 
             Log.w("delDateStr1:", delDateStr!!)
 
@@ -324,10 +318,10 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         // Initialize a new RequestQueue instance
         val jsonObject = JSONObject()
         // jsonObject.put("CompanyCode", companyId);
-        jsonObject.put("InvoiceNo", invoiceNumber)
-        jsonObject.put("LocationCode", locationCode)
+        jsonObject.put("DeliveryOrderNo", invoiceNumber)
+      //  jsonObject.put("LocationCode", locationCode)
         val requestQueue = Volley.newRequestQueue(this)
-        val url = Utils.getBaseUrl(this) + "InvoiceDetails"
+        val url = Utils.getBaseUrl(this) + "DeliveryOrderDetails"
         // Initialize a new JsonArrayRequest instance
         Log.w("Given_url:", url + jsonObject.toString())
         pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
@@ -346,10 +340,10 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                     if (statusCode == "1") {
                         val responseData = response.getJSONArray("responseData")
                         val `object` = responseData.optJSONObject(0)
-                        //
+
                         val model = PicklistDeliveryPrintPreviewModel()
-                        model.invoiceNumber = `object`.optString("invoiceNumber")
-                        model.invoiceDate = `object`.optString("invoiceDate")
+                        model.invoiceNumber = `object`.optString("doNumber")
+                        model.invoiceDate = `object`.optString("doDate")
                         model.customerCode = `object`.optString("customerCode")
                         model.customerName = `object`.optString("customerName")
                         model.address = (`object`.optString("address1") +
@@ -401,28 +395,28 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                         model.addresssZipcode =
                             (`object`.optString("countryName") + " " + `object`.optString("state") + " "
                                     + `object`.optString("zipcode"))
-                        model.soNumber = `object`.optString("soNumber")
-                        model.soDate = `object`.optString("soDate")
-                        model.doDate = `object`.optString("doDate")
-                        model.doNumber = `object`.optString("doNumber")
+//                        model.soNumber = `object`.optString("soNumber")
+//                        model.soDate = `object`.optString("soDate")
+//                        model.doDate = `object`.optString("doDate")
+//                        model.doNumber = `object`.optString("doNumber")
                         model.phoneNo = `object`.optString("phoneNo")
                         val signFlag = `object`.optString("signFlag")
                         if (signFlag == "Y") {
                             val signature = `object`.optString("signature")
-                            // Utils.setSignature(signature)
-                            // createSignature()
+                           // Utils.setSignature(signature)
+                           // createSignature()
                         } else {
-                            // Utils.setSignature("")
+                           // Utils.setSignature("")
                         }
                         var lineNo = ""
-                      //  val lineArray = `object`.optJSONArray("invTextTypeDetails")
+//                        val lineArray = `object`.optJSONArray("invTextTypeDetails")
 //                        for (i in 0 until lineArray.length()) {
 //                            val lineobj = lineArray.optJSONObject(i)
 //                            val invoiceListModel = PicklistDeliveryPrintPreviewModel()
 //                            lineNo = lineobj.optString("lineText")
 //                            // invoiceListModel.setLineNo(lineobj.optString("lineText"));
 //                        }
-                        val detailsArray = `object`.optJSONArray("invoiceDetails")
+                        val detailsArray = `object`.optJSONArray("deliveryOrderDetails")
                         invoiceList = ArrayList()
                         for (i in 0 until detailsArray.length()) {
                             val detailObject = detailsArray.optJSONObject(i)
@@ -521,7 +515,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             customerNameText!!.text = model.customerName
             billAddressText!!.text = model.address
             shipAddressText!!.text = model.deliveryAddress
-            //   linetxt!!.text = model.lineNo
+         //   linetxt!!.text = model.lineNo
             phoneNo_previewl!!.text = model.phoneNo
             Log.w("shiaddreee1detat",""+model.deliveryAddress)
 //            if (!model.getAddress1().isEmpty()){
@@ -581,12 +575,12 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             invoiceListView!!.setHasFixedSize(true)
             // RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
             invoiceListView!!.layoutManager = LinearLayoutManager(
-                this@PickListDeliveryPrintPreviewActivity,
+                this@PickListDoApiPrintPreviewActivity,
                 LinearLayoutManager.VERTICAL,
                 false
             )
             adapter = PickDeliveryPrintPreviewAdapter(
-                this@PickListDeliveryPrintPreviewActivity,
+                this@PickListDoApiPrintPreviewActivity,
                 invoiceList
             )
             invoiceListView!!.adapter = adapter
@@ -614,7 +608,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             menuItem.setVisible(true)
         }
         saveItem.setOnMenuItemClickListener {
-            showCompletedAlert()
+           showCompletedAlert()
             true
         }
 
@@ -623,42 +617,42 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             true
         }
         uploadItem.setOnMenuItemClickListener {
-            //  showUploadImageAlert(pickModel)
-            showUploadImageAlert()
+      //  showUploadImageAlert(pickModel)
+        showUploadImageAlert()
             true
         }
 
         switchColor1(switchPicklist,false)
 
         switchPicklist.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            if (isChecked) {
-                switchPickStr =  "OC"
-                packStatusStr =  "Picked"
-                switchColor(switchPicklist,isChecked)
+              if (isChecked) {
+                  switchPickStr =  "OC"
+                  packStatusStr =  "Picked"
+                  switchColor(switchPicklist,isChecked)
 //                  switchPicklist!!.setBackgroundColor(Color.parseColor("#AC655C"));
                 showSaveAlert(switchPicklist,switchPickStr , packStatusStr, "")
             } else {
-                switchColor1(switchPicklist,isChecked)
-                //   switchPicklist!!.setBackgroundColor(Color.parseColor("#F95B24"));
-                switchPickStr = "O"
-                packStatusStr =  "Pending"
-            }
+                  switchColor1(switchPicklist,isChecked)
+               //   switchPicklist!!.setBackgroundColor(Color.parseColor("#F95B24"));
+                  switchPickStr = "O"
+                  packStatusStr =  "Pending"
+              }
         }
         return true
     }
 
     private fun showPopupMenu(view: View) {
         val menuItemView = findViewById<View>(R.id.fab)
-        val popupMenu = PopupMenu(this@PickListDeliveryPrintPreviewActivity, view)
+        val popupMenu = PopupMenu(this@PickListDoApiPrintPreviewActivity, view)
         popupMenu.menuInflater.inflate(R.menu.three_dot_pick_menu, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.upload_pick_menu -> {
-                    //  showUploadImageAlert(pickModel)
+                  //  showUploadImageAlert(pickModel)
                     showUploadImageAlert()
                     true
                 } R.id.viewImg_pick_menu -> {
-                //  showViewImageAlert()
+              //  showViewImageAlert()
                 true
             }
                 else -> false
@@ -668,7 +662,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
     }
 
     fun showUploadImageAlert() {
-        val alertDialog = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        val alertDialog = AlertDialog.Builder(this@PickListDoApiPrintPreviewActivity)
         val customLayout: View = layoutInflater.inflate(R.layout.pick_image_upload_dialog, null)
         alertDialog.setView(customLayout)
         uploadImgDialogLay = customLayout.findViewById<LinearLayout>(R.id.attachement_layout_inv)
@@ -680,7 +674,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         val close_btn_edit_invl = customLayout.findViewById<ImageView>(R.id.close_btn_pickdel)
         spinner_pickStatus = customLayout.findViewById<Spinner>(R.id.spinner_status_pickD)
 
-        val mSig = CaptureSignatureView(this@PickListDeliveryPrintPreviewActivity, null)
+        val mSig = CaptureSignatureView(this@PickListDoApiPrintPreviewActivity, null)
         // mContent.addView(mSig, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         invNo_txt.text = invoiceNumber
 //        Log.w("pickmodelaa:", pickModel.code!!)
@@ -727,14 +721,13 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
         submit_imgl.setOnClickListener {
 
-            if(signatureString.isNotEmpty() || imageString!!.isNotEmpty()){
+        if(signatureString.isNotEmpty() || imageString!!.isNotEmpty()){
                 spinnertxt_dialog = "OC"
                 packStatusStr = "Picked" // todo
 
                 val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 val currentDateandTime = sdf.format(Date())
                 currentSaveDateTime = currentDateandTime
-
                 try {
                     val obj = JSONObject()
                     obj.put("invoiceNumber", invoiceNumber)
@@ -752,7 +745,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
                     Log.w("imgSign_","$obj")
 
-                    savePicklistDeliveryApi(obj,null,"false")
+                 savePicklistDeliveryApi(obj,null,"false")
                 } catch (e: JSONException) {
                     throw RuntimeException(e)
                 }
@@ -765,7 +758,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 //                    spinnertxt_dialog = "O"
 //                }
                 // //  spinnertxt_dialog = "OC"
-            }
+       }
 //            {"invoiceNumber":"18","currentDateTime":"20250616_171118","customerCode":"0005","Username":"ST01",
 //            "status":"C",
 //                "latitude":"10.96440894","longitude":"78.44143506","image":"","signature":""}
@@ -786,7 +779,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         val mContent = customLayout.findViewById<LinearLayout>(R.id.signature_layout)
         acceptButton.setEnabled(false)
         acceptButton.setAlpha(0.4f)
-        val mSig = CaptureSignatureView(this@PickListDeliveryPrintPreviewActivity, null) {
+        val mSig = CaptureSignatureView(this@PickListDoApiPrintPreviewActivity, null) {
             acceptButton.setEnabled(true)
             acceptButton.setAlpha(1f)
         }
@@ -810,7 +803,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         alert!!.show()
     }
     fun showImage() {
-        val builder = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        val builder = AlertDialog.Builder(this@PickListDoApiPrintPreviewActivity)
         val inflater = layoutInflater
         val dialogView = inflater.inflate(R.layout.image_view_layout, null)
         val imageView = dialogView.findViewById<ImageView>(R.id.invoice_image)
@@ -857,7 +850,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             "Take Photo",  /* "Choose from Library",*/
             "Cancel"
         )
-        val builder = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        val builder = AlertDialog.Builder(this@PickListDoApiPrintPreviewActivity)
         builder.setItems(
             items
         ) { dialog: DialogInterface, item: Int ->
@@ -1007,14 +1000,14 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
     }
     private fun switchColor(switchPicklist: SwitchCompat?,checked: Boolean) {
         switchPicklist!!.getThumbDrawable().setColorFilter(
-            if (checked) Color.BLACK
+                if (checked) Color.BLACK
             else Color.parseColor("#F95B24"),
-            PorterDuff.Mode.MULTIPLY)
+                PorterDuff.Mode.MULTIPLY)
         switchPicklist!!.getTrackDrawable().setColorFilter(
-            if (!checked) Color.BLACK
-            else Color.parseColor("#F95B24"),
-            PorterDuff.Mode.MULTIPLY
-        )
+                if (!checked) Color.BLACK
+                else Color.parseColor("#F95B24"),
+                PorterDuff.Mode.MULTIPLY
+            )
     }
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -1124,7 +1117,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
     @SuppressLint("MissingInflatedId")
     fun showViewImageAlert(pickModel: PickIistDeliveryListingModel) {
-        val alertDialog = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        val alertDialog = AlertDialog.Builder(this@PickListDoApiPrintPreviewActivity)
         val customLayout: View = layoutInflater.inflate(R.layout.pick_view_image_dialog, null)
         alertDialog.setView(customLayout)
         var view_imgl = customLayout.findViewById<ImageView>(R.id.view_pick_img)
@@ -1163,7 +1156,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
             val requestQueue = Volley.newRequestQueue(this)
             Log.w("picklDel_request:", jsonBody.toString())
             var URL = ""
-            URL = Utils.getBaseUrl(this) + "PostingSignImageInvoice"
+            URL = Utils.getBaseUrl(this) + "PostingSignImageDeliveryOrder"
             Log.w("url_picklDel_save:", URL)
             pDialog!!.setTitleText("Saving Picklist...")
             pDialog!!.show()
@@ -1271,7 +1264,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         }
     }
     fun showSaveAlert(switchPicklist: SwitchCompat?,status: String , pickStatus: String , mail: String) {
-        val builder1 = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        val builder1 = AlertDialog.Builder(this@PickListDoApiPrintPreviewActivity)
         builder1.setTitle("Are you sure want to save picklist?")
         // builder1.setMessage("Products and Customer Details will be erased.");
         builder1.setCancelable(false)
@@ -1292,7 +1285,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
     }
 
     fun showCompletedAlert() {
-        val builder1 = AlertDialog.Builder(this@PickListDeliveryPrintPreviewActivity)
+        val builder1 = AlertDialog.Builder(this@PickListDoApiPrintPreviewActivity)
         builder1.setTitle("Are you sure update to completed status?")
         // builder1.setMessage("Products and Customer Details will be erased.");
         builder1.setCancelable(false)
@@ -1313,21 +1306,21 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         alertSave!! .show()
     }
     fun getCurrentLocation() {
-        locationTrack = LocationTrack(this@PickListDeliveryPrintPreviewActivity)
+        locationTrack = LocationTrack(this@PickListDoApiPrintPreviewActivity)
         if (locationTrack!!.canGetLocation()) {
             val longitude: Double = locationTrack!!.getLongitude()
             val latitude: Double = locationTrack!!.getLatitude()
             current_latitude = latitude.toString()
             current_longitude = longitude.toString()
-            val currentAddress = Utils.getCompleteAddress(this@PickListDeliveryPrintPreviewActivity, latitude, longitude)
+            val currentAddress = Utils.getCompleteAddress(this@PickListDoApiPrintPreviewActivity, latitude, longitude)
             if (currentAddress != null && !currentAddress.isEmpty()) {
                 //  locationText.setText(currentAddress)
-                current_addr = currentAddress
+               current_addr = currentAddress
             }
             Log.w("latlongpickDPrev",""+current_latitude)
 
         } else {
-            // locationTrack!!.showSettingsAlert();
+           // locationTrack!!.showSettingsAlert();
         }
     }
     fun printPreview() {
@@ -1464,7 +1457,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
 
     companion object {
         var REQUEST_PERMISSIONS = 154
-        private val TAG = PickListDeliveryPrintPreviewActivity::class.java.getSimpleName()
+        private val TAG = PickListDoApiPrintPreviewActivity::class.java.getSimpleName()
         const val SAMPLE_FILE = "android_tutorial.pdf"
         var behavior: BottomSheetBehavior<*>? = null
         private const val PERMISSION_REQUEST_CODE = 100

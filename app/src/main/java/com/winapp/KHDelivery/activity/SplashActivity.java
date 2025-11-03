@@ -90,6 +90,7 @@ public class SplashActivity extends AppCompatActivity {
         session=new SessionManager(this);
         user = session.getUserDetails();
         registerUser=session.getRegisterDetails();
+
         userName=user.get(SessionManager.KEY_USER_NAME);
         companyCode = user.get(SessionManager.KEY_COMPANY_CODE);
         emailId=user.get(SessionManager.KEY_EMAIL);

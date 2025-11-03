@@ -78,7 +78,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class NewDeliveryPickListActivity : AppCompatActivity(),
+class DoApiPickListActivity : AppCompatActivity(),
     OnClickListener,DeliveryPickListNewAdapter.PickListUploadClickListener {
 
     private var picklistinvoice_rv: RecyclerView? = null
@@ -219,7 +219,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         zoneSpinner = findViewById(R.id.zoneSpinnerl)
         mCompressor = FileCompressor(this)
 
-        //   val status = arrayOf("All", "Pending", "Packed", "Delivered")
+     //   val status = arrayOf("All", "Pending", "Packed", "Delivered")
         val status = arrayOf("All", "Pending", "Packed")
 
         val langAdapter =
@@ -278,7 +278,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
             val intent = Intent(applicationContext, FilterCustomerListActivity::class.java)
             startActivityForResult(intent, CUST_RESULT_CODE)
         }
-        // custFilterAutol!!.clearFocus()
+       // custFilterAutol!!.clearFocus()
 
         search_ed!!.addTextChangedListener(searchTextWatcher)
 
@@ -461,15 +461,15 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
 //            jsonObject.put("User",userName);
 //        }
 
-        jsonObject.put("User", user)
-        jsonObject.put("LocationCode", location)
+        jsonObject.put("User", "All")
+//        jsonObject.put("LocationCode", location)
         jsonObject.put("CustomerCode", customerCode)
         jsonObject.put("FromDate", fromdate)
         jsonObject.put("ToDate", todate)
-        jsonObject.put("DocNo", docNum)
-        jsonObject.put("DocStatus", status)
+//        jsonObject.put("DocNo", docNum)
+        jsonObject.put("DoStatus", status)
 
-        val url = Utils.getBaseUrl(this) + "InvoiceList"
+        val url = Utils.getBaseUrl(this) + "DeliveryOrderList"
         Log.w("url_picklis_deli:", "$url-$jsonObject")
         pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
         pDialog!!.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"))
@@ -516,10 +516,10 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
                                 model.code = obj.optString("code");
                                 model.customerCode = obj.optString("customerCode")
                                 model.customerName = obj.optString("customerName")
-                                model.docDate = obj.optString("invoiceDate")
-                                model.invNumber = obj.optString("invoiceNumber")
+                                model.docDate = obj.optString("doDate")
+                                model.invNumber = obj.optString("doNumber")
                                 model.noOfItem = obj.optString("noOfItemCount")
-                                model.invoiceStatus = obj.optString("invoiceStatus")
+                                model.invoiceStatus = obj.optString("doStatus")
                                 model.dateTime = obj.optString("dateTime")
                                 model.pickListStatus = obj.optString("pickingStatus")
                                 model.customerAddress = custAddress
@@ -536,27 +536,27 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
                                 model.isItemSelected = false
                                 model.invoiceList = invoiceList
 
-                                Log.w("delDateStr1a:",".."+obj.optString("dateTime"));
+                            //    Log.w("delDateStr1a:",".."+obj.optString("dateTime"));
 
                                 picklistNew!!.add(model)
                             }
 
-                            //   withContext(Dispatchers.Main) {
-                            if (picklistNew!!.size > 0) {
-                                searchFilterView!!.visibility = View.GONE
-                                setAdapter(picklistNew!!)
-                                cleartxt()
+                         //   withContext(Dispatchers.Main) {
+                                if (picklistNew!!.size > 0) {
+                                    searchFilterView!!.visibility = View.GONE
+                                    setAdapter(picklistNew!!)
+                                    cleartxt()
 
-                            } else {
-                                emptytxt()
-                                searchFilterView!!.visibility = View.GONE
-                            }
-                            //   }
+                                } else {
+                                    emptytxt()
+                                    searchFilterView!!.visibility = View.GONE
+                                }
+                         //   }
                         } else {
                             emptytxt()
                         }
                     } else {
-                        toast(this@NewDeliveryPickListActivity, statusMsg)
+                        toast(this@DoApiPickListActivity, statusMsg)
                         emptytxt()
 
                     }
@@ -953,7 +953,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
     }
 
     fun showUploadImageAlert(pickModel: PickIistDeliveryListingModel) {
-        val alertDialog = AlertDialog.Builder(this@NewDeliveryPickListActivity)
+        val alertDialog = AlertDialog.Builder(this@DoApiPickListActivity)
         val customLayout: View = layoutInflater.inflate(R.layout.pick_image_upload_dialog, null)
         alertDialog.setView(customLayout)
         uploadImgDialogLay = customLayout.findViewById<LinearLayout>(R.id.attachement_layout_inv)
@@ -965,7 +965,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         val close_btn_edit_invl = customLayout.findViewById<ImageView>(R.id.close_btn_pickdel)
         spinner_pickStatus = customLayout.findViewById<Spinner>(R.id.spinner_status_pickD)
 
-        val mSig = CaptureSignatureView(this@NewDeliveryPickListActivity, null)
+        val mSig = CaptureSignatureView(this@DoApiPickListActivity, null)
         // mContent.addView(mSig, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         invNo_txt.text = pickModel.invNumber
 
@@ -1045,7 +1045,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
 //                } else  {
 //                    spinnertxt_dialog = "O"
 //                }
-                // //  spinnertxt_dialog = "OC"
+              // //  spinnertxt_dialog = "OC"
             }
 //            {"invoiceNumber":"18","currentDateTime":"20250616_171118","customerCode":"0005","Username":"ST01",
 //            "status":"C",
@@ -1058,7 +1058,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
     }
     @SuppressLint("MissingInflatedId")
     fun showViewImageAlert(pickModel: PickIistDeliveryListingModel) {
-        val alertDialog = AlertDialog.Builder(this@NewDeliveryPickListActivity)
+        val alertDialog = AlertDialog.Builder(this@DoApiPickListActivity)
         val customLayout: View = layoutInflater.inflate(R.layout.pick_view_image_dialog, null)
         alertDialog.setView(customLayout)
         var view_imgl = customLayout.findViewById<ImageView>(R.id.view_pick_img)
@@ -1088,7 +1088,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
     }
 
     fun showImage() {
-        val builder = AlertDialog.Builder(this@NewDeliveryPickListActivity)
+        val builder = AlertDialog.Builder(this@DoApiPickListActivity)
         val inflater = layoutInflater
         val dialogView = inflater.inflate(R.layout.image_view_layout, null)
         val imageView = dialogView.findViewById<ImageView>(R.id.invoice_image)
@@ -1135,7 +1135,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
             "Take Photo",  /* "Choose from Library",*/
             "Cancel"
         )
-        val builder = AlertDialog.Builder(this@NewDeliveryPickListActivity)
+        val builder = AlertDialog.Builder(this@DoApiPickListActivity)
         builder.setItems(
             items
         ) { dialog: DialogInterface, item: Int ->
@@ -1259,7 +1259,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
 //    }
     private fun showPopupMenu(pickModel: PickIistDeliveryListingModel, view: View) {
         val menuItemView = findViewById<View>(R.id.fab)
-        val popupMenu = PopupMenu(this@NewDeliveryPickListActivity, view)
+        val popupMenu = PopupMenu(this@DoApiPickListActivity, view)
         popupMenu.menuInflater.inflate(R.menu.three_dot_pick_menu, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -1268,8 +1268,8 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
                     true
                 } R.id.viewImg_pick_menu -> {
                 showViewImageAlert(pickModel)
-                true
-            }
+                    true
+                }
                 else -> false
             }
         }
@@ -1299,10 +1299,10 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
                     var responseData: JSONObject? = null
                     responseData = response.optJSONObject("responseData")
                     if (statusCode == "1") {
-                        //  val docNum = responseData.optString("docNum")
+                      //  val docNum = responseData.optString("docNum")
                         Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
 
-                        val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
+                        val intent = Intent(applicationContext, DoApiPickListActivity::class.java)
                         startActivity(intent)
                         finish()
                         alertUpload!!.dismiss()
@@ -1419,7 +1419,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         val mContent = customLayout.findViewById<LinearLayout>(R.id.signature_layout)
         acceptButton.setEnabled(false)
         acceptButton.setAlpha(0.4f)
-        val mSig = CaptureSignatureView(this@NewDeliveryPickListActivity, null) {
+        val mSig = CaptureSignatureView(this@DoApiPickListActivity, null) {
             acceptButton.setEnabled(true)
             acceptButton.setAlpha(1f)
         }
@@ -1432,7 +1432,7 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
             val signature = mSig.getBitmap()
             signatureCaptu!!.setImageBitmap(signature)
             signatureString = ImageUtil.convertBimaptoBase64(signature)
-            //  Utils.setSignature(signatureString)
+          //  Utils.setSignature(signatureString)
             alert!!.dismiss()
             Log.w("SignatureString:", signatureString)
         }
@@ -1447,24 +1447,24 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         showPopupMenu(pickModel,view)
     }
     fun getCurrentLocation() {
-        locationTrack = LocationTrack(this@NewDeliveryPickListActivity)
+        locationTrack = LocationTrack(this@DoApiPickListActivity)
         if (locationTrack!!.canGetLocation()) {
             val longitude: Double = locationTrack!!.getLongitude()
             val latitude: Double = locationTrack!!.getLatitude()
             current_latitude = latitude.toString()
             current_longitude = longitude.toString()
-            val currentAddress = Utils.getCompleteAddress(this@NewDeliveryPickListActivity, latitude, longitude)
+            val currentAddress = Utils.getCompleteAddress(this@DoApiPickListActivity, latitude, longitude)
             if (currentAddress != null && !currentAddress.isEmpty()) {
-                //  locationText.setText(currentAddress)
+              //  locationText.setText(currentAddress)
                 current_addr = currentAddress
             }
             Log.w("latlongpickD",""+current_latitude)
 
         } else {
-            //   locationTrack!!.showSettingsAlert();
+     //   locationTrack!!.showSettingsAlert();
         }
     }
-    //    fun setCurrentLocation(latitude: Double, longitude: Double) {
+//    fun setCurrentLocation(latitude: Double, longitude: Double) {
 //        currentLocationLatitude = latitude
 //        currentLocationLongitude = longitude
 //        val currentAddress = Utils.getCompleteAddress(this@NewDeliveryPickListActivity, latitude, longitude)
