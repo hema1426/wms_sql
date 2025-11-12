@@ -196,7 +196,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val builder = VmPolicy.Builder()
         StrictMode.setVmPolicy(builder.build())
-        setContentView(R.layout.activity_picklist_delivery_print_preview)
+       // setContentView(R.layout.activity_picklist_delivery_print_preview)
         setTitle()
         TscDll = TSCActivity()
         session = SessionManager(this)
@@ -1194,7 +1194,7 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                                 alertUpload = null
                             }
                         }else{
-                            showSaveConfirmDialog()
+                            showSaveConfirmDialog()  todo not check , need to check
                         }
                         if(switchPicklist != null) {
                             switchPicklist.isChecked = false

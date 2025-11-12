@@ -4240,6 +4240,7 @@ class CreateNewInvoiceActivity : BaseActivity() , OnClickListener {
                 invoiceObject.put("locationCode", locationCode)
                 invoiceObject.put("createUser", username)
                 invoiceObject.put("modifyUser", username)
+
                 invoiceDetailsArray.put(invoiceObject)
                 index++
             }

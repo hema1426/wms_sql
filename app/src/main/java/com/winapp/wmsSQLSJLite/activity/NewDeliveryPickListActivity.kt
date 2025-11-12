@@ -191,7 +191,8 @@ class NewDeliveryPickListActivity : AppCompatActivity(),
         setContentView(R.layout.activity_delivery_picklist_list)
         Objects.requireNonNull(supportActionBar)!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.title = "Delivery PickList"
-        Log.w("activity_cg", javaClass.getSimpleName().toString()+"ar invoice")
+
+        Log.w("activity_cg", javaClass.getSimpleName().toString())
 
         sharedPreferenceUtil = SharedPreferenceUtil(this)
         //  intentIntegrator = IntentIntegrator.forSupportFragment(this) // use this instead
