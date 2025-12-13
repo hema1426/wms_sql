@@ -1194,7 +1194,11 @@ class PickListDeliveryPrintPreviewActivity : AppCompatActivity() {
                                 alertUpload = null
                             }
                         }else{
-                            showSaveConfirmDialog()  todo not check , need to check
+                          //  showSaveConfirmDialog() // todo not check , need to check
+                            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                            val intent = Intent(applicationContext, NewDeliveryPickListActivity::class.java)
+                            startActivity(intent)
+                            finish()
                         }
                         if(switchPicklist != null) {
                             switchPicklist.isChecked = false
